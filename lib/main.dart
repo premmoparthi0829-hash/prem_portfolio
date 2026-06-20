@@ -400,15 +400,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 color: Colors.white,
               ),
             ),
-            Text(
+            GradientText(
               "WORKS",
+              gradient: LinearGradient(
+                colors: [Colors.white, Colors.white.withOpacity(0.4)],
+              ),
               style: GoogleFonts.outfit(
                 fontSize: 36,
                 fontWeight: FontWeight.w900,
-                foreground: Paint()
-                  ..style = PaintingStyle.stroke
-                  ..strokeWidth = 1.5
-                  ..color = Colors.white.withOpacity(0.15),
               ),
             ),
           ],
@@ -553,15 +552,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 color: Colors.white,
               ),
             ),
-            Text(
+            GradientText(
               "EXPERIENCE",
+              gradient: LinearGradient(
+                colors: [Colors.white, Colors.white.withOpacity(0.4)],
+              ),
               style: GoogleFonts.outfit(
                 fontSize: 36,
                 fontWeight: FontWeight.w900,
-                foreground: Paint()
-                  ..style = PaintingStyle.stroke
-                  ..strokeWidth = 1.5
-                  ..color = Colors.white.withOpacity(0.15),
               ),
             ),
           ],
@@ -607,15 +605,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 color: Colors.white,
               ),
             ),
-            Text(
+            GradientText(
               "SPECIALIZATION",
+              gradient: LinearGradient(
+                colors: [Colors.white, Colors.white.withOpacity(0.4)],
+              ),
               style: GoogleFonts.outfit(
                 fontSize: 36,
                 fontWeight: FontWeight.w900,
-                foreground: Paint()
-                  ..style = PaintingStyle.stroke
-                  ..strokeWidth = 1.5
-                  ..color = Colors.white.withOpacity(0.15),
               ),
             ),
           ],
@@ -804,15 +801,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 color: Colors.white,
               ),
             ),
-            Text(
+            GradientText(
               "TOUCH",
+              gradient: LinearGradient(
+                colors: [Colors.white, Colors.white.withOpacity(0.4)],
+              ),
               style: GoogleFonts.outfit(
                 fontSize: 36,
                 fontWeight: FontWeight.w900,
-                foreground: Paint()
-                  ..style = PaintingStyle.stroke
-                  ..strokeWidth = 1.5
-                  ..color = Colors.white.withOpacity(0.15),
               ),
             ),
           ],
