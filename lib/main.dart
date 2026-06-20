@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:simple_icons/simple_icons.dart';
 
 void main() {
   runApp(const MyApp());
@@ -37,7 +38,7 @@ class PortfolioScreen extends StatefulWidget {
 
 class _PortfolioScreenState extends State<PortfolioScreen> {
   final ScrollController _scrollController = ScrollController();
-  
+
   // Keys for section navigation
   final GlobalKey _homeKey = GlobalKey();
   final GlobalKey _projectsKey = GlobalKey();
@@ -94,7 +95,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final isDesktop = constraints.maxWidth > 950;
-          
+
           if (isDesktop) {
             // Desktop Layout: Two columns (Left Sticky Profile Card, Right Scrollable Panel)
             return SafeArea(
@@ -108,7 +109,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                     padding: const EdgeInsets.all(24),
                     child: const LeftProfileCard(),
                   ),
-                  
+
                   // Right Scrollable Panel
                   Expanded(
                     child: Stack(
@@ -116,24 +117,44 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         // Main Scrollable Area
                         SingleChildScrollView(
                           controller: _scrollController,
-                          padding: const EdgeInsets.only(left: 24, right: 64, top: 100, bottom: 64),
+                          padding: const EdgeInsets.only(
+                            left: 24,
+                            right: 64,
+                            top: 100,
+                            bottom: 64,
+                          ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               // Sections with keys for smooth scrolling
-                              Container(key: _homeKey, child: _buildHeroSection(isDesktop)),
+                              Container(
+                                key: _homeKey,
+                                child: _buildHeroSection(isDesktop),
+                              ),
                               const SizedBox(height: 80),
-                              Container(key: _projectsKey, child: _buildProjectsSection()),
+                              Container(
+                                key: _projectsKey,
+                                child: _buildProjectsSection(),
+                              ),
                               const SizedBox(height: 80),
-                              Container(key: _experienceKey, child: _buildExperienceSection()),
+                              Container(
+                                key: _experienceKey,
+                                child: _buildExperienceSection(),
+                              ),
                               const SizedBox(height: 80),
-                              Container(key: _skillsKey, child: _buildSkillsSection()),
+                              Container(
+                                key: _skillsKey,
+                                child: _buildSkillsSection(),
+                              ),
                               const SizedBox(height: 80),
-                              Container(key: _contactKey, child: _buildContactSection()),
+                              Container(
+                                key: _contactKey,
+                                child: _buildContactSection(),
+                              ),
                             ],
                           ),
                         ),
-                        
+
                         // Floating Navbar at the top of the right panel
                         Positioned(
                           top: 24,
@@ -145,11 +166,21 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               activeIndex: _activeSectionIndex,
                               onTap: (index) {
                                 switch (index) {
-                                  case 0: _scrollToSection(_homeKey); break;
-                                  case 1: _scrollToSection(_projectsKey); break;
-                                  case 2: _scrollToSection(_experienceKey); break;
-                                  case 3: _scrollToSection(_skillsKey); break;
-                                  case 4: _scrollToSection(_contactKey); break;
+                                  case 0:
+                                    _scrollToSection(_homeKey);
+                                    break;
+                                  case 1:
+                                    _scrollToSection(_projectsKey);
+                                    break;
+                                  case 2:
+                                    _scrollToSection(_experienceKey);
+                                    break;
+                                  case 3:
+                                    _scrollToSection(_skillsKey);
+                                    break;
+                                  case 4:
+                                    _scrollToSection(_contactKey);
+                                    break;
                                 }
                               },
                             ),
@@ -168,28 +199,48 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 children: [
                   SingleChildScrollView(
                     controller: _scrollController,
-                    padding: const EdgeInsets.only(left: 16, right: 16, top: 90, bottom: 40),
+                    padding: const EdgeInsets.only(
+                      left: 16,
+                      right: 16,
+                      top: 90,
+                      bottom: 40,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Left Profile Card acts as top header card on mobile
                         const LeftProfileCard(),
                         const SizedBox(height: 48),
-                        
+
                         // Main Content sections
-                        Container(key: _homeKey, child: _buildHeroSection(isDesktop)),
+                        Container(
+                          key: _homeKey,
+                          child: _buildHeroSection(isDesktop),
+                        ),
                         const SizedBox(height: 64),
-                        Container(key: _projectsKey, child: _buildProjectsSection()),
+                        Container(
+                          key: _projectsKey,
+                          child: _buildProjectsSection(),
+                        ),
                         const SizedBox(height: 64),
-                        Container(key: _experienceKey, child: _buildExperienceSection()),
+                        Container(
+                          key: _experienceKey,
+                          child: _buildExperienceSection(),
+                        ),
                         const SizedBox(height: 64),
-                        Container(key: _skillsKey, child: _buildSkillsSection()),
+                        Container(
+                          key: _skillsKey,
+                          child: _buildSkillsSection(),
+                        ),
                         const SizedBox(height: 64),
-                        Container(key: _contactKey, child: _buildContactSection()),
+                        Container(
+                          key: _contactKey,
+                          child: _buildContactSection(),
+                        ),
                       ],
                     ),
                   ),
-                  
+
                   // Floating Navbar centered at the top for mobile
                   Positioned(
                     top: 16,
@@ -201,11 +252,21 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         activeIndex: _activeSectionIndex,
                         onTap: (index) {
                           switch (index) {
-                            case 0: _scrollToSection(_homeKey); break;
-                            case 1: _scrollToSection(_projectsKey); break;
-                            case 2: _scrollToSection(_experienceKey); break;
-                            case 3: _scrollToSection(_skillsKey); break;
-                            case 4: _scrollToSection(_contactKey); break;
+                            case 0:
+                              _scrollToSection(_homeKey);
+                              break;
+                            case 1:
+                              _scrollToSection(_projectsKey);
+                              break;
+                            case 2:
+                              _scrollToSection(_experienceKey);
+                              break;
+                            case 3:
+                              _scrollToSection(_skillsKey);
+                              break;
+                            case 4:
+                              _scrollToSection(_contactKey);
+                              break;
                           }
                         },
                       ),
@@ -266,7 +327,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           ),
         ),
         const SizedBox(height: 40),
-        
+
         // Stats Counter Row
         const Wrap(
           spacing: 48,
@@ -278,14 +339,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           ],
         ),
         const SizedBox(height: 48),
-        
+
         // Large Action block cards (Orange & Lime Green)
         LayoutBuilder(
           builder: (context, cardConstraints) {
-            final double cardWidth = isDesktop 
-              ? (cardConstraints.maxWidth - 24) / 2
-              : cardConstraints.maxWidth;
-            
+            final double cardWidth = isDesktop
+                ? (cardConstraints.maxWidth - 24) / 2
+                : cardConstraints.maxWidth;
+
             final cards = [
               GridAccentCard(
                 width: cardWidth,
@@ -293,7 +354,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 textColor: Colors.white,
                 icon: Icons.layers_outlined,
                 title: "CLEAN ARCHITECTURE\n& SECURE DESIGN",
-                description: "Clean architecture, MVC, state management, and strict separation of concerns.",
+                description:
+                    "Clean architecture, MVC, state management, and strict separation of concerns.",
               ),
               GridAccentCard(
                 width: cardWidth,
@@ -301,22 +363,19 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 textColor: const Color(0xFF0F0F0F),
                 icon: Icons.code,
                 title: "FLUTTER, FIREBASE\n& MOBILE ECOSYSTEMS",
-                description: "Cross-platform mobile apps, dynamic systems, secure payment gates, and notifications.",
+                description:
+                    "Cross-platform mobile apps, dynamic systems, secure payment gates, and notifications.",
               ),
             ];
 
             return isDesktop
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: cards,
-                )
-              : Column(
-                  children: [
-                    cards[0],
-                    const SizedBox(height: 16),
-                    cards[1],
-                  ],
-                );
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: cards,
+                  )
+                : Column(
+                    children: [cards[0], const SizedBox(height: 16), cards[1]],
+                  );
           },
         ),
       ],
@@ -354,14 +413,22 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           ],
         ),
         const SizedBox(height: 32),
-        
+
         // Project items
         ProjectCard(
           year: "2025-2026",
           title: "Seven Pay Services",
           subtitle: "Fintech Flutter Application & Admin Dashboard",
-          description: "Built and deployed a production-ready Flutter application integrated with Firebase Authentication, Firestore, and Cloud Functions. Designed real-time service management, secure payment workflows (Razorpay integration), and comprehensive admin controls with optimized data operations.",
-          techTags: const ["Flutter", "Dart", "Firebase Auth", "Firestore", "Cloud Functions", "Razorpay"],
+          description:
+              "Built and deployed a production-ready Flutter application integrated with Firebase Authentication, Firestore, and Cloud Functions. Designed real-time service management, secure payment workflows (Razorpay integration), and comprehensive admin controls with optimized data operations.",
+          techTags: const [
+            "Flutter",
+            "Dart",
+            "Firebase Auth",
+            "Firestore",
+            "Cloud Functions",
+            "Razorpay",
+          ],
           icon: Icons.payment,
         ),
         const SizedBox(height: 24),
@@ -369,8 +436,15 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           year: "2025-2026",
           title: "Ride 4 you",
           subtitle: "Real-time Location-Based Ride Booking Platform",
-          description: "Built a location-based ride booking platform with real-time GPS tracking, dynamic pricing models, and instant driver allocation algorithms. Integrated Firebase Authentication, Firestore, and Cloud Functions for secure ride lifecycle management and seamless payment checkouts.",
-          techTags: const ["Flutter & Dart", "Google Maps API", "GPS Tracking", "Firestore", "Cloud Functions"],
+          description:
+              "Built a location-based ride booking platform with real-time GPS tracking, dynamic pricing models, and instant driver allocation algorithms. Integrated Firebase Authentication, Firestore, and Cloud Functions for secure ride lifecycle management and seamless payment checkouts.",
+          techTags: const [
+            "Flutter & Dart",
+            "Google Maps API",
+            "GPS Tracking",
+            "Firestore",
+            "Cloud Functions",
+          ],
           icon: Icons.local_taxi,
         ),
       ],
@@ -408,14 +482,15 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           ],
         ),
         const SizedBox(height: 32),
-        
+
         // Experience items
         TimelineExperienceCard(
           duration: "2026-Present",
           company: "All Hands Global Pvt. Ltd.",
           location: "HYDERABAD · India",
           role: "Flutter Developer",
-          description: "Working as a Flutter Developer, responsible for designing and developing cross-platform mobile applications (Android & iOS) and Web Admin Panels. Implementing scalable app architectures, secure authentication protocols, dynamic content synchronization, and seamless integration with third-party modules and APIs.",
+          description:
+              "Working as a Flutter Developer, responsible for designing and developing cross-platform mobile applications (Android & iOS) and Web Admin Panels. Implementing scalable app architectures, secure authentication protocols, dynamic content synchronization, and seamless integration with third-party modules and APIs.",
         ),
         const SizedBox(height: 24),
         TimelineExperienceCard(
@@ -423,7 +498,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           company: "Space Age Infotech",
           location: "BENGALURU · India",
           role: "Web Developer",
-          description: "Worked as a Web Developer, developing responsive websites and interactive web applications. Successfully implemented REST API integrations, optimized client-side performance, and ensured highly secure, robust, and scalable solutions for dynamic service websites.",
+          description:
+              "Worked as a Web Developer, developing responsive websites and interactive web applications. Successfully implemented REST API integrations, optimized client-side performance, and ensured highly secure, robust, and scalable solutions for dynamic service websites.",
         ),
       ],
     );
@@ -460,12 +536,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           ],
         ),
         const SizedBox(height: 32),
-        
+
         // Education and Skills Content blocks
         LayoutBuilder(
           builder: (context, constraints) {
             final isDesktop = constraints.maxWidth > 700;
-            
+
             return Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -490,12 +566,20 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         runSpacing: 10,
                         children: [
                           SkillChip(label: "Flutter (Android / iOS / Web)"),
-                          SkillChip(label: "Firebase (Auth, Firestore, Cloud Functions)"),
+                          SkillChip(
+                            label:
+                                "Firebase (Auth, Firestore, Cloud Functions)",
+                          ),
                           SkillChip(label: "Clean Architecture & MVC"),
-                          SkillChip(label: "State Management (Bloc, Riverpod, Provider)"),
+                          SkillChip(
+                            label:
+                                "State Management (Bloc, Riverpod, Provider)",
+                          ),
                           SkillChip(label: "REST APIs & Razorpay"),
                           SkillChip(label: "Swift & Kotlin"),
-                          SkillChip(label: "Play Store & App Store Deployments"),
+                          SkillChip(
+                            label: "Play Store & App Store Deployments",
+                          ),
                           SkillChip(label: "Git / GitHub"),
                           SkillChip(label: "Secure System Design"),
                           SkillChip(label: "Xcode & Android Studio"),
@@ -503,7 +587,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         ],
                       ),
                       const SizedBox(height: 32),
-                      
+
                       Text(
                         "PROGRAMMING LANGUAGES",
                         style: GoogleFonts.outfit(
@@ -528,9 +612,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                     ],
                   ),
                 ),
-                
+
                 if (isDesktop) const SizedBox(width: 32),
-                
+
                 // Column 2: Education Info
                 if (isDesktop)
                   Expanded(
@@ -551,7 +635,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         const EducationTimelineItem(
                           year: "2019-2023",
                           degree: "B.Tech - Computer Science",
-                          school: "National Institute of Technology Sikkim, India",
+                          school:
+                              "National Institute of Technology Sikkim, India",
                         ),
                         const SizedBox(height: 16),
                         const EducationTimelineItem(
@@ -572,7 +657,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             );
           },
         ),
-        
+
         // Display Education below on Mobile
         LayoutBuilder(
           builder: (context, constraints) {
@@ -648,13 +733,17 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           ],
         ),
         const SizedBox(height: 24),
-        
+
         Text(
           "I am open to new professional opportunities, full-time Flutter roles, app architecture consultations, or just standard tech chats. Drop me a line directly!",
-          style: TextStyle(fontSize: 16, color: Colors.white.withOpacity(0.6), height: 1.6),
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.white.withOpacity(0.6),
+            height: 1.6,
+          ),
         ),
         const SizedBox(height: 32),
-        
+
         // Contact block links
         Wrap(
           spacing: 16,
@@ -681,7 +770,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           ],
         ),
         const SizedBox(height: 48),
-        
+
         // Footer credits
         const Divider(color: Colors.white10),
         const SizedBox(height: 16),
@@ -690,11 +779,17 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           children: [
             Text(
               "© 2026 Moparthi Prem. All rights reserved.",
-              style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 13),
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.3),
+                fontSize: 13,
+              ),
             ),
             Text(
               "Premium Flutter Web Portfolio",
-              style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 13),
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.3),
+                fontSize: 13,
+              ),
             ),
           ],
         ),
@@ -731,7 +826,9 @@ class _HoverWidgetState extends State<HoverWidget> {
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
-      cursor: widget.onTap != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      cursor: widget.onTap != null
+          ? SystemMouseCursors.click
+          : SystemMouseCursors.basic,
       child: GestureDetector(
         onTap: widget.onTap,
         child: AnimatedScale(
@@ -801,7 +898,9 @@ class FloatingNavbar extends StatelessWidget {
         child: Icon(
           icon,
           size: 20,
-          color: isActive ? const Color(0xFF0F0F0F) : Colors.white.withOpacity(0.6),
+          color: isActive
+              ? const Color(0xFF0F0F0F)
+              : Colors.white.withOpacity(0.6),
         ),
       ),
     );
@@ -846,11 +945,9 @@ class LeftProfileCard extends StatelessWidget {
               children: [
                 // Concentric circles painted behind the picture
                 Positioned.fill(
-                  child: CustomPaint(
-                    painter: DashedCirclesPainter(),
-                  ),
+                  child: CustomPaint(painter: DashedCirclesPainter()),
                 ),
-                
+
                 // Orange image frame
                 Align(
                   alignment: Alignment.center,
@@ -891,7 +988,7 @@ class LeftProfileCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          
+
           // Name and Details
           Text(
             "Moparthi Prem",
@@ -915,7 +1012,7 @@ class LeftProfileCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          
+
           // Orange circular flame element
           Center(
             child: Container(
@@ -923,7 +1020,10 @@ class LeftProfileCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFFFF5C35).withOpacity(0.1),
                 shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFFFF5C35).withOpacity(0.2), width: 1.5),
+                border: Border.all(
+                  color: const Color(0xFFFF5C35).withOpacity(0.2),
+                  width: 1.5,
+                ),
               ),
               child: const Icon(
                 Icons.local_fire_department,
@@ -933,7 +1033,7 @@ class LeftProfileCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Short bio
           const Text(
             "Computer Science graduate from NIT Sikkim. Building highly secure, robust systems with expertise in Clean Architecture, state structures, dynamic payments, and cloud APIs.",
@@ -945,7 +1045,7 @@ class LeftProfileCard extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          
+
           // Interactive Social icons row (Orange theme)
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -957,7 +1057,8 @@ class LeftProfileCard extends StatelessWidget {
               ),
               SocialIconBtn(
                 icon: Icons.work_history_outlined,
-                onTap: () => _launchUrl("https://linkedin.com/in/moparthi-prem"),
+                onTap: () =>
+                    _launchUrl("https://linkedin.com/in/moparthi-prem"),
                 tooltip: "LinkedIn",
               ),
               SocialIconBtn(
@@ -1005,13 +1106,12 @@ class SocialIconBtn extends StatelessWidget {
           decoration: BoxDecoration(
             color: const Color(0xFFFF5C35).withOpacity(0.08),
             shape: BoxShape.circle,
-            border: Border.all(color: const Color(0xFFFF5C35).withOpacity(0.15), width: 1),
+            border: Border.all(
+              color: const Color(0xFFFF5C35).withOpacity(0.15),
+              width: 1,
+            ),
           ),
-          child: Icon(
-            icon,
-            size: 18,
-            color: const Color(0xFFFF5C35),
-          ),
+          child: Icon(icon, size: 18, color: const Color(0xFFFF5C35)),
         ),
       ),
     );
@@ -1033,11 +1133,19 @@ class DashedCirclesPainter extends CustomPainter {
     _drawDashedCircle(canvas, center, 125, paint, 8, 8);
   }
 
-  void _drawDashedCircle(Canvas canvas, Offset center, double radius, Paint paint, double dashWidth, double dashSpace) {
+  void _drawDashedCircle(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    Paint paint,
+    double dashWidth,
+    double dashSpace,
+  ) {
     final double circumference = 2 * 3.1415926535 * radius;
     final int dashCount = (circumference / (dashWidth + dashSpace)).floor();
     for (int i = 0; i < dashCount; i++) {
-      final double startAngle = (i * (dashWidth + dashSpace) / circumference) * 2 * 3.1415926535;
+      final double startAngle =
+          (i * (dashWidth + dashSpace) / circumference) * 2 * 3.1415926535;
       final double sweepAngle = (dashWidth / circumference) * 2 * 3.1415926535;
       canvas.drawArc(
         Rect.fromCircle(center: center, radius: radius),
@@ -1059,11 +1167,7 @@ class StatItem extends StatelessWidget {
   final String value;
   final String label;
 
-  const StatItem({
-    super.key,
-    required this.value,
-    required this.label,
-  });
+  const StatItem({super.key, required this.value, required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -1130,11 +1234,7 @@ class GridAccentCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(
-              icon,
-              color: textColor,
-              size: 32,
-            ),
+            Icon(icon, color: textColor, size: 32),
             const Spacer(),
             Text(
               title,
@@ -1202,7 +1302,10 @@ class ProjectCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.06),
                     borderRadius: BorderRadius.circular(12),
@@ -1232,11 +1335,7 @@ class ProjectCard extends StatelessWidget {
                     color: const Color(0xFFFF5C35).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Icon(
-                    icon,
-                    color: const Color(0xFFFF5C35),
-                    size: 24,
-                  ),
+                  child: Icon(icon, color: const Color(0xFFFF5C35), size: 24),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -1277,21 +1376,47 @@ class ProjectCard extends StatelessWidget {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: techTags.map((tag) => Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.04),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.white.withOpacity(0.05), width: 1),
-                ),
-                child: Text(
-                  tag,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
-                    fontSize: 12,
-                  ),
-                ),
-              )).toList(),
+              children: techTags
+                  .map(
+                    (tag) {
+                      final icon = TechIconHelper.getIcon(tag);
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.04),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.05),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (icon != null) ...[
+                              Icon(
+                                icon,
+                                color: TechIconHelper.getIconColor(icon),
+                                size: 12,
+                              ),
+                              const SizedBox(width: 6),
+                            ],
+                            Text(
+                              tag,
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.5),
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  )
+                  .toList(),
             ),
           ],
         ),
@@ -1457,13 +1582,11 @@ class EducationTimelineItem extends StatelessWidget {
 class SkillChip extends StatelessWidget {
   final String label;
 
-  const SkillChip({
-    super.key,
-    required this.label,
-  });
+  const SkillChip({super.key, required this.label});
 
   @override
   Widget build(BuildContext context) {
+    final icons = TechIconHelper.getIconsForLabel(label);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
@@ -1471,13 +1594,28 @@ class SkillChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withOpacity(0.05), width: 1),
       ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 13,
-          fontWeight: FontWeight.w500,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icons.isNotEmpty) ...[
+            for (var icon in icons) ...[
+              Icon(
+                icon,
+                color: TechIconHelper.getIconColor(icon),
+                size: 14,
+              ),
+              const SizedBox(width: 6),
+            ],
+          ],
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1489,14 +1627,11 @@ class LangChip extends StatelessWidget {
   final String name;
   final int rating;
 
-  const LangChip({
-    super.key,
-    required this.name,
-    required this.rating,
-  });
+  const LangChip({super.key, required this.name, required this.rating});
 
   @override
   Widget build(BuildContext context) {
+    final icon = TechIconHelper.getIcon(name);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
@@ -1507,6 +1642,14 @@ class LangChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (icon != null) ...[
+            Icon(
+              icon,
+              color: TechIconHelper.getIconColor(icon),
+              size: 16,
+            ),
+            const SizedBox(width: 8),
+          ],
           Text(
             name,
             style: const TextStyle(
@@ -1521,7 +1664,9 @@ class LangChip extends StatelessWidget {
               return Icon(
                 Icons.star,
                 size: 12,
-                color: index < rating ? const Color(0xFFFF5C35) : Colors.white.withOpacity(0.1),
+                color: index < rating
+                    ? const Color(0xFFFF5C35)
+                    : Colors.white.withOpacity(0.1),
               );
             }),
           ),
@@ -1575,11 +1720,7 @@ class ContactTileCard extends StatelessWidget {
                 color: Colors.white.withOpacity(0.05),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                icon,
-                color: Colors.white.withOpacity(0.8),
-                size: 20,
-              ),
+              child: Icon(icon, color: Colors.white.withOpacity(0.8), size: 20),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -1612,5 +1753,66 @@ class ContactTileCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+// --- Tech Icon & Color Mapper Helper Class ---
+
+class TechIconHelper {
+  static IconData? getIcon(String name) {
+    final lower = name.toLowerCase().trim();
+    if (lower.contains('flutter')) return SimpleIcons.flutter;
+    if (lower.contains('firebase') || lower.contains('firestore')) return SimpleIcons.firebase;
+    if (lower.contains('dart')) return SimpleIcons.dart;
+    if (lower.contains('kotlin')) return SimpleIcons.kotlin;
+    if (lower.contains('python')) return SimpleIcons.python;
+    if (lower.contains('java') && !lower.contains('script')) return SimpleIcons.openjdk;
+    if (lower.contains('react')) return SimpleIcons.react;
+    if (lower.contains('git') || lower.contains('github')) return SimpleIcons.git;
+    if (lower.contains('figma')) return SimpleIcons.figma;
+    if (lower.contains('xcode')) return SimpleIcons.xcode;
+    if (lower.contains('android studio')) return SimpleIcons.androidstudio;
+    if (lower.contains('swift')) return SimpleIcons.swift;
+    return null;
+  }
+
+  static Color getIconColor(IconData icon) {
+    Color color = Colors.white;
+    if (icon == SimpleIcons.flutter) color = SimpleIconColors.flutter;
+    else if (icon == SimpleIcons.firebase) color = SimpleIconColors.firebase;
+    else if (icon == SimpleIcons.git) color = SimpleIconColors.git;
+    else if (icon == SimpleIcons.figma) color = SimpleIconColors.figma;
+    else if (icon == SimpleIcons.swift) color = SimpleIconColors.swift;
+    else if (icon == SimpleIcons.kotlin) color = SimpleIconColors.kotlin;
+    else if (icon == SimpleIcons.xcode) color = SimpleIconColors.xcode;
+    else if (icon == SimpleIcons.androidstudio) color = SimpleIconColors.androidstudio;
+    else if (icon == SimpleIcons.dart) color = SimpleIconColors.dart;
+    else if (icon == SimpleIcons.openjdk) color = SimpleIconColors.openjdk;
+    else if (icon == SimpleIcons.python) color = SimpleIconColors.python;
+    else if (icon == SimpleIcons.react) color = SimpleIconColors.react;
+
+    // Fallback to white for pure black/very dark colors to look good in dark mode
+    if (color.computeLuminance() < 0.15) {
+      return Colors.white;
+    }
+    return color;
+  }
+
+  static List<IconData> getIconsForLabel(String label) {
+    final lower = label.toLowerCase();
+    final icons = <IconData>[];
+    if (lower.contains('flutter')) icons.add(SimpleIcons.flutter);
+    if (lower.contains('firebase') || lower.contains('firestore')) icons.add(SimpleIcons.firebase);
+    if (lower.contains('git')) icons.add(SimpleIcons.git);
+    if (lower.contains('figma')) icons.add(SimpleIcons.figma);
+    if (lower.contains('swift')) icons.add(SimpleIcons.swift);
+    if (lower.contains('kotlin')) icons.add(SimpleIcons.kotlin);
+    if (lower.contains('xcode')) icons.add(SimpleIcons.xcode);
+    if (lower.contains('android studio')) icons.add(SimpleIcons.androidstudio);
+    if (lower.contains('dart')) icons.add(SimpleIcons.dart);
+    if (lower.contains('python')) icons.add(SimpleIcons.python);
+    if (lower.contains('java') && !lower.contains('script')) icons.add(SimpleIcons.openjdk);
+    if (lower.contains('react')) icons.add(SimpleIcons.react);
+    return icons;
   }
 }
