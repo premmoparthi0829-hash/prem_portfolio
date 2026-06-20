@@ -292,34 +292,35 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           direction: Axis.vertical,
           spacing: 0,
           children: [
-            Text(
+            GradientText(
               "FULL STACK",
+              gradient: const LinearGradient(
+                colors: [Color(0xFFFF5C35), Color(0xFFB2FF33)],
+              ),
               style: GoogleFonts.outfit(
                 fontSize: isDesktop ? 76 : 48,
                 fontWeight: FontWeight.w900,
                 height: 1.0,
                 letterSpacing: -1,
-                color: Colors.white,
               ),
             ),
-            Text(
-              "FLUTTER DEV",
+            GradientText(
+              "FLUTTER DEVELOPER",
+              gradient: LinearGradient(
+                colors: [Colors.white, Colors.white.withOpacity(0.4)],
+              ),
               style: GoogleFonts.outfit(
                 fontSize: isDesktop ? 76 : 48,
                 fontWeight: FontWeight.w900,
                 height: 1.1,
                 letterSpacing: -1,
-                foreground: Paint()
-                  ..style = PaintingStyle.stroke
-                  ..strokeWidth = 2
-                  ..color = Colors.white.withOpacity(0.15),
               ),
             ),
           ],
         ),
         const SizedBox(height: 24),
         Text(
-          "Passionate about creating intuitive, high-performance, and gorgeous user experiences. Specializing in transforming ideas into beautifully crafted, clean mobile and backend ecosystems.",
+          "Crafting high-performance, premium cross-platform mobile apps is my true passion. I specialize in building state-of-the-art mobile architectures and elegant, interactive user experiences with clean code that scales. Let's build something extraordinary together.",
           style: TextStyle(
             fontSize: isDesktop ? 18 : 16,
             color: const Color(0xFF9F9F9F),
@@ -418,9 +419,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         ProjectCard(
           year: "2025-2026",
           title: "Seven Pay Services",
-          subtitle: "Fintech Flutter Application & Admin Dashboard",
+          subtitle: "Enterprise Fintech Mobile App & Dashboard",
           description:
-              "Built and deployed a production-ready Flutter application integrated with Firebase Authentication, Firestore, and Cloud Functions. Designed real-time service management, secure payment workflows (Razorpay integration), and comprehensive admin controls with optimized data operations.",
+              "Engineered and shipped a production-ready fintech ecosystem. Architected secure transactional layers, integrated multi-channel payment gateways, and built real-time synchronizations with Firebase. Implemented strict state management patterns (Bloc) and clean security boundaries.",
           techTags: const [
             "Flutter",
             "Dart",
@@ -435,9 +436,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         ProjectCard(
           year: "2025-2026",
           title: "Ride 4 you",
-          subtitle: "Real-time Location-Based Ride Booking Platform",
+          subtitle: "Real-time Ride-Hailing Mobile Platform",
           description:
-              "Built a location-based ride booking platform with real-time GPS tracking, dynamic pricing models, and instant driver allocation algorithms. Integrated Firebase Authentication, Firestore, and Cloud Functions for secure ride lifecycle management and seamless payment checkouts.",
+              "Developed a location-aware, reactive mobile booking app with background GPS tracking, dynamic pricing calculators, and efficient driver routing algorithms. Optimized location fetch intervals to conserve battery while maintaining high tracking accuracy.",
           techTags: const [
             "Flutter & Dart",
             "Google Maps API",
@@ -446,6 +447,90 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             "Cloud Functions",
           ],
           icon: Icons.local_taxi,
+        ),
+        const SizedBox(height: 24),
+        ProjectCard(
+          year: "2025-2026",
+          title: "Alham Mutton",
+          subtitle: "Premium Meat & Fresh E-Commerce App (Licious-style)",
+          description:
+              "Engineered a premium, fast delivery mobile app for fresh meat ordering. Implemented smart item categorization, localized search algorithms, real-time order tracking, and dynamic checkout layers. Integrated reactive local caching to ensure zero latency during high-traffic order peaks.",
+          techTags: const [
+            "Flutter",
+            "Dart",
+            "Firebase Auth",
+            "Firestore",
+            "Push Notifications",
+            "Razorpay",
+          ],
+          icon: Icons.shopping_bag_outlined,
+        ),
+        const SizedBox(height: 24),
+        ProjectCard(
+          year: "2025-2026",
+          title: "Rythu Rice",
+          subtitle: "Multi-App Rice Booking & Supply Chain Ecosystem",
+          description:
+              "Architected and engineered a comprehensive 4-app rice distribution platform containing dedicated apps for Users (ordering), Vendors (inventory & store management), Riders (delivery routing), and an Admin Dashboard (metrics & control). Designed robust real-time order matching and secure transaction layers.",
+          techTags: const [
+            "Flutter",
+            "Dart",
+            "Firebase Auth",
+            "Firestore",
+            "Google Maps API",
+            "Push Notifications",
+          ],
+          icon: Icons.agriculture_outlined,
+        ),
+        const SizedBox(height: 24),
+        ProjectCard(
+          year: "2025-2026",
+          title: "Meatoon",
+          subtitle: "Live Online Meat & Poultry Delivery App",
+          description:
+              "Designed and shipped a production-ready, live online meat delivery app. Engineered instant order processing, dynamic weight/price calculations, cold-chain delivery monitoring, and automated SMS alert pipelines.",
+          techTags: const [
+            "Flutter",
+            "Dart",
+            "Firebase Auth",
+            "Firestore",
+            "Razorpay",
+            "Push Notifications",
+          ],
+          icon: Icons.restaurant_menu_outlined,
+        ),
+        const SizedBox(height: 24),
+        ProjectCard(
+          year: "2025-2026",
+          title: "Fresh & Fresh",
+          subtitle: "Vibrant Local Grocery Delivery Platform",
+          description:
+              "Developed a comprehensive grocery e-commerce app featuring smart product cataloging, localized search filters, dynamic discount managers, and integration with local logistics systems for rapid order fulfilment.",
+          techTags: const [
+            "Flutter",
+            "Dart",
+            "Firebase Auth",
+            "Firestore",
+            "Google Maps API",
+          ],
+          icon: Icons.local_grocery_store_outlined,
+        ),
+        const SizedBox(height: 24),
+        ProjectCard(
+          year: "2025-2026",
+          title: "Church App",
+          subtitle: "Community Engagement & Livestream Mobile App",
+          description:
+              "Created a dedicated mobile platform for community interaction, event registrations, secure donations, and audio/video livestream integration. Boosted community participation by introducing instant notifications for live updates.",
+          techTags: const [
+            "Flutter",
+            "Dart",
+            "Firebase Auth",
+            "Firestore",
+            "Push Notifications",
+            "Razorpay",
+          ],
+          icon: Icons.church_outlined,
         ),
       ],
     );
@@ -488,18 +573,18 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           duration: "2026-Present",
           company: "All Hands Global Pvt. Ltd.",
           location: "HYDERABAD · India",
-          role: "Flutter Developer",
+          role: "Mobile Application Architect & Flutter Developer",
           description:
-              "Working as a Flutter Developer, responsible for designing and developing cross-platform mobile applications (Android & iOS) and Web Admin Panels. Implementing scalable app architectures, secure authentication protocols, dynamic content synchronization, and seamless integration with third-party modules and APIs.",
+              "Lead the architecture and delivery of premium cross-platform mobile apps for iOS and Android. Spearheaded migrations to clean architecture, reducing codebase complexity and boosting feature delivery velocity. Integrated secure biometric auth, local caching (Hive/Isar), and optimized push notification delivery paths.",
         ),
         const SizedBox(height: 24),
         TimelineExperienceCard(
           duration: "2024-2025",
           company: "Space Age Infotech",
           location: "BENGALURU · India",
-          role: "Web Developer",
+          role: "Software Development Engineer (Web & APIs)",
           description:
-              "Worked as a Web Developer, developing responsive websites and interactive web applications. Successfully implemented REST API integrations, optimized client-side performance, and ensured highly secure, robust, and scalable solutions for dynamic service websites.",
+              "Developed performant, responsive web apps and robust REST APIs. Optimized API response times by implementing Redis caching and database indexing. Constructed smooth, interactive frontend dashboards using React, establishing solid fundamentals in UI state management and client-server synchronization.",
         ),
       ],
     );
@@ -1002,7 +1087,7 @@ class LeftProfileCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            "Full Stack Flutter Developer &\nMobile Application Architect",
+            "Mobile Application Architect &\nLead Flutter Developer",
             textAlign: TextAlign.center,
             style: TextStyle(
               color: const Color(0xFF555555),
@@ -1036,7 +1121,7 @@ class LeftProfileCard extends StatelessWidget {
 
           // Short bio
           const Text(
-            "Computer Science graduate from NIT Sikkim. Building highly secure, robust systems with expertise in Clean Architecture, state structures, dynamic payments, and cloud APIs.",
+            "Computer Science graduate from NIT Sikkim with a deep passion for mobile application engineering. Specializing in crafting premium, highly secure mobile ecosystems using Flutter, clean architecture, and reactive state management.",
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Color(0xFF666666),
@@ -1814,5 +1899,31 @@ class TechIconHelper {
     if (lower.contains('java') && !lower.contains('script')) icons.add(SimpleIcons.openjdk);
     if (lower.contains('react')) icons.add(SimpleIcons.react);
     return icons;
+  }
+}
+
+// --- Gradient Text Widget ---
+
+class GradientText extends StatelessWidget {
+  const GradientText(
+    this.text, {
+    super.key,
+    required this.gradient,
+    this.style,
+  });
+
+  final String text;
+  final TextStyle? style;
+  final Gradient gradient;
+
+  @override
+  Widget build(BuildContext context) {
+    return ShaderMask(
+      blendMode: BlendMode.srcIn,
+      shaderCallback: (bounds) => gradient.createShader(
+        Rect.fromLTWH(0, 0, bounds.width, bounds.height),
+      ),
+      child: Text(text, style: style),
+    );
   }
 }
