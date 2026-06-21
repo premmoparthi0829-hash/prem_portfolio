@@ -1,7 +1,11 @@
+import 'dart:ui' show ImageFilter;
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:simple_icons/simple_icons.dart';
+import 'services/resume_service.dart';
+import 'utils/download_helper.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Moparthi Prem | Portfolio',
+      title: 'Prem Moparthi | Portfolio',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color(0xFF0F0F0F),
@@ -107,7 +111,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                     width: 380,
                     height: constraints.maxHeight,
                     padding: const EdgeInsets.all(24),
-                    child: const LeftProfileCard(),
+                    child: const SingleChildScrollView(
+                      child: LeftProfileCard(),
+                    ),
                   ),
 
                   // Right Scrollable Panel
@@ -200,10 +206,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   SingleChildScrollView(
                     controller: _scrollController,
                     padding: const EdgeInsets.only(
-                      left: 16,
-                      right: 16,
-                      top: 90,
-                      bottom: 40,
+                      left: 20,
+                      right: 20,
+                      top: 80,
+                      bottom: 60,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -284,102 +290,158 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   // --- Right Panel Section Builders ---
 
   Widget _buildHeroSection(bool isDesktop) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Giant Heading Block
-        Wrap(
-          direction: Axis.vertical,
-          spacing: 0,
+    return LayoutBuilder(
+      builder: (context, heroConstraints) {
+        final double availableWidth = heroConstraints.maxWidth;
+        // Scale heading font size from available width
+        // Desktop: 76, Tablet (600-950): proportional, Mobile: clamp 28..40
+        final double headingSize = isDesktop
+            ? 76.0
+            : (availableWidth * 0.105).clamp(28.0, 40.0);
+        final double bodyFontSize = isDesktop ? 18.0 : 15.0;
+        final double sectionSpacing = isDesktop ? 48.0 : 28.0;
+        final double statsSpacing = isDesktop ? 48.0 : 24.0;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GradientText(
-              "FULL STACK",
-              gradient: const LinearGradient(
-                colors: [Color(0xFFFF5C35), Color(0xFFB2FF33)],
-              ),
-              style: GoogleFonts.outfit(
-                fontSize: isDesktop ? 76 : 48,
-                fontWeight: FontWeight.w900,
-                height: 1.0,
-                letterSpacing: -1,
-              ),
-            ),
-            GradientText(
-              "FLUTTER DEVELOPER",
-              gradient: LinearGradient(
-                colors: [Colors.white, Colors.white.withOpacity(0.4)],
-              ),
-              style: GoogleFonts.outfit(
-                fontSize: isDesktop ? 76 : 48,
-                fontWeight: FontWeight.w900,
-                height: 1.1,
-                letterSpacing: -1,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 24),
-        Text(
-          "Crafting high-performance, premium cross-platform mobile apps is my true passion. I specialize in building state-of-the-art mobile architectures and elegant, interactive user experiences with clean code that scales. Let's build something extraordinary together.",
-          style: TextStyle(
-            fontSize: isDesktop ? 18 : 16,
-            color: const Color(0xFF9F9F9F),
-            height: 1.6,
-          ),
-        ),
-        const SizedBox(height: 40),
-
-        // Stats Counter Row
-        const Wrap(
-          spacing: 48,
-          runSpacing: 24,
-          children: [
-            StatItem(value: "+2", label: "YEARS OF\nEXPERIENCE"),
-            StatItem(value: "+12", label: "COMPLETED\nPROJECTS"),
-            StatItem(value: "+5", label: "APPS ON STORES\n(PLAY & APP STORE)"),
-          ],
-        ),
-        const SizedBox(height: 48),
-
-        // Large Action block cards (Orange & Lime Green)
-        LayoutBuilder(
-          builder: (context, cardConstraints) {
-            final double cardWidth = isDesktop
-                ? (cardConstraints.maxWidth - 24) / 2
-                : cardConstraints.maxWidth;
-
-            final cards = [
-              GridAccentCard(
-                width: cardWidth,
-                bgColor: const Color(0xFFFF5C35),
-                textColor: Colors.white,
-                icon: Icons.layers_outlined,
-                title: "CLEAN ARCHITECTURE\n& SECURE DESIGN",
-                description:
-                    "Clean architecture, MVC, state management, and strict separation of concerns.",
-              ),
-              GridAccentCard(
-                width: cardWidth,
-                bgColor: const Color(0xFFB2FF33),
-                textColor: const Color(0xFF0F0F0F),
-                icon: Icons.code,
-                title: "FLUTTER, FIREBASE\n& MOBILE ECOSYSTEMS",
-                description:
-                    "Cross-platform mobile apps, dynamic systems, secure payment gates, and notifications.",
-              ),
-            ];
-
-            return isDesktop
-                ? Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: cards,
+            // Giant Heading Block — always 3 lines on mobile, 2 on desktop
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GradientText(
+                  "FULL STACK",
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFFF5C35), Color(0xFFB2FF33)],
+                  ),
+                  style: GoogleFonts.outfit(
+                    fontSize: headingSize,
+                    fontWeight: FontWeight.w900,
+                    height: 1.0,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                if (isDesktop)
+                  GradientText(
+                    "FLUTTER DEVELOPER",
+                    gradient: LinearGradient(
+                      colors: [Colors.white, Colors.white.withOpacity(0.4)],
+                    ),
+                    style: GoogleFonts.outfit(
+                      fontSize: headingSize,
+                      fontWeight: FontWeight.w900,
+                      height: 1.1,
+                      letterSpacing: -0.5,
+                    ),
                   )
-                : Column(
-                    children: [cards[0], const SizedBox(height: 16), cards[1]],
-                  );
-          },
-        ),
-      ],
+                else ...[
+                  GradientText(
+                    "FLUTTER",
+                    gradient: LinearGradient(
+                      colors: [Colors.white, Colors.white.withOpacity(0.4)],
+                    ),
+                    style: GoogleFonts.outfit(
+                      fontSize: headingSize,
+                      fontWeight: FontWeight.w900,
+                      height: 1.1,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  GradientText(
+                    "DEVELOPER",
+                    gradient: LinearGradient(
+                      colors: [Colors.white, Colors.white.withOpacity(0.4)],
+                    ),
+                    style: GoogleFonts.outfit(
+                      fontSize: headingSize,
+                      fontWeight: FontWeight.w900,
+                      height: 1.1,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            SizedBox(height: isDesktop ? 24 : 16),
+            Text(
+              "Crafting high-performance, premium cross-platform mobile apps is my passion. Specializing in clean architecture, reactive state management, and elegant interactive UIs that scale.",
+              style: TextStyle(
+                fontSize: bodyFontSize,
+                color: const Color(0xFF9F9F9F),
+                height: 1.6,
+              ),
+            ),
+            SizedBox(height: sectionSpacing),
+
+            // Stats Counter Row
+            Wrap(
+              spacing: statsSpacing,
+              runSpacing: 20,
+              children: [
+                StatItem(
+                  value: "+2",
+                  label: "YEARS OF\nEXPERIENCE",
+                  compact: !isDesktop,
+                ),
+                StatItem(
+                  value: "+12",
+                  label: "COMPLETED\nPROJECTS",
+                  compact: !isDesktop,
+                ),
+                StatItem(
+                  value: "+5",
+                  label: "APPS ON STORES\n(PLAY & APP STORE)",
+                  compact: !isDesktop,
+                ),
+              ],
+            ),
+            SizedBox(height: sectionSpacing),
+
+            // Large Action block cards (Orange & Lime Green)
+            LayoutBuilder(
+              builder: (context, cardConstraints) {
+                final double cardWidth = isDesktop
+                    ? (cardConstraints.maxWidth - 24) / 2
+                    : cardConstraints.maxWidth;
+
+                final cards = [
+                  GridAccentCard(
+                    width: cardWidth,
+                    bgColor: const Color(0xFFFF5C35),
+                    textColor: Colors.white,
+                    icon: Icons.layers_outlined,
+                    title: "CLEAN ARCHITECTURE\n& SECURE DESIGN",
+                    description:
+                        "Clean architecture, MVC, state management, and strict separation of concerns.",
+                  ),
+                  GridAccentCard(
+                    width: cardWidth,
+                    bgColor: const Color(0xFFB2FF33),
+                    textColor: const Color(0xFF0F0F0F),
+                    icon: Icons.code,
+                    title: "FLUTTER, FIREBASE\n& MOBILE ECOSYSTEMS",
+                    description:
+                        "Cross-platform mobile apps, dynamic systems, secure payment gates, and notifications.",
+                  ),
+                ];
+
+                return isDesktop
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: cards,
+                      )
+                    : Column(
+                        children: [
+                          cards[0],
+                          const SizedBox(height: 16),
+                          cards[1],
+                        ],
+                      );
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -388,149 +450,57 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Title
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          children: [
-            Text(
-              "RECENT ",
-              style: GoogleFonts.outfit(
-                fontSize: 36,
-                fontWeight: FontWeight.w900,
-                color: Colors.white,
-              ),
-            ),
-            GradientText(
-              "WORKS",
-              gradient: LinearGradient(
-                colors: [Colors.white, Colors.white.withOpacity(0.4)],
-              ),
-              style: GoogleFonts.outfit(
-                fontSize: 36,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ],
+        LayoutBuilder(
+          builder: (context, c) {
+            final double fs = c.maxWidth > 600 ? 36 : 28;
+            return Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Text(
+                  "RECENT ",
+                  style: GoogleFonts.outfit(
+                    fontSize: fs,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                  ),
+                ),
+                GradientText(
+                  "WORKS",
+                  gradient: LinearGradient(
+                    colors: [Colors.white, Colors.white.withOpacity(0.4)],
+                  ),
+                  style: GoogleFonts.outfit(
+                    fontSize: fs,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
         const SizedBox(height: 32),
 
-        // Project items
-        ProjectCard(
-          year: "2025-2026",
-          title: "Seven Pay Services",
-          subtitle: "Enterprise Fintech Mobile App & Dashboard",
-          description:
-              "Engineered and shipped a production-ready fintech ecosystem. Architected secure transactional layers, integrated multi-channel payment gateways, and built real-time synchronizations with Firebase. Implemented strict state management patterns (Bloc) and clean security boundaries.",
-          techTags: const [
-            "Flutter",
-            "Dart",
-            "Firebase Auth",
-            "Firestore",
-            "Cloud Functions",
-            "Razorpay",
-          ],
-          icon: Icons.payment,
-        ),
-        const SizedBox(height: 24),
-        ProjectCard(
-          year: "2025-2026",
-          title: "Ride 4 you",
-          subtitle: "Real-time Ride-Hailing Mobile Platform",
-          description:
-              "Developed a location-aware, reactive mobile booking app with background GPS tracking, dynamic pricing calculators, and efficient driver routing algorithms. Optimized location fetch intervals to conserve battery while maintaining high tracking accuracy.",
-          techTags: const [
-            "Flutter & Dart",
-            "Google Maps API",
-            "GPS Tracking",
-            "Firestore",
-            "Cloud Functions",
-          ],
-          icon: Icons.local_taxi,
-        ),
-        const SizedBox(height: 24),
-        ProjectCard(
-          year: "2025-2026",
-          title: "Alham Mutton",
-          subtitle: "Premium Meat & Fresh E-Commerce App (Licious-style)",
-          description:
-              "Engineered a premium, fast delivery mobile app for fresh meat ordering. Implemented smart item categorization, localized search algorithms, real-time order tracking, and dynamic checkout layers. Integrated reactive local caching to ensure zero latency during high-traffic order peaks.",
-          techTags: const [
-            "Flutter",
-            "Dart",
-            "Firebase Auth",
-            "Firestore",
-            "Push Notifications",
-            "Razorpay",
-          ],
-          icon: Icons.shopping_bag_outlined,
-        ),
-        const SizedBox(height: 24),
-        ProjectCard(
-          year: "2025-2026",
-          title: "Rythu Rice",
-          subtitle: "Multi-App Rice Booking & Supply Chain Ecosystem",
-          description:
-              "Architected and engineered a comprehensive 4-app rice distribution platform containing dedicated apps for Users (ordering), Vendors (inventory & store management), Riders (delivery routing), and an Admin Dashboard (metrics & control). Designed robust real-time order matching and secure transaction layers.",
-          techTags: const [
-            "Flutter",
-            "Dart",
-            "Firebase Auth",
-            "Firestore",
-            "Google Maps API",
-            "Push Notifications",
-          ],
-          icon: Icons.agriculture_outlined,
-        ),
-        const SizedBox(height: 24),
-        ProjectCard(
-          year: "2025-2026",
-          title: "Meatoon",
-          subtitle: "Live Online Meat & Poultry Delivery App",
-          description:
-              "Designed and shipped a production-ready, live online meat delivery app. Engineered instant order processing, dynamic weight/price calculations, cold-chain delivery monitoring, and automated SMS alert pipelines.",
-          techTags: const [
-            "Flutter",
-            "Dart",
-            "Firebase Auth",
-            "Firestore",
-            "Razorpay",
-            "Push Notifications",
-          ],
-          icon: Icons.restaurant_menu_outlined,
-        ),
-        const SizedBox(height: 24),
-        ProjectCard(
-          year: "2025-2026",
-          title: "Fresh & Fresh",
-          subtitle: "Vibrant Local Grocery Delivery Platform",
-          description:
-              "Developed a comprehensive grocery e-commerce app featuring smart product cataloging, localized search filters, dynamic discount managers, and integration with local logistics systems for rapid order fulfilment.",
-          techTags: const [
-            "Flutter",
-            "Dart",
-            "Firebase Auth",
-            "Firestore",
-            "Google Maps API",
-          ],
-          icon: Icons.local_grocery_store_outlined,
-        ),
-        const SizedBox(height: 24),
-        ProjectCard(
-          year: "2025-2026",
-          title: "Church App",
-          subtitle: "Community Engagement & Livestream Mobile App",
-          description:
-              "Created a dedicated mobile platform for community interaction, event registrations, secure donations, and audio/video livestream integration. Boosted community participation by introducing instant notifications for live updates.",
-          techTags: const [
-            "Flutter",
-            "Dart",
-            "Firebase Auth",
-            "Firestore",
-            "Push Notifications",
-            "Razorpay",
-          ],
-          icon: Icons.church_outlined,
-        ),
+        // Dynamically generated project items mapping from static dataset
+        ...ProjectDetail.projects.map((project) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 24.0),
+            child: ProjectCard(
+              year: project.year,
+              title: project.title,
+              subtitle: project.subtitle,
+              description: project.description,
+              techTags: project.techTags,
+              icon: project.icon,
+              onTap: () {
+                Navigator.of(
+                  context,
+                ).push(ProjectDetailRoute(project: project));
+              },
+            ),
+          );
+        }).toList(),
       ],
     );
   }
@@ -540,29 +510,35 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Title
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          children: [
-            Text(
-              "WORK ",
-              style: GoogleFonts.outfit(
-                fontSize: 36,
-                fontWeight: FontWeight.w900,
-                color: Colors.white,
-              ),
-            ),
-            GradientText(
-              "EXPERIENCE",
-              gradient: LinearGradient(
-                colors: [Colors.white, Colors.white.withOpacity(0.4)],
-              ),
-              style: GoogleFonts.outfit(
-                fontSize: 36,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ],
+        LayoutBuilder(
+          builder: (context, c) {
+            final double fs = c.maxWidth > 600 ? 36 : 28;
+            return Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Text(
+                  "WORK ",
+                  style: GoogleFonts.outfit(
+                    fontSize: fs,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                  ),
+                ),
+                GradientText(
+                  "EXPERIENCE",
+                  gradient: LinearGradient(
+                    colors: [Colors.white, Colors.white.withOpacity(0.4)],
+                  ),
+                  style: GoogleFonts.outfit(
+                    fontSize: fs,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
         const SizedBox(height: 32),
 
@@ -593,29 +569,35 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Title
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          children: [
-            Text(
-              "SKILLS & ",
-              style: GoogleFonts.outfit(
-                fontSize: 36,
-                fontWeight: FontWeight.w900,
-                color: Colors.white,
-              ),
-            ),
-            GradientText(
-              "SPECIALIZATION",
-              gradient: LinearGradient(
-                colors: [Colors.white, Colors.white.withOpacity(0.4)],
-              ),
-              style: GoogleFonts.outfit(
-                fontSize: 36,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ],
+        LayoutBuilder(
+          builder: (context, c) {
+            final double fs = c.maxWidth > 600 ? 36 : 26;
+            return Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Text(
+                  "SKILLS & ",
+                  style: GoogleFonts.outfit(
+                    fontSize: fs,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                  ),
+                ),
+                GradientText(
+                  "SPECIALIZATION",
+                  gradient: LinearGradient(
+                    colors: [Colors.white, Colors.white.withOpacity(0.4)],
+                  ),
+                  style: GoogleFonts.outfit(
+                    fontSize: fs,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
         const SizedBox(height: 32),
 
@@ -785,94 +767,296 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   }
 
   Widget _buildContactSection() {
+    final isDesktop = MediaQuery.of(context).size.width > 950;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Title
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          children: [
-            Text(
-              "GET IN ",
-              style: GoogleFonts.outfit(
-                fontSize: 36,
-                fontWeight: FontWeight.w900,
-                color: Colors.white,
-              ),
-            ),
-            GradientText(
-              "TOUCH",
-              gradient: LinearGradient(
-                colors: [Colors.white, Colors.white.withOpacity(0.4)],
-              ),
-              style: GoogleFonts.outfit(
-                fontSize: 36,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ],
+        LayoutBuilder(
+          builder: (context, c) {
+            final double fs = c.maxWidth > 600 ? 36 : 28;
+            return Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Text(
+                  "GET IN ",
+                  style: GoogleFonts.outfit(
+                    fontSize: fs,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                  ),
+                ),
+                GradientText(
+                  "TOUCH",
+                  gradient: LinearGradient(
+                    colors: [Colors.white, Colors.white.withOpacity(0.4)],
+                  ),
+                  style: GoogleFonts.outfit(
+                    fontSize: fs,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
         const SizedBox(height: 24),
 
         Text(
-          "I am open to new professional opportunities, full-time Flutter roles, app architecture consultations, or just standard tech chats. Drop me a line directly!",
+          isDesktop
+              ? "Let's get in touch! Every great application begins with a conversation. I don’t just write code; I design fluid, responsive mobile experiences that blend secure, clean architecture with pixel-perfect design. From optimizing state dynamics to engineering complex ecosystem integrations, my absolute focus is on crafting products that users love to interact with. Whether you are looking for a dedicated Mobile Architect to elevate your mobile team, seeking consultation on scalable Flutter codebases, or simply want to brainstorm high-performance systems—I am ready to bring precision, drive, and absolute focus to your projects. Drop me a line directly!"
+              : "Let's get in touch! I am deeply passionate about engineering high-performance mobile applications and always open to discussing full-time roles, codebase architecture, or collaborations. Drop me a line directly!",
           style: TextStyle(
             fontSize: 16,
-            color: Colors.white.withOpacity(0.6),
+            color: Colors.white.withOpacity(0.85),
             height: 1.6,
           ),
         ),
         const SizedBox(height: 32),
 
+        // Resume View & Download Row
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final buttonWidth = constraints.maxWidth > 600
+                ? 240.0
+                : double.infinity;
+            return Wrap(
+              spacing: 16,
+              runSpacing: 12,
+              children: [
+                HoverWidget(
+                  scale: 1.03,
+                  onTap: () async {
+                    try {
+                      final resume = await ResumeService.getActiveResume();
+                      if (resume.sourceType == ResumeSourceType.customUrl) {
+                        final Uri url = Uri.parse(resume.url!);
+                        if (await canLaunchUrl(url)) {
+                          await launchUrl(
+                            url,
+                            mode: LaunchMode.externalApplication,
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Could not open resume link'),
+                            ),
+                          );
+                        }
+                      } else if (resume.bytes != null) {
+                        viewFile(resume.bytes!, resume.fileName);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('No resume content available'),
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error viewing resume: $e')),
+                      );
+                    }
+                  },
+                  child: Container(
+                    width: buttonWidth,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFFF5C35), Color(0xFFB2FF33)],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFFF5C35).withOpacity(0.15),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    alignment: Alignment.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.visibility_outlined,
+                          color: Color(0xFF0F0F0F),
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          "VIEW RESUME",
+                          style: GoogleFonts.outfit(
+                            color: const Color(0xFF0F0F0F),
+                            fontWeight: FontWeight.w900,
+                            fontSize: 14,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                HoverWidget(
+                  scale: 1.03,
+                  onTap: () async {
+                    try {
+                      final resume = await ResumeService.getActiveResume();
+                      if (resume.sourceType == ResumeSourceType.customUrl) {
+                        final Uri url = Uri.parse(resume.url!);
+                        if (await canLaunchUrl(url)) {
+                          await launchUrl(
+                            url,
+                            mode: LaunchMode.externalApplication,
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Could not open resume link'),
+                            ),
+                          );
+                        }
+                      } else if (resume.bytes != null) {
+                        downloadFile(resume.bytes!, resume.fileName);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('No resume content available'),
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error downloading resume: $e')),
+                      );
+                    }
+                  },
+                  child: Container(
+                    width: buttonWidth,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: const Color(0xFFFF5C35).withOpacity(0.3),
+                        width: 1.5,
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.file_download_outlined,
+                          color: Color(0xFFFF5C35),
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          "DOWNLOAD PDF DIRECTLY",
+                          style: GoogleFonts.outfit(
+                            color: const Color(0xFFFF5C35),
+                            fontWeight: FontWeight.w800,
+                            fontSize: 12,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+        const SizedBox(height: 32),
+
         // Contact block links
-        Wrap(
-          spacing: 16,
-          runSpacing: 16,
-          children: [
-            ContactTileCard(
-              icon: Icons.email_outlined,
-              title: "Email me",
-              value: "premmoparthi0829@gmail.com",
-              url: "mailto:premmoparthi0829@gmail.com",
-            ),
-            ContactTileCard(
-              icon: Icons.phone_android_outlined,
-              title: "Call/WhatsApp",
-              value: "+91 7780324745",
-              url: "tel:+917780324745",
-            ),
-            ContactTileCard(
-              icon: Icons.location_on_outlined,
-              title: "Based in",
-              value: "Hyderabad, India",
-              url: "https://maps.google.com/?q=Hyderabad,India",
-            ),
-          ],
+        LayoutBuilder(
+          builder: (context, cc) {
+            return Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              children: const [
+                ContactTileCard(
+                  icon: Icons.email_outlined,
+                  title: "Email me",
+                  value: "premmoparthi8@gmail.com",
+                  url: "mailto:premmoparthi8@gmail.com",
+                ),
+                ContactTileCard(
+                  icon: Icons.phone_android_outlined,
+                  title: "Call/WhatsApp",
+                  value: "",
+                  url: "",
+                  subItems: [
+                    {"label": "Primary", "value": "+91 7780324745", "url": "tel:+917780324745"},
+                    {"label": "Alternate", "value": "+91 7287928766", "url": "tel:+917287928766"},
+                  ],
+                ),
+                ContactTileCard(
+                  icon: Icons.location_on_outlined,
+                  title: "Based in",
+                  value: "Hyderabad, India",
+                  url: "https://maps.google.com/?q=Hyderabad,India",
+                ),
+              ],
+            );
+          },
         ),
         const SizedBox(height: 48),
 
         // Footer credits
         const Divider(color: Colors.white10),
         const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "© 2026 Moparthi Prem. All rights reserved.",
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.3),
-                fontSize: 13,
-              ),
-            ),
-            Text(
-              "Premium Flutter Web Portfolio",
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.3),
-                fontSize: 13,
-              ),
-            ),
-          ],
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final isWide = MediaQuery.of(context).size.width > 700;
+            if (isWide) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "© 2026 Prem Moparthi. All rights reserved.",
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.3),
+                      fontSize: 13,
+                    ),
+                  ),
+                  Text(
+                    "Prem Moparthi Portfolio",
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.3),
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              );
+            } else {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "© 2026 Prem Moparthi. All rights reserved.",
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.3),
+                      fontSize: 13,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Prem Moparthi Portfolio",
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.3),
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              );
+            }
+          },
         ),
       ],
     );
@@ -937,6 +1121,7 @@ class FloatingNavbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isWide = MediaQuery.of(context).size.width > 600;
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF1E1E1E).withOpacity(0.85),
@@ -950,35 +1135,39 @@ class FloatingNavbar extends StatelessWidget {
           ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: EdgeInsets.symmetric(
+        horizontal: isWide ? 16 : 8,
+        vertical: isWide ? 10 : 6,
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildNavItem(0, Icons.home_outlined),
-          _buildNavItem(1, Icons.folder_open_outlined),
-          _buildNavItem(2, Icons.work_outline),
-          _buildNavItem(3, Icons.psychology_outlined),
-          _buildNavItem(4, Icons.mail_outline),
+          _buildNavItem(context, 0, Icons.home_outlined),
+          _buildNavItem(context, 1, Icons.folder_open_outlined),
+          _buildNavItem(context, 2, Icons.work_outline),
+          _buildNavItem(context, 3, Icons.psychology_outlined),
+          _buildNavItem(context, 4, Icons.mail_outline),
         ],
       ),
     );
   }
 
-  Widget _buildNavItem(int index, IconData icon) {
+  Widget _buildNavItem(BuildContext context, int index, IconData icon) {
+    final isWide = MediaQuery.of(context).size.width > 600;
     final isActive = activeIndex == index;
     return HoverWidget(
       onTap: () => onTap(index),
       scale: 1.15,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 6),
-        padding: const EdgeInsets.all(10),
+        margin: EdgeInsets.symmetric(horizontal: isWide ? 6 : 3),
+        padding: EdgeInsets.all(isWide ? 10 : 8),
         decoration: BoxDecoration(
           color: isActive ? Colors.white : Colors.transparent,
           shape: BoxShape.circle,
         ),
         child: Icon(
           icon,
-          size: 20,
+          size: isWide ? 20 : 18,
           color: isActive
               ? const Color(0xFF0F0F0F)
               : Colors.white.withOpacity(0.6),
@@ -995,7 +1184,14 @@ class LeftProfileCard extends StatelessWidget {
 
   Future<void> _launchUrl(String urlString) async {
     final Uri url = Uri.parse(urlString);
-    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+    final isNativeProtocol =
+        url.scheme == 'mailto' || url.scheme == 'tel' || url.scheme == 'sms';
+    if (!await launchUrl(
+      url,
+      mode: isNativeProtocol
+          ? LaunchMode.platformDefault
+          : LaunchMode.externalApplication,
+    )) {
       throw Exception('Could not launch $url');
     }
   }
@@ -1072,7 +1268,7 @@ class LeftProfileCard extends StatelessWidget {
 
           // Name and Details
           Text(
-            "Moparthi Prem",
+            "Prem Moparthi",
             textAlign: TextAlign.center,
             style: GoogleFonts.outfit(
               color: const Color(0xFF0F0F0F),
@@ -1125,15 +1321,18 @@ class LeftProfileCard extends StatelessWidget {
               height: 1.55,
             ),
           ),
-          const Spacer(),
+          const SizedBox(height: 32),
 
           // Interactive Social icons row (Orange theme)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 0,
+            runSpacing: 8,
             children: [
               SocialIconBtn(
                 icon: Icons.language,
-                onTap: () => _launchUrl("https://github.com/premmoparthi0829"),
+                onTap: () =>
+                    _launchUrl("https://github.com/premmoparthi0829"),
                 tooltip: "GitHub",
               ),
               SocialIconBtn(
@@ -1149,7 +1348,8 @@ class LeftProfileCard extends StatelessWidget {
               ),
               SocialIconBtn(
                 icon: Icons.alternate_email_outlined,
-                onTap: () => _launchUrl("mailto:premmoparthi0829@gmail.com"),
+                onTap: () =>
+                    _launchUrl("mailto:premmoparthi8@gmail.com"),
                 tooltip: "Email",
               ),
             ],
@@ -1247,8 +1447,14 @@ class DashedCirclesPainter extends CustomPainter {
 class StatItem extends StatelessWidget {
   final String value;
   final String label;
+  final bool compact;
 
-  const StatItem({super.key, required this.value, required this.label});
+  const StatItem({
+    super.key,
+    required this.value,
+    required this.label,
+    this.compact = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1258,17 +1464,17 @@ class StatItem extends StatelessWidget {
         Text(
           value,
           style: GoogleFonts.outfit(
-            fontSize: 54,
+            fontSize: compact ? 40 : 54,
             fontWeight: FontWeight.w900,
             color: Colors.white,
             height: 1.0,
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
         Text(
           label,
           style: GoogleFonts.outfit(
-            fontSize: 11,
+            fontSize: compact ? 10 : 11,
             fontWeight: FontWeight.w800,
             color: const Color(0xFF8F8F8F),
             letterSpacing: 1.2,
@@ -1302,16 +1508,17 @@ class GridAccentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isWide = MediaQuery.of(context).size.width > 600;
     return HoverWidget(
       scale: 1.03,
       child: Container(
         width: width,
-        height: 200,
+        height: isWide ? 220 : 230,
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(24),
         ),
-        padding: const EdgeInsets.all(28),
+        padding: EdgeInsets.all(isWide ? 28 : 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1354,6 +1561,7 @@ class ProjectCard extends StatelessWidget {
   final String description;
   final List<String> techTags;
   final IconData icon;
+  final VoidCallback onTap;
 
   const ProjectCard({
     super.key,
@@ -1363,11 +1571,13 @@ class ProjectCard extends StatelessWidget {
     required this.description,
     required this.techTags,
     required this.icon,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return HoverWidget(
+      onTap: onTap,
       scale: 1.015,
       child: Container(
         decoration: BoxDecoration(
@@ -1457,47 +1667,43 @@ class ProjectCard extends StatelessWidget {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: techTags
-                  .map(
-                    (tag) {
-                      final icon = TechIconHelper.getIcon(tag);
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
+              children: techTags.map((tag) {
+                final icon = TechIconHelper.getIcon(tag);
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.04),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.05),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (icon != null) ...[
+                        Icon(
+                          icon,
+                          color: TechIconHelper.getIconColor(icon),
+                          size: 12,
                         ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.04),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.05),
-                            width: 1,
-                          ),
+                        const SizedBox(width: 6),
+                      ],
+                      Text(
+                        tag,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.5),
+                          fontSize: 12,
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (icon != null) ...[
-                              Icon(
-                                icon,
-                                color: TechIconHelper.getIconColor(icon),
-                                size: 12,
-                              ),
-                              const SizedBox(width: 6),
-                            ],
-                            Text(
-                              tag,
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.5),
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  )
-                  .toList(),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
             ),
           ],
         ),
@@ -1538,27 +1744,33 @@ class TimelineExperienceCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  duration,
-                  style: GoogleFonts.outfit(
-                    color: const Color(0xFFB2FF33),
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
+            SizedBox(
+              width: double.infinity,
+              child: Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 16,
+                runSpacing: 4,
+                children: [
+                  Text(
+                    duration,
+                    style: GoogleFonts.outfit(
+                      color: const Color(0xFFB2FF33),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
                   ),
-                ),
-                Text(
-                  location,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.4),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
+                  Text(
+                    location,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.4),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             const SizedBox(height: 16),
             Text(
@@ -1675,17 +1887,14 @@ class SkillChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withOpacity(0.05), width: 1),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      child: Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 6,
+        runSpacing: 4,
         children: [
           if (icons.isNotEmpty) ...[
             for (var icon in icons) ...[
-              Icon(
-                icon,
-                color: TechIconHelper.getIconColor(icon),
-                size: 14,
-              ),
-              const SizedBox(width: 6),
+              Icon(icon, color: TechIconHelper.getIconColor(icon), size: 14),
             ],
           ],
           Text(
@@ -1720,16 +1929,13 @@ class LangChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white.withOpacity(0.05), width: 1),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      child: Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 8,
+        runSpacing: 4,
         children: [
           if (icon != null) ...[
-            Icon(
-              icon,
-              color: TechIconHelper.getIconColor(icon),
-              size: 16,
-            ),
-            const SizedBox(width: 8),
+            Icon(icon, color: TechIconHelper.getIconColor(icon), size: 16),
           ],
           Text(
             name,
@@ -1739,8 +1945,8 @@ class LangChip extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(width: 8),
-          Row(
+          Wrap(
+            spacing: 2,
             children: List.generate(5, (index) {
               return Icon(
                 Icons.star,
@@ -1764,6 +1970,7 @@ class ContactTileCard extends StatelessWidget {
   final String title;
   final String value;
   final String url;
+  final List<Map<String, String>>? subItems;
 
   const ContactTileCard({
     super.key,
@@ -1771,66 +1978,172 @@ class ContactTileCard extends StatelessWidget {
     required this.title,
     required this.value,
     required this.url,
+    this.subItems,
   });
 
   Future<void> _launchUrl() async {
     final Uri parsedUrl = Uri.parse(url);
-    if (!await launchUrl(parsedUrl, mode: LaunchMode.externalApplication)) {
+    final isNativeProtocol =
+        parsedUrl.scheme == 'mailto' ||
+        parsedUrl.scheme == 'tel' ||
+        parsedUrl.scheme == 'sms';
+    if (!await launchUrl(
+      parsedUrl,
+      mode: isNativeProtocol
+          ? LaunchMode.platformDefault
+          : LaunchMode.externalApplication,
+    )) {
       throw Exception('Could not launch $parsedUrl');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return HoverWidget(
-      onTap: _launchUrl,
-      scale: 1.025,
-      child: Container(
-        width: 250,
+    final isWide = MediaQuery.of(context).size.width > 600;
+    final hasSubItems = subItems != null && subItems!.isNotEmpty;
+
+    Widget cardContent = Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.05),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: Colors.white.withOpacity(0.8), size: 20),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.4),
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 2),
+              if (hasSubItems)
+                ...subItems!.map((item) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: HoverPhoneItem(
+                      value: item['value'] ?? '',
+                      label: item['label'] ?? '',
+                      url: item['url'] ?? '',
+                    ),
+                  );
+                })
+              else
+                Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.outfit(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+
+    if (hasSubItems) {
+      return Container(
+        width: isWide ? 270 : double.infinity,
         decoration: BoxDecoration(
           color: const Color(0xFF171717),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Colors.white.withOpacity(0.04), width: 1),
         ),
         padding: const EdgeInsets.all(20),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.05),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: Colors.white.withOpacity(0.8), size: 20),
+        child: cardContent,
+      );
+    } else {
+      return HoverWidget(
+        onTap: _launchUrl,
+        scale: 1.025,
+        child: Container(
+          width: isWide ? 270 : double.infinity,
+          decoration: BoxDecoration(
+            color: const Color(0xFF171717),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white.withOpacity(0.04), width: 1),
+          ),
+          padding: const EdgeInsets.all(20),
+          child: cardContent,
+        ),
+      );
+    }
+  }
+}
+
+// --- Hoverable Phone Item for Combined Card ---
+
+class HoverPhoneItem extends StatefulWidget {
+  final String value;
+  final String label;
+  final String url;
+
+  const HoverPhoneItem({
+    super.key,
+    required this.value,
+    required this.label,
+    required this.url,
+  });
+
+  @override
+  State<HoverPhoneItem> createState() => _HoverPhoneItemState();
+}
+
+class _HoverPhoneItemState extends State<HoverPhoneItem> {
+  bool _isHovered = false;
+
+  Future<void> _launchUrl() async {
+    final Uri parsedUrl = Uri.parse(widget.url);
+    if (await canLaunchUrl(parsedUrl)) {
+      await launchUrl(parsedUrl, mode: LaunchMode.platformDefault);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: _launchUrl,
+        child: RichText(
+          text: TextSpan(
+            style: GoogleFonts.outfit(
+              color: _isHovered ? const Color(0xFFFF5C35) : Colors.white,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.4),
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                    ),
+            children: [
+              TextSpan(text: widget.value),
+              if (widget.label.isNotEmpty)
+                TextSpan(
+                  text: ' (${widget.label})',
+                  style: TextStyle(
+                    color: _isHovered
+                        ? const Color(0xFFFF5C35).withOpacity(0.7)
+                        : Colors.white.withOpacity(0.4),
+                    fontSize: 10,
+                    fontWeight: FontWeight.normal,
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    value,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.outfit(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -1843,13 +2156,16 @@ class TechIconHelper {
   static IconData? getIcon(String name) {
     final lower = name.toLowerCase().trim();
     if (lower.contains('flutter')) return SimpleIcons.flutter;
-    if (lower.contains('firebase') || lower.contains('firestore')) return SimpleIcons.firebase;
+    if (lower.contains('firebase') || lower.contains('firestore'))
+      return SimpleIcons.firebase;
     if (lower.contains('dart')) return SimpleIcons.dart;
     if (lower.contains('kotlin')) return SimpleIcons.kotlin;
     if (lower.contains('python')) return SimpleIcons.python;
-    if (lower.contains('java') && !lower.contains('script')) return SimpleIcons.openjdk;
+    if (lower.contains('java') && !lower.contains('script'))
+      return SimpleIcons.openjdk;
     if (lower.contains('react')) return SimpleIcons.react;
-    if (lower.contains('git') || lower.contains('github')) return SimpleIcons.git;
+    if (lower.contains('git') || lower.contains('github'))
+      return SimpleIcons.git;
     if (lower.contains('figma')) return SimpleIcons.figma;
     if (lower.contains('xcode')) return SimpleIcons.xcode;
     if (lower.contains('android studio')) return SimpleIcons.androidstudio;
@@ -1859,18 +2175,30 @@ class TechIconHelper {
 
   static Color getIconColor(IconData icon) {
     Color color = Colors.white;
-    if (icon == SimpleIcons.flutter) color = SimpleIconColors.flutter;
-    else if (icon == SimpleIcons.firebase) color = SimpleIconColors.firebase;
-    else if (icon == SimpleIcons.git) color = SimpleIconColors.git;
-    else if (icon == SimpleIcons.figma) color = SimpleIconColors.figma;
-    else if (icon == SimpleIcons.swift) color = SimpleIconColors.swift;
-    else if (icon == SimpleIcons.kotlin) color = SimpleIconColors.kotlin;
-    else if (icon == SimpleIcons.xcode) color = SimpleIconColors.xcode;
-    else if (icon == SimpleIcons.androidstudio) color = SimpleIconColors.androidstudio;
-    else if (icon == SimpleIcons.dart) color = SimpleIconColors.dart;
-    else if (icon == SimpleIcons.openjdk) color = SimpleIconColors.openjdk;
-    else if (icon == SimpleIcons.python) color = SimpleIconColors.python;
-    else if (icon == SimpleIcons.react) color = SimpleIconColors.react;
+    if (icon == SimpleIcons.flutter)
+      color = SimpleIconColors.flutter;
+    else if (icon == SimpleIcons.firebase)
+      color = SimpleIconColors.firebase;
+    else if (icon == SimpleIcons.git)
+      color = SimpleIconColors.git;
+    else if (icon == SimpleIcons.figma)
+      color = SimpleIconColors.figma;
+    else if (icon == SimpleIcons.swift)
+      color = SimpleIconColors.swift;
+    else if (icon == SimpleIcons.kotlin)
+      color = SimpleIconColors.kotlin;
+    else if (icon == SimpleIcons.xcode)
+      color = SimpleIconColors.xcode;
+    else if (icon == SimpleIcons.androidstudio)
+      color = SimpleIconColors.androidstudio;
+    else if (icon == SimpleIcons.dart)
+      color = SimpleIconColors.dart;
+    else if (icon == SimpleIcons.openjdk)
+      color = SimpleIconColors.openjdk;
+    else if (icon == SimpleIcons.python)
+      color = SimpleIconColors.python;
+    else if (icon == SimpleIcons.react)
+      color = SimpleIconColors.react;
 
     // Fallback to white for pure black/very dark colors to look good in dark mode
     if (color.computeLuminance() < 0.15) {
@@ -1883,7 +2211,8 @@ class TechIconHelper {
     final lower = label.toLowerCase();
     final icons = <IconData>[];
     if (lower.contains('flutter')) icons.add(SimpleIcons.flutter);
-    if (lower.contains('firebase') || lower.contains('firestore')) icons.add(SimpleIcons.firebase);
+    if (lower.contains('firebase') || lower.contains('firestore'))
+      icons.add(SimpleIcons.firebase);
     if (lower.contains('git')) icons.add(SimpleIcons.git);
     if (lower.contains('figma')) icons.add(SimpleIcons.figma);
     if (lower.contains('swift')) icons.add(SimpleIcons.swift);
@@ -1892,7 +2221,8 @@ class TechIconHelper {
     if (lower.contains('android studio')) icons.add(SimpleIcons.androidstudio);
     if (lower.contains('dart')) icons.add(SimpleIcons.dart);
     if (lower.contains('python')) icons.add(SimpleIcons.python);
-    if (lower.contains('java') && !lower.contains('script')) icons.add(SimpleIcons.openjdk);
+    if (lower.contains('java') && !lower.contains('script'))
+      icons.add(SimpleIcons.openjdk);
     if (lower.contains('react')) icons.add(SimpleIcons.react);
     return icons;
   }
@@ -1920,6 +2250,969 @@ class GradientText extends StatelessWidget {
         Rect.fromLTWH(0, 0, bounds.width, bounds.height),
       ),
       child: Text(text, style: style),
+    );
+  }
+}
+
+// --- Project Details Data Model ---
+
+class ProjectDetail {
+  final String year;
+  final String title;
+  final String subtitle;
+  final String description;
+  final List<String> techTags;
+  final IconData icon;
+  final List<String> userImages;
+  final List<String> adminImages;
+  final List<String> highlights;
+  final String githubUrl;
+
+  const ProjectDetail({
+    required this.year,
+    required this.title,
+    required this.subtitle,
+    required this.description,
+    required this.techTags,
+    required this.icon,
+    required this.userImages,
+    required this.adminImages,
+    required this.highlights,
+    this.githubUrl = "https://github.com/premmoparthi0829",
+  });
+
+  static const List<ProjectDetail> projects = [
+    ProjectDetail(
+      year: "2025-2026",
+      title: "Seven Pay Services",
+      subtitle: "Enterprise Fintech Mobile App & Dashboard",
+      description:
+          "Engineered and shipped a production-ready fintech ecosystem. Architected secure transactional layers, integrated multi-channel payment gateways, and built real-time synchronizations with Firebase. Implemented strict state management patterns (Bloc) and clean security boundaries.",
+      techTags: [
+        "Flutter",
+        "Dart",
+        "Firebase Auth",
+        "Firestore",
+        "Cloud Functions",
+        "Razorpay",
+      ],
+      icon: Icons.payment,
+      userImages: [
+        "assets/project_seven_pay_services_user1.png",
+        "assets/project_seven_pay_services_user2.png",
+        "assets/project_seven_pay_services_user3.png",
+      ],
+      adminImages: [
+        "assets/project_seven_pay_services_admin1.png",
+        "assets/project_seven_pay_services_admin2.png",
+      ],
+      highlights: [
+        "Developed secure transactional API channels with strict payload validations.",
+        "Integrated Razorpay Payment Gateway for seamless deposits and automated settlement routing.",
+        "Built live ledger updates and transaction statement exports using PDF generator libraries.",
+        "Implemented Firebase Authentication with secure storage for sessions and biometric lock toggle.",
+        "Architected client state using Bloc/Cubit pattern to separate presentation from transaction logic.",
+      ],
+    ),
+    ProjectDetail(
+      year: "2025-2026",
+      title: "Ride 4 you",
+      subtitle: "Real-time Ride-Hailing Mobile Platform",
+      description:
+          "Developed a location-aware, reactive mobile booking app with background GPS tracking, dynamic pricing calculators, and efficient driver routing algorithms. Optimized location fetch intervals to conserve battery while maintaining high tracking accuracy.",
+      techTags: [
+        "Flutter & Dart",
+        "Google Maps API",
+        "GPS Tracking",
+        "Firestore",
+        "Cloud Functions",
+      ],
+      icon: Icons.local_taxi,
+      userImages: [
+        "assets/project_ride_4_you_user1.png",
+        "assets/project_ride_4_you_user2.png",
+        "assets/project_ride_4_you_user3.png",
+      ],
+      adminImages: [
+        "assets/project_ride_4_you_admin1.png",
+        "assets/project_ride_4_you_admin2.png",
+      ],
+      highlights: [
+        "Configured persistent background location tracking optimized for low battery usage.",
+        "Integrated Google Maps API with route drawing, custom markers, and camera transitions.",
+        "Calculated fare estimations dynamically using geographic distance matrices and surge factors.",
+        "Designed double-token validation handshake between rider and driver to verify trip starts.",
+      ],
+    ),
+    ProjectDetail(
+      year: "2025-2026",
+      title: "Alham Mutton",
+      subtitle: "Premium Meat & Fresh E-Commerce App (Licious-style)",
+      description:
+          "Engineered a premium, fast delivery mobile app for fresh meat ordering. Implemented smart item categorization, localized search algorithms, real-time order tracking, and dynamic checkout layers. Integrated reactive local caching to ensure zero latency during high-traffic order peaks.",
+      techTags: [
+        "Flutter",
+        "Dart",
+        "Firebase Auth",
+        "Firestore",
+        "Push Notifications",
+        "Razorpay",
+      ],
+      icon: Icons.shopping_bag_outlined,
+      userImages: [
+        "assets/project_alham_mutton_user1.png",
+        "assets/project_alham_mutton_user2.png",
+        "assets/project_alham_mutton_user3.png",
+      ],
+      adminImages: [
+        "assets/project_alham_mutton_admin1.png",
+        "assets/project_alham_mutton_admin2.png",
+      ],
+      highlights: [
+        "Engineered an interface for meat category filtering with animated transitions.",
+        "Implemented local cart caching using SQLite/Hive for instant offline editing and retrieval.",
+        "Configured cloud push notifications for real-time delivery status updates.",
+        "Integrated Razorpay secure payment processing with auto-refund trigger loops on fail.",
+      ],
+    ),
+    ProjectDetail(
+      year: "2025-2026",
+      title: "Rythu Rice",
+      subtitle: "Multi-App Rice Booking & Supply Chain Ecosystem",
+      description:
+          "Architected and engineered a comprehensive 4-app rice distribution platform containing dedicated apps for Users (ordering), Vendors (inventory & store management), Riders (delivery routing), and an Admin Dashboard (metrics & control). Designed robust real-time order matching and secure transaction layers.",
+      techTags: [
+        "Flutter",
+        "Dart",
+        "Firebase Auth",
+        "Firestore",
+        "Google Maps API",
+        "Push Notifications",
+      ],
+      icon: Icons.agriculture_outlined,
+      userImages: [
+        "assets/project_rythu_rice_user1.png",
+        "assets/project_rythu_rice_user2.png",
+        "assets/project_rythu_rice_user3.png",
+      ],
+      adminImages: [
+        "assets/project_rythu_rice_admin1.png",
+        "assets/project_rythu_rice_admin2.png",
+      ],
+      highlights: [
+        "Constructed a 4-app ecosystem separating User, Vendor, Rider, and Admin dashboards.",
+        "Built real-time order matching queue matching riders to close-proximity store vendors.",
+        "Designed vendors stock management portal with real-time push synchronization.",
+        "Integrated route optimization maps for riders delivering heavy volume orders.",
+      ],
+    ),
+    ProjectDetail(
+      year: "2025-2026",
+      title: "Meatoon",
+      subtitle: "Live Online Meat & Poultry Delivery App",
+      description:
+          "Designed and shipped a production-ready, live online meat delivery app. Engineered instant order processing, dynamic weight/price calculations, cold-chain delivery monitoring, and automated SMS alert pipelines.",
+      techTags: [
+        "Flutter",
+        "Dart",
+        "Firebase Auth",
+        "Firestore",
+        "Razorpay",
+        "Push Notifications",
+      ],
+      icon: Icons.restaurant_menu_outlined,
+      userImages: [
+        "assets/project_meatoon_user1.png",
+        "assets/project_meatoon_user2.png",
+        "assets/project_meatoon_user3.png",
+      ],
+      adminImages: [
+        "assets/project_meatoon_admin1.png",
+        "assets/project_meatoon_admin2.png",
+      ],
+      highlights: [
+        "Engineered instant order placement flow with custom weighing-scale integrations.",
+        "Developed localized search algorithm with partial match capabilities.",
+        "Implemented automated SMS alert pipelines using Twilio functions trigger on Firebase DB updates.",
+        "Created custom animations for items added to cart for high-end feel.",
+      ],
+    ),
+    ProjectDetail(
+      year: "2025-2026",
+      title: "Fresh & Fresh",
+      subtitle: "Vibrant Local Grocery Delivery Platform",
+      description:
+          "Developed a comprehensive grocery e-commerce app featuring smart product cataloging, localized search filters, dynamic discount managers, and integration with local logistics systems for rapid order fulfilment.",
+      techTags: [
+        "Flutter",
+        "Dart",
+        "Firebase Auth",
+        "Firestore",
+        "Google Maps API",
+      ],
+      icon: Icons.local_grocery_store_outlined,
+      userImages: [
+        "assets/project_fresh_fresh_user1.png",
+        "assets/project_fresh_fresh_user2.png",
+        "assets/project_fresh_fresh_user3.png",
+      ],
+      adminImages: [
+        "assets/project_fresh_fresh_admin1.png",
+        "assets/project_fresh_fresh_admin2.png",
+      ],
+      highlights: [
+        "Created dynamic catalog filtering with deep-nested category support.",
+        "Designed interactive discount and coupon applying logic in checkout stage.",
+        "Built Google Maps store locator with distance calculation.",
+        "Configured dashboard statistics for local merchants to monitor active orders.",
+      ],
+    ),
+    ProjectDetail(
+      year: "2025-2026",
+      title: "Church App",
+      subtitle: "Community Engagement & Livestream Mobile App",
+      description:
+          "Created a dedicated mobile platform for community interaction, event registrations, secure donations, and audio/video livestream integration. Boosted community participation by introducing instant notifications for live updates.",
+      techTags: [
+        "Flutter",
+        "Dart",
+        "Firebase Auth",
+        "Firestore",
+        "Push Notifications",
+        "Razorpay",
+      ],
+      icon: Icons.church_outlined,
+      userImages: [
+        "assets/project_church_app_user1.png",
+        "assets/project_church_app_user2.png",
+        "assets/project_church_app_user3.png",
+      ],
+      adminImages: [
+        "assets/project_church_app_admin1.png",
+        "assets/project_church_app_admin2.png",
+      ],
+      highlights: [
+        "Integrated YouTube / HLS video player supporting picture-in-picture background execution.",
+        "Built secure donation module using Razorpay, generating instant receipts sent to email.",
+        "Developed events registration and digital entry ticket passes using QR codes.",
+        "Designed daily verses notifications delivered via FCM scheduled CRON triggers.",
+      ],
+    ),
+  ];
+}
+
+// --- Project Details Page Route Builder ---
+
+class ProjectDetailRoute extends PageRouteBuilder {
+  final ProjectDetail project;
+
+  ProjectDetailRoute({required this.project})
+    : super(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            ProjectDetailScreen(project: project),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          final curve = CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+          );
+          return FadeTransition(
+            opacity: curve,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0.0, 0.08),
+                end: Offset.zero,
+              ).animate(curve),
+              child: child,
+            ),
+          );
+        },
+        opaque: false,
+        barrierDismissible: true,
+        barrierColor: Colors.black.withOpacity(0.7),
+      );
+}
+
+// --- Custom Smartphone Device Chassis Frame Wrapper ---
+
+class MobileDeviceFrame extends StatelessWidget {
+  final Widget child;
+  const MobileDeviceFrame({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 250,
+      height: 420,
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F0F0F),
+        borderRadius: BorderRadius.circular(36),
+        border: Border.all(color: Colors.white.withOpacity(0.12), width: 6),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.5),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        children: [
+          Positioned.fill(child: child),
+          // Notch / Speaker slit
+          Align(
+            alignment: Alignment.topCenter,
+            child: Container(
+              margin: const EdgeInsets.only(top: 4),
+              width: 80,
+              height: 14,
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 30,
+                    height: 2,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                    width: 4,
+                    height: 4,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF1E1E1E),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// --- Custom Web Browser Device Chassis Frame Wrapper ---
+
+class BrowserDeviceFrame extends StatelessWidget {
+  final Widget child;
+  final String projectTitle;
+  const BrowserDeviceFrame({
+    super.key,
+    required this.child,
+    required this.projectTitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cleanSubdomain = projectTitle.toLowerCase().replaceAll(' ', '');
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF171717),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.08), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          // Browser top bar
+          Container(
+            height: 36,
+            color: const Color(0xFF222222),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              children: [
+                // Three window controls dots
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFF5F57),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFFBD2E),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF27C13F),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                // Address bar
+                Expanded(
+                  child: Container(
+                    height: 22,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF171717),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.only(left: 12),
+                    child: Text(
+                      "https://admin.$cleanSubdomain.com",
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.35),
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Window content
+          Expanded(child: child),
+        ],
+      ),
+    );
+  }
+}
+
+// --- Project Details Interactive Screen ---
+
+class ProjectDetailScreen extends StatefulWidget {
+  final ProjectDetail project;
+
+  const ProjectDetailScreen({super.key, required this.project});
+
+  @override
+  State<ProjectDetailScreen> createState() => _ProjectDetailScreenState();
+}
+
+class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
+  int _selectedTab = 0; // 0 = Mobile User, 1 = Web Admin
+  int _currentImageIndex = 0;
+
+  Future<void> _launchUrl(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDesktop = MediaQuery.of(context).size.width > 900;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final currentImages = _selectedTab == 0
+        ? widget.project.userImages
+        : widget.project.adminImages;
+
+    // Boundary sanity check
+    if (_currentImageIndex >= currentImages.length) {
+      _currentImageIndex = 0;
+    }
+
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        children: [
+          // Blurred background overlay tapping it dismisses the dialog
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: () => Navigator.of(context).pop(),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                child: Container(color: Colors.black.withOpacity(0.65)),
+              ),
+            ),
+          ),
+
+          // Main Center Card
+          Center(
+            child: Container(
+              width: isDesktop ? 960 : screenWidth * 0.92,
+              height: isDesktop ? screenHeight * 0.85 : screenHeight * 0.90,
+              decoration: BoxDecoration(
+                color: const Color(0xFF121212),
+                borderRadius: BorderRadius.circular(32),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.08),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.6),
+                    blurRadius: 40,
+                    offset: const Offset(0, 20),
+                  ),
+                ],
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Stack(
+                children: [
+                  // Scrollable Content
+                  Positioned.fill(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.only(
+                        left: isDesktop ? 40 : 20,
+                        right: isDesktop ? 40 : 20,
+                        top: isDesktop
+                            ? 40
+                            : 64, // extra space on mobile for close button
+                        bottom: 40,
+                      ),
+                      child: isDesktop
+                          ? Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Left Column: Mockup Image switcher and Project Meta
+                                Expanded(
+                                  flex: 5,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      _buildImageCard(context, currentImages),
+                                      const SizedBox(height: 24),
+                                      _buildProjectMeta(context),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 40),
+                                // Right Column: Detailed info, highlights, tags
+                                Expanded(
+                                  flex: 6,
+                                  child: _buildDetailsContent(context),
+                                ),
+                              ],
+                            )
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildImageCard(context, currentImages),
+                                const SizedBox(height: 24),
+                                _buildProjectMeta(context),
+                                const SizedBox(height: 24),
+                                _buildDetailsContent(context),
+                              ],
+                            ),
+                    ),
+                  ),
+
+                  // Pinned close button at top-right
+                  Positioned(
+                    top: 20,
+                    right: 20,
+                    child: HoverWidget(
+                      scale: 1.15,
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E1E1E),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.1),
+                            width: 1,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageCard(BuildContext context, List<String> currentImages) {
+    final activeImage = currentImages[_currentImageIndex];
+    return Column(
+      children: [
+        // Tab buttons (Mobile User vs Admin Web)
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E1E1E),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white.withOpacity(0.05)),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => setState(() {
+                    _selectedTab = 0;
+                    _currentImageIndex = 0;
+                  }),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: _selectedTab == 0
+                          ? const Color(0xFFFF5C35)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      "USER APP (3)",
+                      style: GoogleFonts.outfit(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                        color: _selectedTab == 0
+                            ? Colors.white
+                            : Colors.white.withOpacity(0.6),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => setState(() {
+                    _selectedTab = 1;
+                    _currentImageIndex = 0;
+                  }),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: _selectedTab == 1
+                          ? const Color(0xFFB2FF33)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      "ADMIN PANEL (2)",
+                      style: GoogleFonts.outfit(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                        color: _selectedTab == 1
+                            ? const Color(0xFF0F0F0F)
+                            : Colors.white.withOpacity(0.6),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+
+        // Active Device Frame Mockup Display
+        Center(
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 250),
+            transitionBuilder: (child, animation) =>
+                FadeTransition(opacity: animation, child: child),
+            child: _selectedTab == 0
+                ? MobileDeviceFrame(
+                    key: ValueKey("mobile_$activeImage"),
+                    child: Image.asset(activeImage, fit: BoxFit.cover),
+                  )
+                : Container(
+                    height: 260,
+                    width: 390,
+                    alignment: Alignment.center,
+                    child: BrowserDeviceFrame(
+                      key: ValueKey("browser_$activeImage"),
+                      projectTitle: widget.project.title,
+                      child: Image.asset(
+                        activeImage,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
+                      ),
+                    ),
+                  ),
+          ),
+        ),
+        const SizedBox(height: 20),
+
+        // Thumbnails selector row
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(currentImages.length, (idx) {
+            final isSelected = _currentImageIndex == idx;
+            return GestureDetector(
+              onTap: () => setState(() => _currentImageIndex = idx),
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 6),
+                width: 45,
+                height: _selectedTab == 0 ? 60 : 35,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isSelected
+                        ? (_selectedTab == 0
+                              ? const Color(0xFFFF5C35)
+                              : const Color(0xFFB2FF33))
+                        : Colors.white.withOpacity(0.1),
+                    width: isSelected ? 2 : 1,
+                  ),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Image.asset(currentImages[idx], fit: BoxFit.cover),
+              ),
+            );
+          }),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProjectMeta(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFF5C35).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0xFFFF5C35).withOpacity(0.2),
+              width: 1,
+            ),
+          ),
+          child: Text(
+            widget.project.year,
+            style: GoogleFonts.outfit(
+              color: const Color(0xFFFF5C35),
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.04),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white.withOpacity(0.08), width: 1),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.devices_other,
+                size: 14,
+                color: Colors.white.withOpacity(0.6),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                "Multi-Platform App",
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.6),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailsContent(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Title
+        GradientText(
+          widget.project.title,
+          gradient: const LinearGradient(
+            colors: [Color(0xFFFF5C35), Color(0xFFB2FF33)],
+          ),
+          style: GoogleFonts.outfit(
+            fontSize: 32,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.5,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          widget.project.subtitle,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.4),
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 20),
+        Text(
+          widget.project.description,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.65),
+            fontSize: 15,
+            height: 1.6,
+          ),
+        ),
+        const SizedBox(height: 28),
+
+        // Key Contributions
+        Text(
+          "KEY CONTRIBUTIONS & FEATURES",
+          style: GoogleFonts.outfit(
+            fontSize: 14,
+            fontWeight: FontWeight.w800,
+            color: const Color(0xFFB2FF33),
+            letterSpacing: 1.5,
+          ),
+        ),
+        const SizedBox(height: 16),
+        ...widget.project.highlights.map(
+          (highlight) => Padding(
+            padding: const EdgeInsets.only(bottom: 12.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(top: 3.0),
+                  child: Icon(
+                    Icons.check_circle_outline,
+                    color: Color(0xFFB2FF33),
+                    size: 16,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    highlight,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.75),
+                      fontSize: 14,
+                      height: 1.5,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 28),
+
+        // Tech Stack
+        Text(
+          "TECH STACK",
+          style: GoogleFonts.outfit(
+            fontSize: 14,
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+            letterSpacing: 1.5,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: widget.project.techTags.map((tag) {
+            final icon = TechIconHelper.getIcon(tag);
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E1E1E),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.05),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (icon != null) ...[
+                    Icon(
+                      icon,
+                      color: TechIconHelper.getIconColor(icon),
+                      size: 14,
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                  Text(
+                    tag,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 36),
+
+        // Actions
+        Row(
+          children: [
+            Expanded(
+              child: HoverWidget(
+                scale: 1.03,
+                onTap: () => _launchUrl(widget.project.githubUrl),
+                child: Container(
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: const Color(0xFFFF5C35),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        SimpleIcons.github,
+                        color: Color(0xFFFF5C35),
+                        size: 20,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        "View Source Code",
+                        style: GoogleFonts.outfit(
+                          color: const Color(0xFFFF5C35),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
