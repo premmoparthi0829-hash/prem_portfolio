@@ -2811,13 +2811,7 @@ class ProjectDetailScreen extends StatefulWidget {
 class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   int _selectedTab = 0; // 0 = Mobile User, 1 = Web Admin
   int _currentImageIndex = 0;
-
-  Future<void> _launchUrl(String urlString) async {
-    final Uri url = Uri.parse(urlString);
-    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      throw Exception('Could not launch $url');
-    }
-  }
+  bool _showImages = false;
 
   @override
   Widget build(BuildContext context) {
@@ -2850,8 +2844,12 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
 
           // Main Center Card
           Center(
-            child: Container(
-              width: isDesktop ? 960 : screenWidth * 0.92,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOutCubic,
+              width: isDesktop
+                  ? (_showImages ? 980.0 : 580.0).clamp(0.0, screenWidth * 0.95)
+                  : screenWidth * 0.92,
               height: isDesktop ? screenHeight * 0.85 : screenHeight * 0.90,
               decoration: BoxDecoration(
                 color: const Color(0xFF121212),
@@ -2883,37 +2881,41 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                         bottom: 40,
                       ),
                       child: isDesktop
-                          ? Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Left Column: Mockup Image switcher and Project Meta
-                                Expanded(
-                                  flex: 5,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      _buildImageCard(context, currentImages),
-                                      const SizedBox(height: 24),
-                                      _buildProjectMeta(context),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 40),
-                                // Right Column: Detailed info, highlights, tags
-                                Expanded(
-                                  flex: 6,
-                                  child: _buildDetailsContent(context),
-                                ),
-                              ],
-                            )
+                          ? (_showImages
+                              ? Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Left Column: Detailed info, highlights, tags
+                                    Expanded(
+                                      flex: 6,
+                                      child: _buildDetailsContent(context),
+                                    ),
+                                    const SizedBox(width: 40),
+                                    // Right Column: Mockup Image switcher and Project Meta
+                                    Expanded(
+                                      flex: 5,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          _buildImageCard(context, currentImages),
+                                          const SizedBox(height: 24),
+                                          _buildProjectMeta(context),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : _buildDetailsContent(context))
                           : Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _buildImageCard(context, currentImages),
-                                const SizedBox(height: 24),
-                                _buildProjectMeta(context),
-                                const SizedBox(height: 24),
+                                if (_showImages) ...[
+                                  _buildImageCard(context, currentImages),
+                                  const SizedBox(height: 24),
+                                  _buildProjectMeta(context),
+                                  const SizedBox(height: 24),
+                                ],
                                 _buildDetailsContent(context),
                               ],
                             ),
@@ -3031,30 +3033,49 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
 
         // Active Device Frame Mockup Display
         Center(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 250),
-            transitionBuilder: (child, animation) =>
-                FadeTransition(opacity: animation, child: child),
-            child: _selectedTab == 0
-                ? MobileDeviceFrame(
-                    key: ValueKey("mobile_$activeImage"),
-                    child: Image.asset(activeImage, fit: BoxFit.cover),
-                  )
-                : Container(
-                    height: 260,
-                    width: 390,
-                    alignment: Alignment.center,
-                    child: BrowserDeviceFrame(
-                      key: ValueKey("browser_$activeImage"),
-                      projectTitle: widget.project.title,
-                      child: Image.asset(
-                        activeImage,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: double.infinity,
-                      ),
-                    ),
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  barrierColor: Colors.black.withOpacity(0.95),
+                  builder: (context) => ImageGalleryDialog(
+                    images: currentImages,
+                    initialIndex: _currentImageIndex,
+                    title: widget.project.title,
                   ),
+                );
+              },
+              child: Tooltip(
+                message: "Click to view fullscreen",
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  transitionBuilder: (child, animation) =>
+                      FadeTransition(opacity: animation, child: child),
+                  child: _selectedTab == 0
+                      ? MobileDeviceFrame(
+                          key: ValueKey("mobile_$activeImage"),
+                          child: Image.asset(activeImage, fit: BoxFit.cover),
+                        )
+                      : Container(
+                          height: 260,
+                          width: 390,
+                          alignment: Alignment.center,
+                          child: BrowserDeviceFrame(
+                            key: ValueKey("browser_$activeImage"),
+                            projectTitle: widget.project.title,
+                            child: Image.asset(
+                              activeImage,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
+                          ),
+                        ),
+                ),
+              ),
+            ),
           ),
         ),
         const SizedBox(height: 20),
@@ -3145,6 +3166,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   }
 
   Widget _buildDetailsContent(BuildContext context) {
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -3279,7 +3301,11 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
             Expanded(
               child: HoverWidget(
                 scale: 1.03,
-                onTap: () => _launchUrl(widget.project.githubUrl),
+                onTap: () {
+                  setState(() {
+                    _showImages = !_showImages;
+                  });
+                },
                 child: Container(
                   height: 52,
                   decoration: BoxDecoration(
@@ -3293,14 +3319,16 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
-                        SimpleIcons.github,
-                        color: Color(0xFFFF5C35),
+                      Icon(
+                        _showImages
+                            ? Icons.visibility_off_outlined
+                            : Icons.collections_rounded,
+                        color: const Color(0xFFFF5C35),
                         size: 20,
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        "View Source Code",
+                        _showImages ? "Hide Images" : "View Images",
                         style: GoogleFonts.outfit(
                           color: const Color(0xFFFF5C35),
                           fontWeight: FontWeight.bold,
@@ -3315,6 +3343,229 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
           ],
         ),
       ],
+    );
+  }
+}
+
+// --- Fullscreen Interactive Image Gallery Lightbox ---
+class ImageGalleryDialog extends StatefulWidget {
+  final List<String> images;
+  final int initialIndex;
+  final String title;
+
+  const ImageGalleryDialog({
+    super.key,
+    required this.images,
+    required this.initialIndex,
+    required this.title,
+  });
+
+  @override
+  State<ImageGalleryDialog> createState() => _ImageGalleryDialogState();
+}
+
+class _ImageGalleryDialogState extends State<ImageGalleryDialog> {
+  late PageController _pageController;
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+    _pageController = PageController(initialPage: widget.initialIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black.withOpacity(0.95),
+      body: Stack(
+        children: [
+          // Dismiss on tap background (outside the InteractiveViewer bounds)
+          GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Container(color: Colors.transparent),
+          ),
+
+          // Swipeable PageView with Interactive Zooming
+          Center(
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: widget.images.length,
+              onPageChanged: (idx) => setState(() => _currentIndex = idx),
+              itemBuilder: (context, index) {
+                return Center(
+                  child: InteractiveViewer(
+                    minScale: 1.0,
+                    maxScale: 4.0,
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      child: Image.asset(
+                        widget.images[index],
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          // Top Header Info & Close Button
+          Positioned(
+            top: 40,
+            left: 20,
+            right: 20,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.title,
+                        style: GoogleFonts.outfit(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "Image ${_currentIndex + 1} of ${widget.images.length}",
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.5),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 20),
+                HoverWidget(
+                  scale: 1.15,
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Left Arrow (only show when there is a previous page)
+          if (_currentIndex > 0)
+            Positioned(
+              left: 20,
+              top: 0,
+              bottom: 0,
+              child: Center(
+                child: HoverWidget(
+                  scale: 1.15,
+                  onTap: () {
+                    _pageController.previousPage(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.5),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.1),
+                        width: 1,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.arrow_back_ios_new,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+          // Right Arrow (only show when there is a next page)
+          if (_currentIndex < widget.images.length - 1)
+            Positioned(
+              right: 20,
+              top: 0,
+              bottom: 0,
+              child: Center(
+                child: HoverWidget(
+                  scale: 1.15,
+                  onTap: () {
+                    _pageController.nextPage(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.5),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.1),
+                        width: 1,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.arrow_forward_ios,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+          // Indicator Dots at bottom
+          Positioned(
+            bottom: 40,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(widget.images.length, (index) {
+                final isSelected = index == _currentIndex;
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: isSelected ? 24 : 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? const Color(0xFFFF5C35)
+                        : Colors.white.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                );
+              }),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
