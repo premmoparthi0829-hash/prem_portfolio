@@ -1,4 +1,5 @@
 import 'dart:ui' show ImageFilter;
+import 'dart:math' as math;
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -2612,25 +2613,17 @@ class ProjectDetailRoute extends PageRouteBuilder {
     : super(
         pageBuilder: (context, animation, secondaryAnimation) =>
             ProjectDetailScreen(project: project),
+        transitionDuration: const Duration(milliseconds: 550),
+        reverseTransitionDuration: const Duration(milliseconds: 400),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          final curve = CurvedAnimation(
-            parent: animation,
-            curve: Curves.easeOutCubic,
-          );
           return FadeTransition(
-            opacity: curve,
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0.0, 0.08),
-                end: Offset.zero,
-              ).animate(curve),
-              child: child,
-            ),
+            opacity: animation,
+            child: child,
           );
         },
         opaque: false,
         barrierDismissible: true,
-        barrierColor: Colors.black.withOpacity(0.7),
+        barrierColor: Colors.black.withOpacity(0.4),
       );
 }
 
@@ -2808,10 +2801,68 @@ class ProjectDetailScreen extends StatefulWidget {
   State<ProjectDetailScreen> createState() => _ProjectDetailScreenState();
 }
 
-class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
+class _ProjectDetailScreenState extends State<ProjectDetailScreen>
+    with TickerProviderStateMixin {
   int _selectedTab = 0; // 0 = Mobile User, 1 = Web Admin
   int _currentImageIndex = 0;
   bool _showImages = false;
+
+  late AnimationController _animationController;
+  late AnimationController _sweepController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+  late Animation<Offset> _slideAnimationMobile;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 550),
+    );
+
+    _sweepController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 5),
+    )..repeat();
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0.12, 0.0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.2, 1.0, curve: Curves.easeOutCubic),
+    ));
+
+    _slideAnimationMobile = Tween<Offset>(
+      begin: const Offset(0.0, 0.15),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.2, 1.0, curve: Curves.easeOutCubic),
+    ));
+
+    _scaleAnimation = Tween<double>(
+      begin: 0.94,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.2, 1.0, curve: Curves.easeOutBack),
+    ));
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _sweepController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -2827,6 +2878,39 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
       _currentImageIndex = 0;
     }
 
+    // Retrieve ModalRoute animation
+    final ModalRoute<dynamic>? modalRoute = ModalRoute.of(context);
+    final Animation<double> routeAnim = modalRoute?.animation ?? const AlwaysStoppedAnimation(1.0);
+
+    // Derived card scale animation using easeOutBack curve (bounce pop)
+    final Animation<double> cardScaleAnim = Tween<double>(begin: 0.82, end: 1.0).animate(
+      CurvedAnimation(
+        parent: routeAnim,
+        curve: Curves.easeOutBack,
+      ),
+    );
+
+    // Derived card slide animation
+    final Animation<Offset> cardSlideAnim = Tween<Offset>(
+      begin: const Offset(0.0, 0.12),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: routeAnim,
+      curve: Curves.easeOutCubic,
+    ));
+    // Staggered cinematic transitions driven by routeAnim
+
+    final Animation<double> closeFadeAnim = CurvedAnimation(
+      parent: routeAnim,
+      curve: const Interval(0.5, 0.8, curve: Curves.easeIn),
+    );
+    final Animation<double> closeRotateAnim = Tween<double>(begin: -0.5, end: 0.0).animate(
+      CurvedAnimation(
+        parent: routeAnim,
+        curve: const Interval(0.5, 0.9, curve: Curves.easeOutBack),
+      ),
+    );
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Stack(
@@ -2835,119 +2919,256 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
           Positioned.fill(
             child: GestureDetector(
               onTap: () => Navigator.of(context).pop(),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                child: Container(color: Colors.black.withOpacity(0.65)),
+              child: AnimatedBuilder(
+                animation: routeAnim,
+                builder: (context, child) {
+                  final blurVal = routeAnim.value * 12.0;
+                  return BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: blurVal, sigmaY: blurVal),
+                    child: Container(
+                      color: Colors.black.withOpacity(0.65 * routeAnim.value),
+                    ),
+                  );
+                },
               ),
+            ),
+          ),
+
+          // Glowing Ambient Aura behind the dialog card
+          Center(
+            child: AnimatedBuilder(
+              animation: routeAnim,
+              builder: (context, child) {
+                final animValue = routeAnim.value;
+                final currentWidth = isDesktop
+                    ? (580.0 + (_animationController.value * 400.0)).clamp(0.0, screenWidth * 0.95)
+                    : screenWidth * 0.92;
+                final currentHeight = isDesktop ? screenHeight * 0.85 : screenHeight * 0.90;
+
+                return ScaleTransition(
+                  scale: cardScaleAnim,
+                  child: SlideTransition(
+                    position: cardSlideAnim,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Orange Glow at top-left
+                        Transform.translate(
+                          offset: Offset(-currentWidth * 0.25, -currentHeight * 0.25),
+                          child: Container(
+                            width: currentWidth * 0.6,
+                            height: currentHeight * 0.6,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: const Color(0xFFFF5C35).withOpacity(0.15 * animValue),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFFFF5C35).withOpacity(0.22 * animValue),
+                                  blurRadius: 70,
+                                  spreadRadius: 20,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        // Lime Glow at bottom-right
+                        Transform.translate(
+                          offset: Offset(currentWidth * 0.25, currentHeight * 0.25),
+                          child: Container(
+                            width: currentWidth * 0.6,
+                            height: currentHeight * 0.6,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: const Color(0xFFB2FF33).withOpacity(0.10 * animValue),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFFB2FF33).withOpacity(0.18 * animValue),
+                                  blurRadius: 70,
+                                  spreadRadius: 20,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
 
           // Main Center Card
           Center(
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOutCubic,
-              width: isDesktop
-                  ? (_showImages ? 980.0 : 580.0).clamp(0.0, screenWidth * 0.95)
-                  : screenWidth * 0.92,
-              height: isDesktop ? screenHeight * 0.85 : screenHeight * 0.90,
-              decoration: BoxDecoration(
-                color: const Color(0xFF121212),
-                borderRadius: BorderRadius.circular(32),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.08),
-                  width: 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.6),
-                    blurRadius: 40,
-                    offset: const Offset(0, 20),
-                  ),
-                ],
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: Stack(
-                children: [
-                  // Scrollable Content
-                  Positioned.fill(
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.only(
-                        left: isDesktop ? 40 : 20,
-                        right: isDesktop ? 40 : 20,
-                        top: isDesktop
-                            ? 40
-                            : 64, // extra space on mobile for close button
-                        bottom: 40,
+            child: SlideTransition(
+              position: cardSlideAnim,
+              child: ScaleTransition(
+                scale: cardScaleAnim,
+                child: AnimatedBuilder(
+                  animation: _animationController,
+                  builder: (context, child) {
+                    final animValue = _animationController.value;
+                    final currentWidth = isDesktop
+                        ? (580.0 + (animValue * 400.0)).clamp(0.0, screenWidth * 0.95)
+                        : screenWidth * 0.92;
+                    final currentHeight = isDesktop ? screenHeight * 0.85 : screenHeight * 0.90;
+
+                    return Container(
+                      width: currentWidth,
+                      height: currentHeight,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(32),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.65),
+                            blurRadius: 40,
+                            offset: const Offset(0, 20),
+                          ),
+                        ],
                       ),
-                      child: isDesktop
-                          ? (_showImages
-                              ? Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // Left Column: Detailed info, highlights, tags
-                                    Expanded(
-                                      flex: 6,
-                                      child: _buildDetailsContent(context),
-                                    ),
-                                    const SizedBox(width: 40),
-                                    // Right Column: Mockup Image switcher and Project Meta
-                                    Expanded(
-                                      flex: 5,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          _buildImageCard(context, currentImages),
-                                          const SizedBox(height: 24),
-                                          _buildProjectMeta(context),
-                                        ],
+                      child: AnimatedBuilder(
+                        animation: _sweepController,
+                        builder: (context, childWidget) {
+                          final double angle = _sweepController.value * 2 * 3.141592653589793;
+                          return Container(
+                            padding: const EdgeInsets.all(1.5), // border thickness
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(32),
+                              gradient: LinearGradient(
+                                colors: [
+                                  const Color(0xFFFF5C35).withOpacity(routeAnim.value * 0.8),
+                                  const Color(0xFFB2FF33).withOpacity(routeAnim.value * 0.8),
+                                  const Color(0xFFFF5C35).withOpacity(routeAnim.value * 0.8),
+                                ],
+                                begin: Alignment(math.cos(angle), math.sin(angle)),
+                                end: Alignment(math.cos(angle + 3.141592653589793), math.sin(angle + 3.141592653589793)),
+                              ),
+                            ),
+                            child: childWidget,
+                          );
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF121212),
+                            borderRadius: BorderRadius.circular(31),
+                          ),
+                          child: Stack(
+                            children: [
+                              // Scrollable Content
+                              Positioned.fill(
+                                child: SingleChildScrollView(
+                                  padding: EdgeInsets.only(
+                                    left: isDesktop ? 40 : 20,
+                                    right: isDesktop ? 40 : 20,
+                                    top: isDesktop
+                                        ? 40
+                                        : 64, // extra space on mobile for close button
+                                    bottom: 40,
+                                  ),
+                                  child: isDesktop
+                                      ? Row(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            // Left Column: Detailed info, highlights, tags
+                                            Expanded(
+                                              flex: 6,
+                                              child: _buildDetailsContent(context, routeAnim),
+                                            ),
+                                            if (animValue > 0) ...[
+                                              SizedBox(width: animValue * 40),
+                                              // Right Column: Mockup Image switcher and Project Meta
+                                              Expanded(
+                                                flex: 5,
+                                                child: FadeTransition(
+                                                  opacity: _fadeAnimation,
+                                                  child: SlideTransition(
+                                                    position: _slideAnimation,
+                                                    child: ScaleTransition(
+                                                      scale: _scaleAnimation,
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment.start,
+                                                        children: [
+                                                          _buildImageCard(context, currentImages),
+                                                          const SizedBox(height: 24),
+                                                          _buildProjectMeta(context),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ],
+                                        )
+                                      : Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            if (animValue > 0) ...[
+                                              FadeTransition(
+                                                opacity: _fadeAnimation,
+                                                child: SlideTransition(
+                                                  position: _slideAnimationMobile,
+                                                  child: ScaleTransition(
+                                                    scale: _scaleAnimation,
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment.start,
+                                                      children: [
+                                                        _buildImageCard(context, currentImages),
+                                                        const SizedBox(height: 24),
+                                                        _buildProjectMeta(context),
+                                                        const SizedBox(height: 24),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                            _buildDetailsContent(context, routeAnim),
+                                          ],
+                                        ),
+                                ),
+                              ),
+
+                              // Pinned close button at top-right
+                              Positioned(
+                                top: 20,
+                                right: 20,
+                                child: FadeTransition(
+                                  opacity: closeFadeAnim,
+                                  child: RotationTransition(
+                                    turns: closeRotateAnim,
+                                    child: HoverWidget(
+                                      scale: 1.15,
+                                      onTap: () => Navigator.of(context).pop(),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF1E1E1E),
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: Colors.white.withOpacity(0.1),
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          Icons.close,
+                                          color: Colors.white,
+                                          size: 20,
+                                        ),
                                       ),
                                     ),
-                                  ],
-                                )
-                              : _buildDetailsContent(context))
-                          : Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (_showImages) ...[
-                                  _buildImageCard(context, currentImages),
-                                  const SizedBox(height: 24),
-                                  _buildProjectMeta(context),
-                                  const SizedBox(height: 24),
-                                ],
-                                _buildDetailsContent(context),
-                              ],
-                            ),
-                    ),
-                  ),
-
-                  // Pinned close button at top-right
-                  Positioned(
-                    top: 20,
-                    right: 20,
-                    child: HoverWidget(
-                      scale: 1.15,
-                      onTap: () => Navigator.of(context).pop(),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1E1E1E),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.1),
-                            width: 1,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        child: const Icon(
-                          Icons.close,
-                          color: Colors.white,
-                          size: 20,
-                        ),
                       ),
-                    ),
-                  ),
-                ],
+                    );
+                  },
+                ),
               ),
             ),
           ),
@@ -3037,14 +3258,30 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
             cursor: SystemMouseCursors.click,
             child: GestureDetector(
               onTap: () {
-                showDialog(
+                showGeneralDialog(
                   context: context,
                   barrierColor: Colors.black.withOpacity(0.95),
-                  builder: (context) => ImageGalleryDialog(
+                  barrierDismissible: true,
+                  barrierLabel: "Gallery",
+                  transitionDuration: const Duration(milliseconds: 500),
+                  pageBuilder: (context, anim, secAnim) => ImageGalleryDialog(
                     images: currentImages,
                     initialIndex: _currentImageIndex,
                     title: widget.project.title,
                   ),
+                  transitionBuilder: (context, anim, secAnim, child) {
+                    final scale = Tween<double>(begin: 0.88, end: 1.0).animate(
+                      CurvedAnimation(parent: anim, curve: Curves.easeOutBack),
+                    );
+                    final opacity = CurvedAnimation(parent: anim, curve: Curves.easeOut);
+                    return FadeTransition(
+                      opacity: opacity,
+                      child: ScaleTransition(
+                        scale: scale,
+                        child: child,
+                      ),
+                    );
+                  },
                 );
               },
               child: Tooltip(
@@ -3165,182 +3402,312 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
     );
   }
 
-  Widget _buildDetailsContent(BuildContext context) {
+  Widget _buildDetailsContent(BuildContext context, Animation<double> routeAnim) {
+    // Staggered cinematic transitions driven by routeAnim
+    final Animation<double> titleFadeAnim = CurvedAnimation(
+      parent: routeAnim,
+      curve: const Interval(0.2, 0.6, curve: Curves.easeOut),
+    );
+    final Animation<Offset> titleSlideAnim = Tween<Offset>(
+      begin: const Offset(0.0, 0.25),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: routeAnim,
+      curve: const Interval(0.2, 0.6, curve: Curves.easeOutCubic),
+    ));
+
+    final Animation<double> descFadeAnim = CurvedAnimation(
+      parent: routeAnim,
+      curve: const Interval(0.3, 0.7, curve: Curves.easeOut),
+    );
+    final Animation<Offset> descSlideAnim = Tween<Offset>(
+      begin: const Offset(0.0, 0.2),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: routeAnim,
+      curve: const Interval(0.3, 0.7, curve: Curves.easeOutCubic),
+    ));
+
+    final Animation<double> specsTitleFadeAnim = CurvedAnimation(
+      parent: routeAnim,
+      curve: const Interval(0.4, 0.8, curve: Curves.easeOut),
+    );
+    final Animation<Offset> specsTitleSlideAnim = Tween<Offset>(
+      begin: const Offset(0.0, 0.25),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: routeAnim,
+      curve: const Interval(0.4, 0.8, curve: Curves.easeOutCubic),
+    ));
+
+    final Animation<double> techFadeAnim = CurvedAnimation(
+      parent: routeAnim,
+      curve: const Interval(0.6, 0.9, curve: Curves.easeOut),
+    );
+    final Animation<double> techScaleAnim = Tween<double>(begin: 0.85, end: 1.0).animate(
+      CurvedAnimation(
+        parent: routeAnim,
+        curve: const Interval(0.6, 0.95, curve: Curves.easeOutBack),
+      ),
+    );
+
+    final Animation<double> actionsFadeAnim = CurvedAnimation(
+      parent: routeAnim,
+      curve: const Interval(0.7, 1.0, curve: Curves.easeOut),
+    );
+    final Animation<double> actionsScaleAnim = Tween<double>(begin: 0.9, end: 1.0).animate(
+      CurvedAnimation(
+        parent: routeAnim,
+        curve: const Interval(0.7, 1.0, curve: Curves.easeOutBack),
+      ),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Title
-        GradientText(
-          widget.project.title,
-          gradient: const LinearGradient(
-            colors: [Color(0xFFFF5C35), Color(0xFFB2FF33)],
-          ),
-          style: GoogleFonts.outfit(
-            fontSize: 32,
-            fontWeight: FontWeight.w900,
-            letterSpacing: -0.5,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          widget.project.subtitle,
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.4),
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 20),
-        Text(
-          widget.project.description,
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.65),
-            fontSize: 15,
-            height: 1.6,
-          ),
-        ),
-        const SizedBox(height: 28),
-
-        // Key Contributions
-        Text(
-          "KEY CONTRIBUTIONS & FEATURES",
-          style: GoogleFonts.outfit(
-            fontSize: 14,
-            fontWeight: FontWeight.w800,
-            color: const Color(0xFFB2FF33),
-            letterSpacing: 1.5,
-          ),
-        ),
-        const SizedBox(height: 16),
-        ...widget.project.highlights.map(
-          (highlight) => Padding(
-            padding: const EdgeInsets.only(bottom: 12.0),
-            child: Row(
+        FadeTransition(
+          opacity: titleFadeAnim,
+          child: SlideTransition(
+            position: titleSlideAnim,
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Padding(
-                  padding: EdgeInsets.only(top: 3.0),
-                  child: Icon(
-                    Icons.check_circle_outline,
-                    color: Color(0xFFB2FF33),
-                    size: 16,
+                GradientText(
+                  widget.project.title,
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFFF5C35), Color(0xFFB2FF33)],
+                  ),
+                  style: GoogleFonts.outfit(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.5,
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    highlight,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.75),
-                      fontSize: 14,
-                      height: 1.5,
-                    ),
+                const SizedBox(height: 8),
+                Text(
+                  widget.project.subtitle,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.4),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
             ),
           ),
         ),
+        const SizedBox(height: 20),
+
+        // Description
+        FadeTransition(
+          opacity: descFadeAnim,
+          child: SlideTransition(
+            position: descSlideAnim,
+            child: Text(
+              widget.project.description,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.65),
+                fontSize: 15,
+                height: 1.6,
+              ),
+            ),
+          ),
+        ),
         const SizedBox(height: 28),
 
-        // Tech Stack
-        Text(
-          "TECH STACK",
-          style: GoogleFonts.outfit(
-            fontSize: 14,
-            fontWeight: FontWeight.w800,
-            color: Colors.white,
-            letterSpacing: 1.5,
+        // Key Contributions Title
+        FadeTransition(
+          opacity: specsTitleFadeAnim,
+          child: SlideTransition(
+            position: specsTitleSlideAnim,
+            child: Text(
+              "KEY CONTRIBUTIONS & FEATURES",
+              style: GoogleFonts.outfit(
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFFB2FF33),
+                letterSpacing: 1.5,
+              ),
+            ),
           ),
         ),
         const SizedBox(height: 16),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: widget.project.techTags.map((tag) {
-            final icon = TechIconHelper.getIcon(tag);
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1E1E1E),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.05),
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (icon != null) ...[
-                    Icon(
-                      icon,
-                      color: TechIconHelper.getIconColor(icon),
-                      size: 14,
-                    ),
-                    const SizedBox(width: 8),
-                  ],
-                  Text(
-                    tag,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
-        ),
-        const SizedBox(height: 36),
 
-        // Actions
-        Row(
-          children: [
-            Expanded(
-              child: HoverWidget(
-                scale: 1.03,
-                onTap: () {
-                  setState(() {
-                    _showImages = !_showImages;
-                  });
-                },
-                child: Container(
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: const Color(0xFFFF5C35),
-                      width: 1.5,
-                    ),
-                  ),
+        // Key Contributions Highlights Staggered Cascade
+        ...widget.project.highlights.asMap().entries.map(
+          (entry) {
+            final int idx = entry.key;
+            final String highlight = entry.value;
+
+            final start = (0.45 + (idx * 0.05)).clamp(0.0, 0.95);
+            final end = (0.75 + (idx * 0.05)).clamp(0.0, 1.0);
+            final itemAnim = CurvedAnimation(
+              parent: routeAnim,
+              curve: Interval(start, end, curve: Curves.easeOutCubic),
+            );
+
+            final itemSlideAnim = Tween<Offset>(
+              begin: const Offset(0.0, 0.35),
+              end: Offset.zero,
+            ).animate(itemAnim);
+
+            return FadeTransition(
+              opacity: itemAnim,
+              child: SlideTransition(
+                position: itemSlideAnim,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        _showImages
-                            ? Icons.visibility_off_outlined
-                            : Icons.collections_rounded,
-                        color: const Color(0xFFFF5C35),
-                        size: 20,
+                      const Padding(
+                        padding: EdgeInsets.only(top: 3.0),
+                        child: Icon(
+                          Icons.check_circle_outline,
+                          color: Color(0xFFB2FF33),
+                          size: 16,
+                        ),
                       ),
                       const SizedBox(width: 12),
-                      Text(
-                        _showImages ? "Hide Images" : "View Images",
-                        style: GoogleFonts.outfit(
-                          color: const Color(0xFFFF5C35),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
+                      Expanded(
+                        child: Text(
+                          highlight,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.75),
+                            fontSize: 14,
+                            height: 1.5,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
+            );
+          },
+        ),
+        const SizedBox(height: 28),
+
+        // Tech Stack
+        FadeTransition(
+          opacity: techFadeAnim,
+          child: ScaleTransition(
+            scale: techScaleAnim,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "TECH STACK",
+                  style: GoogleFonts.outfit(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: widget.project.techTags.map((tag) {
+                    final icon = TechIconHelper.getIcon(tag);
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1E1E1E),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.05),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (icon != null) ...[
+                            Icon(
+                              icon,
+                              color: TechIconHelper.getIconColor(icon),
+                              size: 14,
+                            ),
+                            const SizedBox(width: 8),
+                          ],
+                          Text(
+                            tag,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.8),
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
             ),
-          ],
+          ),
+        ),
+        const SizedBox(height: 36),
+
+        // Actions
+        FadeTransition(
+          opacity: actionsFadeAnim,
+          child: ScaleTransition(
+            scale: actionsScaleAnim,
+            child: Row(
+              children: [
+                Expanded(
+                  child: HoverWidget(
+                    scale: 1.03,
+                    onTap: () {
+                      setState(() {
+                        _showImages = !_showImages;
+                      });
+                      if (_showImages) {
+                        _animationController.forward();
+                      } else {
+                        _animationController.reverse();
+                      }
+                    },
+                    child: Container(
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: const Color(0xFFFF5C35),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            _showImages
+                                ? Icons.visibility_off_outlined
+                                : Icons.collections_rounded,
+                            color: const Color(0xFFFF5C35),
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            _showImages ? "Hide Images" : "View Images",
+                            style: GoogleFonts.outfit(
+                              color: const Color(0xFFFF5C35),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );
