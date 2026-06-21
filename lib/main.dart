@@ -363,12 +363,38 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               ],
             ),
             SizedBox(height: isDesktop ? 24 : 16),
-            Text(
-              "Crafting high-performance, premium cross-platform mobile apps is my passion. Specializing in clean architecture, reactive state management, and elegant interactive UIs that scale.",
-              style: TextStyle(
-                fontSize: bodyFontSize,
-                color: const Color(0xFF9F9F9F),
-                height: 1.6,
+            Text.rich(
+              TextSpan(
+                style: TextStyle(
+                  fontSize: bodyFontSize,
+                  color: const Color(0xFF9F9F9F),
+                  height: 1.6,
+                ),
+                children: isDesktop
+                    ? [
+                        const TextSpan(
+                          text: "As a Mobile Application Architect & Lead Flutter Developer (CS graduate from NIT Sikkim), I engineer premium cross-platform ecosystems. Over the last 2+ years, I have successfully delivered 12+ premium projects and launched 5+ apps to production. Combining clean architecture with pixel-perfect design, I build secure, scalable, and polished mobile solutions. ",
+                        ),
+                        const TextSpan(
+                          text: "Let's build together extraordinary mobile apps for Android & iOS!",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ]
+                    : [
+                        const TextSpan(
+                          text: "CS graduate from NIT Sikkim and Mobile Architect specializing in engineering high-performance cross-platform applications. With 2+ years of experience, I have delivered 12+ projects and launched 5+ apps to production, leveraging clean architecture, reactive state, and pixel-perfect design. ",
+                        ),
+                        const TextSpan(
+                          text: "Let's build together extraordinary mobile apps for Android & iOS!",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
               ),
             ),
             SizedBox(height: sectionSpacing),
@@ -806,7 +832,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 
         Text(
           isDesktop
-              ? "Let's get in touch! Every great application begins with a conversation. I don’t just write code; I design fluid, responsive mobile experiences that blend secure, clean architecture with pixel-perfect design. From optimizing state dynamics to engineering complex ecosystem integrations, my absolute focus is on crafting products that users love to interact with. Whether you are looking for a dedicated Mobile Architect to elevate your mobile team, seeking consultation on scalable Flutter codebases, or simply want to brainstorm high-performance systems. I am ready to bring precision, drive, and absolute focus to your projects. Drop me a line directly!"
+              ? "Let's get in touch! I'm always open to discussing new opportunities, codebase architecture, or consulting on scalable Flutter projects. Whether you want to collaborate, hire a dedicated Mobile Architect, or simply brainstorm high-performance systems, drop me a line directly!"
               : "Let's get in touch! I am deeply passionate about engineering high-performance mobile applications and always open to discussing full-time roles, codebase architecture, or collaborations. Drop me a line directly!",
           style: TextStyle(
             fontSize: 16,
@@ -974,21 +1000,21 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             return Wrap(
               spacing: 16,
               runSpacing: 16,
-              children: const [
+              children: [
                 ContactTileCard(
-                  icon: Icons.email_outlined,
+                  icon: SimpleIcons.gmail,
                   title: "Email me",
                   value: "premmoparthi8@gmail.com",
                   url: "mailto:premmoparthi8@gmail.com",
-                  accentColor: Color(0xFF33C7FF),
+                  accentColor: const Color(0xFFEA4335),
                 ),
                 ContactTileCard(
-                  icon: Icons.phone_android_outlined,
+                  icon: SimpleIcons.whatsapp,
                   title: "Call/WhatsApp",
                   value: "",
                   url: "",
-                  accentColor: Color(0xFF26A69A),
-                  subItems: [
+                  accentColor: const Color(0xFF25D366),
+                  subItems: const [
                     {
                       "label": "Primary",
                       "value": "+91 7780324745",
@@ -1002,25 +1028,42 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   ],
                 ),
                 ContactTileCard(
-                  icon: Icons.location_on_outlined,
+                  icon: SimpleIcons.googlemaps,
                   title: "Based in",
                   value: "Hyderabad, India",
                   url: "https://maps.google.com/?q=Hyderabad,India",
-                  accentColor: Color(0xFFFFB74D),
+                  accentColor: const Color(0xFF4285F4),
                 ),
                 ContactTileCard(
-                  icon: Icons.work_history_outlined,
+                  customIcon: Container(
+                    width: 20,
+                    height: 20,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0077B5),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text(
+                      "in",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Arial',
+                      ),
+                    ),
+                  ),
                   title: "LinkedIn",
                   value: "moparthi-prem",
                   url: "https://linkedin.com/in/moparthi-prem",
-                  accentColor: Color(0xFF00A0DC),
+                  accentColor: const Color(0xFF0077B5),
                 ),
                 ContactTileCard(
                   icon: SimpleIcons.github,
                   title: "GitHub",
                   value: "premmoparthi0829",
                   url: "https://github.com/premmoparthi0829",
-                  accentColor: Color(0xFFB0BEC5),
+                  accentColor: const Color(0xFFB0BEC5),
                 ),
               ],
             );
@@ -1351,9 +1394,8 @@ class LeftProfileCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Short bio
           const Text(
-            "Computer Science graduate from NIT Sikkim with a deep passion for mobile application engineering. Specializing in crafting premium, highly secure mobile ecosystems using Flutter, clean architecture, and reactive state management.",
+            "Hi, I'm Prem! A passionate Mobile Architect focused on building fluid, high-performance user experiences. Specializing in secure clean architecture, state dynamics, and custom interactive animations that bring apps to life. Let's build together extraordinary mobile apps for Android & iOS!",
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Color(0xFF666666),
@@ -2003,8 +2045,9 @@ class LangChip extends StatelessWidget {
 
 // --- Contact Tile Card ---
 
-class ContactTileCard extends StatelessWidget {
-  final IconData icon;
+class ContactTileCard extends StatefulWidget {
+  final IconData? icon;
+  final Widget? customIcon;
   final String title;
   final String value;
   final String url;
@@ -2013,7 +2056,8 @@ class ContactTileCard extends StatelessWidget {
 
   const ContactTileCard({
     super.key,
-    required this.icon,
+    this.icon,
+    this.customIcon,
     required this.title,
     required this.value,
     required this.url,
@@ -2021,8 +2065,15 @@ class ContactTileCard extends StatelessWidget {
     this.accentColor,
   });
 
+  @override
+  State<ContactTileCard> createState() => _ContactTileCardState();
+}
+
+class _ContactTileCardState extends State<ContactTileCard> {
+  bool _isHovered = false;
+
   Future<void> _launchUrl() async {
-    final Uri parsedUrl = Uri.parse(url);
+    final Uri parsedUrl = Uri.parse(widget.url);
     final isNativeProtocol =
         parsedUrl.scheme == 'mailto' ||
         parsedUrl.scheme == 'tel' ||
@@ -2040,17 +2091,19 @@ class ContactTileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isWide = MediaQuery.of(context).size.width > 600;
-    final hasSubItems = subItems != null && subItems!.isNotEmpty;
+    final hasSubItems = widget.subItems != null && widget.subItems!.isNotEmpty;
 
-    final bgCol = accentColor != null
-        ? accentColor!.withOpacity(0.08)
+    final accent = widget.accentColor ?? Colors.white;
+
+    final bgCol = _isHovered
+        ? accent.withOpacity(0.06)
         : const Color(0xFF171717);
-    final borderCol = accentColor != null
-        ? accentColor!.withOpacity(0.35)
-        : Colors.white.withOpacity(0.04);
-    final iconCol = accentColor ?? Colors.white.withOpacity(0.8);
-    final titleCol = accentColor != null
-        ? accentColor!.withOpacity(0.6)
+    final borderCol = _isHovered
+        ? accent.withOpacity(0.3)
+        : Colors.white.withOpacity(0.06);
+    final iconCol = widget.accentColor ?? Colors.white.withOpacity(0.8);
+    final titleCol = widget.accentColor != null
+        ? widget.accentColor!.withOpacity(0.6)
         : Colors.white.withOpacity(0.4);
 
     Widget cardContent = Row(
@@ -2062,7 +2115,7 @@ class ContactTileCard extends StatelessWidget {
             color: iconCol.withOpacity(0.12),
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: iconCol, size: 20),
+          child: widget.customIcon ?? (widget.icon != null ? Icon(widget.icon, color: iconCol, size: 20) : const SizedBox.shrink()),
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -2071,7 +2124,7 @@ class ContactTileCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                title,
+                widget.title,
                 style: TextStyle(
                   color: titleCol,
                   fontSize: 11,
@@ -2080,7 +2133,7 @@ class ContactTileCard extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               if (hasSubItems)
-                ...subItems!.map((item) {
+                ...widget.subItems!.map((item) {
                   return Padding(
                     padding: const EdgeInsets.only(top: 4.0),
                     child: HoverPhoneItem(
@@ -2093,7 +2146,7 @@ class ContactTileCard extends StatelessWidget {
                 })
               else
                 Text(
-                  value,
+                  widget.value,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.outfit(
@@ -2108,18 +2161,26 @@ class ContactTileCard extends StatelessWidget {
       ],
     );
 
-    return HoverWidget(
-      onTap: hasSubItems ? null : _launchUrl,
-      scale: 1.02,
-      child: Container(
-        width: isWide ? 270 : double.infinity,
-        decoration: BoxDecoration(
-          color: bgCol,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: borderCol, width: 1),
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: hasSubItems ? SystemMouseCursors.basic : SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: hasSubItems ? null : _launchUrl,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          transform: Matrix4.identity()..scale(_isHovered ? 1.02 : 1.0),
+          transformAlignment: Alignment.center,
+          width: isWide ? 270 : double.infinity,
+          decoration: BoxDecoration(
+            color: bgCol,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: borderCol, width: 1),
+          ),
+          padding: const EdgeInsets.all(20),
+          child: cardContent,
         ),
-        padding: const EdgeInsets.all(20),
-        child: cardContent,
       ),
     );
   }
