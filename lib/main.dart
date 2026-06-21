@@ -806,7 +806,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 
         Text(
           isDesktop
-              ? "Let's get in touch! Every great application begins with a conversation. I don’t just write code; I design fluid, responsive mobile experiences that blend secure, clean architecture with pixel-perfect design. From optimizing state dynamics to engineering complex ecosystem integrations, my absolute focus is on crafting products that users love to interact with. Whether you are looking for a dedicated Mobile Architect to elevate your mobile team, seeking consultation on scalable Flutter codebases, or simply want to brainstorm high-performance systems—I am ready to bring precision, drive, and absolute focus to your projects. Drop me a line directly!"
+              ? "Let's get in touch! Every great application begins with a conversation. I don’t just write code; I design fluid, responsive mobile experiences that blend secure, clean architecture with pixel-perfect design. From optimizing state dynamics to engineering complex ecosystem integrations, my absolute focus is on crafting products that users love to interact with. Whether you are looking for a dedicated Mobile Architect to elevate your mobile team, seeking consultation on scalable Flutter codebases, or simply want to brainstorm high-performance systems. I am ready to bring precision, drive, and absolute focus to your projects. Drop me a line directly!"
               : "Let's get in touch! I am deeply passionate about engineering high-performance mobile applications and always open to discussing full-time roles, codebase architecture, or collaborations. Drop me a line directly!",
           style: TextStyle(
             fontSize: 16,
@@ -820,14 +820,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         LayoutBuilder(
           builder: (context, constraints) {
             final buttonWidth = constraints.maxWidth > 600
-                ? 240.0
+                ? 180.0
                 : double.infinity;
             return Wrap(
               spacing: 16,
               runSpacing: 12,
               children: [
                 HoverWidget(
-                  scale: 1.03,
+                  scale: 1.02,
                   onTap: () async {
                     try {
                       final resume = await ResumeService.getActiveResume();
@@ -862,19 +862,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   },
                   child: Container(
                     width: buttonWidth,
-                    height: 48,
+                    height: 38,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFFF5C35), Color(0xFFB2FF33)],
+                      color: const Color(0xFFFF5C35).withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: const Color(0xFFFF5C35).withOpacity(0.35),
+                        width: 1.0,
                       ),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFFF5C35).withOpacity(0.15),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
                     ),
                     alignment: Alignment.center,
                     child: Row(
@@ -882,16 +877,16 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                       children: [
                         const Icon(
                           Icons.visibility_outlined,
-                          color: Color(0xFF0F0F0F),
-                          size: 20,
+                          color: Color(0xFFFF5C35),
+                          size: 16,
                         ),
                         const SizedBox(width: 8),
                         Text(
                           "VIEW RESUME",
                           style: GoogleFonts.outfit(
-                            color: const Color(0xFF0F0F0F),
-                            fontWeight: FontWeight.w900,
-                            fontSize: 14,
+                            color: const Color(0xFFFF5C35),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
                             letterSpacing: 0.5,
                           ),
                         ),
@@ -900,7 +895,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   ),
                 ),
                 HoverWidget(
-                  scale: 1.03,
+                  scale: 1.02,
                   onTap: () async {
                     try {
                       final resume = await ResumeService.getActiveResume();
@@ -935,13 +930,13 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   },
                   child: Container(
                     width: buttonWidth,
-                    height: 48,
+                    height: 38,
                     decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(16),
+                      color: const Color(0xFFB2FF33).withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: const Color(0xFFFF5C35).withOpacity(0.3),
-                        width: 1.5,
+                        color: const Color(0xFFB2FF33).withOpacity(0.35),
+                        width: 1.0,
                       ),
                     ),
                     alignment: Alignment.center,
@@ -950,15 +945,15 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                       children: [
                         const Icon(
                           Icons.file_download_outlined,
-                          color: Color(0xFFFF5C35),
-                          size: 18,
+                          color: Color(0xFFB2FF33),
+                          size: 16,
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          "DOWNLOAD PDF DIRECTLY",
+                          "DOWNLOAD RESUME",
                           style: GoogleFonts.outfit(
-                            color: const Color(0xFFFF5C35),
-                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFFB2FF33),
+                            fontWeight: FontWeight.bold,
                             fontSize: 12,
                             letterSpacing: 0.5,
                           ),
@@ -985,15 +980,25 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   title: "Email me",
                   value: "premmoparthi8@gmail.com",
                   url: "mailto:premmoparthi8@gmail.com",
+                  accentColor: Color(0xFF33C7FF),
                 ),
                 ContactTileCard(
                   icon: Icons.phone_android_outlined,
                   title: "Call/WhatsApp",
                   value: "",
                   url: "",
+                  accentColor: Color(0xFF26A69A),
                   subItems: [
-                    {"label": "Primary", "value": "+91 7780324745", "url": "tel:+917780324745"},
-                    {"label": "Alternate", "value": "+91 7287928766", "url": "tel:+917287928766"},
+                    {
+                      "label": "Primary",
+                      "value": "+91 7780324745",
+                      "url": "tel:+917780324745",
+                    },
+                    {
+                      "label": "Alternate",
+                      "value": "+91 7287928766",
+                      "url": "tel:+917287928766",
+                    },
                   ],
                 ),
                 ContactTileCard(
@@ -1001,6 +1006,21 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   title: "Based in",
                   value: "Hyderabad, India",
                   url: "https://maps.google.com/?q=Hyderabad,India",
+                  accentColor: Color(0xFFFFB74D),
+                ),
+                ContactTileCard(
+                  icon: Icons.work_history_outlined,
+                  title: "LinkedIn",
+                  value: "moparthi-prem",
+                  url: "https://linkedin.com/in/moparthi-prem",
+                  accentColor: Color(0xFF00A0DC),
+                ),
+                ContactTileCard(
+                  icon: SimpleIcons.github,
+                  title: "GitHub",
+                  value: "premmoparthi0829",
+                  url: "https://github.com/premmoparthi0829",
+                  accentColor: Color(0xFFB0BEC5),
                 ),
               ],
             );
@@ -1290,24 +1310,44 @@ class LeftProfileCard extends StatelessWidget {
           ),
           const SizedBox(height: 20),
 
-          // Orange circular flame element
-          Center(
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFF5C35).withOpacity(0.1),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: const Color(0xFFFF5C35).withOpacity(0.2),
-                  width: 1.5,
+          // Android & iOS icons
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF3DDC84).withOpacity(0.1),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: const Color(0xFF3DDC84).withOpacity(0.2),
+                    width: 1.5,
+                  ),
+                ),
+                child: const Icon(
+                  Icons.android,
+                  color: Color(0xFF3DDC84),
+                  size: 20,
                 ),
               ),
-              child: const Icon(
-                Icons.local_fire_department,
-                color: Color(0xFFFF5C35),
-                size: 20,
+              const SizedBox(width: 12),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF555555).withOpacity(0.1),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: const Color(0xFF555555).withOpacity(0.2),
+                    width: 1.5,
+                  ),
+                ),
+                child: const Icon(
+                  Icons.apple,
+                  color: Color(0xFF555555),
+                  size: 20,
+                ),
               ),
-            ),
+            ],
           ),
           const SizedBox(height: 16),
 
@@ -1331,8 +1371,7 @@ class LeftProfileCard extends StatelessWidget {
             children: [
               SocialIconBtn(
                 icon: Icons.language,
-                onTap: () =>
-                    _launchUrl("https://github.com/premmoparthi0829"),
+                onTap: () => _launchUrl("https://github.com/premmoparthi0829"),
                 tooltip: "GitHub",
               ),
               SocialIconBtn(
@@ -1348,8 +1387,7 @@ class LeftProfileCard extends StatelessWidget {
               ),
               SocialIconBtn(
                 icon: Icons.alternate_email_outlined,
-                onTap: () =>
-                    _launchUrl("mailto:premmoparthi8@gmail.com"),
+                onTap: () => _launchUrl("mailto:premmoparthi8@gmail.com"),
                 tooltip: "Email",
               ),
             ],
@@ -1971,6 +2009,7 @@ class ContactTileCard extends StatelessWidget {
   final String value;
   final String url;
   final List<Map<String, String>>? subItems;
+  final Color? accentColor;
 
   const ContactTileCard({
     super.key,
@@ -1979,6 +2018,7 @@ class ContactTileCard extends StatelessWidget {
     required this.value,
     required this.url,
     this.subItems,
+    this.accentColor,
   });
 
   Future<void> _launchUrl() async {
@@ -2002,16 +2042,27 @@ class ContactTileCard extends StatelessWidget {
     final isWide = MediaQuery.of(context).size.width > 600;
     final hasSubItems = subItems != null && subItems!.isNotEmpty;
 
+    final bgCol = accentColor != null
+        ? accentColor!.withOpacity(0.08)
+        : const Color(0xFF171717);
+    final borderCol = accentColor != null
+        ? accentColor!.withOpacity(0.35)
+        : Colors.white.withOpacity(0.04);
+    final iconCol = accentColor ?? Colors.white.withOpacity(0.8);
+    final titleCol = accentColor != null
+        ? accentColor!.withOpacity(0.6)
+        : Colors.white.withOpacity(0.4);
+
     Widget cardContent = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: iconCol.withOpacity(0.12),
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: Colors.white.withOpacity(0.8), size: 20),
+          child: Icon(icon, color: iconCol, size: 20),
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -2022,7 +2073,7 @@ class ContactTileCard extends StatelessWidget {
               Text(
                 title,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.4),
+                  color: titleCol,
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                 ),
@@ -2036,6 +2087,7 @@ class ContactTileCard extends StatelessWidget {
                       value: item['value'] ?? '',
                       label: item['label'] ?? '',
                       url: item['url'] ?? '',
+                      hoverColor: iconCol,
                     ),
                   );
                 })
@@ -2056,33 +2108,20 @@ class ContactTileCard extends StatelessWidget {
       ],
     );
 
-    if (hasSubItems) {
-      return Container(
+    return HoverWidget(
+      onTap: hasSubItems ? null : _launchUrl,
+      scale: 1.02,
+      child: Container(
         width: isWide ? 270 : double.infinity,
         decoration: BoxDecoration(
-          color: const Color(0xFF171717),
+          color: bgCol,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.04), width: 1),
+          border: Border.all(color: borderCol, width: 1),
         ),
         padding: const EdgeInsets.all(20),
         child: cardContent,
-      );
-    } else {
-      return HoverWidget(
-        onTap: _launchUrl,
-        scale: 1.025,
-        child: Container(
-          width: isWide ? 270 : double.infinity,
-          decoration: BoxDecoration(
-            color: const Color(0xFF171717),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withOpacity(0.04), width: 1),
-          ),
-          padding: const EdgeInsets.all(20),
-          child: cardContent,
-        ),
-      );
-    }
+      ),
+    );
   }
 }
 
@@ -2092,12 +2131,14 @@ class HoverPhoneItem extends StatefulWidget {
   final String value;
   final String label;
   final String url;
+  final Color hoverColor;
 
   const HoverPhoneItem({
     super.key,
     required this.value,
     required this.label,
     required this.url,
+    this.hoverColor = const Color(0xFFFF5C35),
   });
 
   @override
@@ -2125,7 +2166,7 @@ class _HoverPhoneItemState extends State<HoverPhoneItem> {
         child: RichText(
           text: TextSpan(
             style: GoogleFonts.outfit(
-              color: _isHovered ? const Color(0xFFFF5C35) : Colors.white,
+              color: _isHovered ? widget.hoverColor : Colors.white,
               fontSize: 13,
               fontWeight: FontWeight.bold,
             ),
@@ -2136,7 +2177,7 @@ class _HoverPhoneItemState extends State<HoverPhoneItem> {
                   text: ' (${widget.label})',
                   style: TextStyle(
                     color: _isHovered
-                        ? const Color(0xFFFF5C35).withOpacity(0.7)
+                        ? widget.hoverColor.withOpacity(0.7)
                         : Colors.white.withOpacity(0.4),
                     fontSize: 10,
                     fontWeight: FontWeight.normal,
