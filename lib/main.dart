@@ -1413,23 +1413,23 @@ class LeftProfileCard extends StatelessWidget {
             runSpacing: 8,
             children: [
               SocialIconBtn(
-                icon: Icons.language,
+                assetPath: 'assets/github_3d.png',
                 onTap: () => _launchUrl("https://github.com/premmoparthi0829"),
                 tooltip: "GitHub",
               ),
               SocialIconBtn(
-                icon: Icons.work_history_outlined,
+                assetPath: 'assets/linkedin_3d.png',
                 onTap: () =>
                     _launchUrl("https://linkedin.com/in/moparthi-prem"),
                 tooltip: "LinkedIn",
               ),
               SocialIconBtn(
-                icon: Icons.chat_bubble_outline_outlined,
+                assetPath: 'assets/contact_3d.png',
                 onTap: () => _launchUrl("tel:+917780324745"),
                 tooltip: "Contact",
               ),
               SocialIconBtn(
-                icon: Icons.alternate_email_outlined,
+                assetPath: 'assets/email_3d.png',
                 onTap: () => _launchUrl("mailto:premmoparthi8@gmail.com"),
                 tooltip: "Email",
               ),
@@ -1443,37 +1443,119 @@ class LeftProfileCard extends StatelessWidget {
 
 // --- Social Icon Button ---
 
-class SocialIconBtn extends StatelessWidget {
-  final IconData icon;
+class SocialIconBtn extends StatefulWidget {
+  final IconData? icon;
+  final String? assetPath;
   final Function() onTap;
   final String tooltip;
 
   const SocialIconBtn({
     super.key,
-    required this.icon,
+    this.icon,
+    this.assetPath,
     required this.onTap,
     required this.tooltip,
   });
 
   @override
+  State<SocialIconBtn> createState() => _SocialIconBtnState();
+}
+
+class _SocialIconBtnState extends State<SocialIconBtn> with SingleTickerProviderStateMixin {
+  late AnimationController _floatController;
+  late Animation<double> _floatAnimation;
+  bool _isHovered = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Continuous floating animation
+    _floatController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat(reverse: true);
+
+    _floatAnimation = Tween<double>(begin: -2.0, end: 2.0).animate(
+      CurvedAnimation(
+        parent: _floatController,
+        curve: Curves.easeInOutQuad,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _floatController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Tooltip(
-      message: tooltip,
-      child: HoverWidget(
-        onTap: onTap,
-        scale: 1.25,
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 8),
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFF5C35).withOpacity(0.08),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: const Color(0xFFFF5C35).withOpacity(0.15),
-              width: 1,
+      message: widget.tooltip,
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: AnimatedBuilder(
+            animation: _floatAnimation,
+            builder: (context, child) {
+              // Combine float and hover lift
+              final double hoverLift = _isHovered ? -5.0 : 0.0;
+              final double yOffset = _floatAnimation.value + hoverLift;
+              final double scale = _isHovered ? 1.2 : 1.0;
+              final double rotation = _isHovered ? 0.08 : 0.0;
+
+              return Transform.translate(
+                offset: Offset(0, yOffset),
+                child: Transform.rotate(
+                  angle: rotation,
+                  child: AnimatedScale(
+                    scale: scale,
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeOutBack,
+                    child: child,
+                  ),
+                ),
+              );
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              padding: EdgeInsets.all(widget.assetPath != null ? 2 : 10),
+              decoration: BoxDecoration(
+                color: widget.assetPath != null
+                    ? Colors.white
+                    : const Color(0xFFFF5C35).withOpacity(0.08),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: widget.assetPath != null
+                      ? Colors.black.withOpacity(0.05)
+                      : const Color(0xFFFF5C35).withOpacity(0.15),
+                  width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                    color: Colors.black.withOpacity(_isHovered ? 0.15 : 0.06),
+                    blurRadius: _isHovered ? 12 : 6,
+                    offset: Offset(0, _isHovered ? 6 : 3),
+              ),
+            ],
+          ),
+          clipBehavior: widget.assetPath != null ? Clip.antiAlias : Clip.none,
+          child: widget.assetPath != null
+              ? Image.asset(
+                  widget.assetPath!,
+                  width: 32,
+                  height: 32,
+                  fit: BoxFit.cover,
+                )
+              : (widget.icon != null
+                  ? Icon(widget.icon, size: 18, color: const Color(0xFFFF5C35))
+                  : const SizedBox.shrink()),
             ),
           ),
-          child: Icon(icon, size: 18, color: const Color(0xFFFF5C35)),
         ),
       ),
     );
