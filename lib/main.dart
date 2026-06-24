@@ -1,6 +1,5 @@
 import 'dart:ui' show ImageFilter;
 import 'dart:math' as math;
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -141,7 +140,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               const SizedBox(height: 80),
                               Container(
                                 key: _projectsKey,
-                                child: _buildProjectsSection(),
+                                child: _buildProjectsSection(isDesktop: true),
                               ),
                               const SizedBox(height: 80),
                               Container(
@@ -225,10 +224,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           child: _buildHeroSection(isDesktop),
                         ),
                         const SizedBox(height: 64),
-                        Container(
-                          key: _projectsKey,
-                          child: _buildProjectsSection(),
-                        ),
+                         Container(
+                           key: _projectsKey,
+                           child: _buildProjectsSection(isDesktop: false),
+                         ),
                         const SizedBox(height: 64),
                         Container(
                           key: _experienceKey,
@@ -472,7 +471,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     );
   }
 
-  Widget _buildProjectsSection() {
+  Widget _buildProjectsSection({bool isDesktop = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -496,7 +495,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 GradientText(
                   "WORKS",
                   gradient: LinearGradient(
-                    colors: [Colors.white, Colors.white.withOpacity(0.4)],
+                    colors: [Colors.white, Colors.white.withValues(alpha: 0.4)],
                   ),
                   style: GoogleFonts.outfit(
                     fontSize: fs,
@@ -509,25 +508,46 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         ),
         const SizedBox(height: 32),
 
-        // Dynamically generated project items mapping from static dataset
-        ...ProjectDetail.projects.map((project) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 24.0),
-            child: ProjectCard(
-              year: project.year,
-              title: project.title,
-              subtitle: project.subtitle,
-              description: project.description,
-              techTags: project.techTags,
-              icon: project.icon,
-              onTap: () {
-                Navigator.of(
-                  context,
-                ).push(ProjectDetailRoute(project: project));
-              },
+        if (isDesktop)
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: ProjectDetail.projects.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 24,
+              mainAxisSpacing: 24,
+              mainAxisExtent: 340,
             ),
-          );
-        }).toList(),
+            itemBuilder: (context, index) {
+              final project = ProjectDetail.projects[index];
+              return WebProjectCard(
+                index: index,
+                project: project,
+                onTap: () {
+                  Navigator.of(context).push(ProjectDetailRoute(project: project));
+                },
+              );
+            },
+          )
+        else
+          // Dynamically generated project items mapping from static dataset (mobile view)
+          ...ProjectDetail.projects.asMap().entries.map((entry) {
+            final index = entry.key;
+            final project = entry.value;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 24.0),
+              child: WebProjectCard(
+                index: index,
+                project: project,
+                onTap: () {
+                  Navigator.of(context).push(
+                    ProjectDetailRoute(project: project),
+                  );
+                },
+              ),
+            );
+          }).toList(),
       ],
     );
   }
@@ -1413,39 +1433,23 @@ class LeftProfileCard extends StatelessWidget {
             runSpacing: 8,
             children: [
               SocialIconBtn(
-<<<<<<< HEAD
-                icon: SimpleIcons.github,
-=======
                 assetPath: 'assets/github_3d.png',
->>>>>>> b76108c5bad8d454502c21b82a686b29701ab397
                 onTap: () => _launchUrl("https://github.com/premmoparthi0829"),
                 tooltip: "GitHub",
               ),
               SocialIconBtn(
-<<<<<<< HEAD
-                icon: SimpleIcons.linkedin,
-=======
                 assetPath: 'assets/linkedin_3d.png',
->>>>>>> b76108c5bad8d454502c21b82a686b29701ab397
                 onTap: () =>
                     _launchUrl("https://linkedin.com/in/moparthi-prem"),
                 tooltip: "LinkedIn",
               ),
               SocialIconBtn(
-<<<<<<< HEAD
-                icon: Icons.phone_rounded,
-=======
                 assetPath: 'assets/contact_3d.png',
->>>>>>> b76108c5bad8d454502c21b82a686b29701ab397
                 onTap: () => _launchUrl("tel:+917780324745"),
                 tooltip: "Contact",
               ),
               SocialIconBtn(
-<<<<<<< HEAD
-                icon: Icons.email_rounded,
-=======
                 assetPath: 'assets/email_3d.png',
->>>>>>> b76108c5bad8d454502c21b82a686b29701ab397
                 onTap: () => _launchUrl("mailto:premmoparthi8@gmail.com"),
                 tooltip: "Email",
               ),
@@ -1891,7 +1895,432 @@ class ProjectCard extends StatelessWidget {
   }
 }
 
-// --- Timeline Experience Card ---
+class ProjectBrandTheme {
+  final List<Color> gradientColors;
+  final Color accentColor;
+
+  const ProjectBrandTheme({
+    required this.gradientColors,
+    required this.accentColor,
+  });
+
+  static ProjectBrandTheme getTheme(String title) {
+    switch (title) {
+      case "Seven Pay Services":
+        return const ProjectBrandTheme(
+          gradientColors: [Color(0xFF0F172A), Color(0xFF1E3A8A)], // deep blue
+          accentColor: Color(0xFF38BDF8),
+        );
+      case "Ride 4 you":
+        return const ProjectBrandTheme(
+          gradientColors: [Color(0xFF1C1917), Color(0xFF451A03)], // amber stone
+          accentColor: Color(0xFFF59E0B),
+        );
+      case "Alham Mutton":
+        return const ProjectBrandTheme(
+          gradientColors: [Color(0xFF450A0A), Color(0xFF1F0808)], // deep red/black
+          accentColor: Color(0xFFEF4444),
+        );
+      case "Rythu Rice":
+        return const ProjectBrandTheme(
+          gradientColors: [Color(0xFF064E3B), Color(0xFF022C22)], // emerald/green
+          accentColor: Color(0xFF10B981),
+        );
+      case "Meatoon":
+        return const ProjectBrandTheme(
+          gradientColors: [Color(0xFF7C2D12), Color(0xFF270E07)], // terracotta/black
+          accentColor: Color(0xFFF97316),
+        );
+      case "Fresh & Fresh":
+        return const ProjectBrandTheme(
+          gradientColors: [Color(0xFF1A2E05), Color(0xFF365314)], // lime olive/green
+          accentColor: Color(0xFF84CC16),
+        );
+      case "Church App":
+        return const ProjectBrandTheme(
+          gradientColors: [Color(0xFF3B0764), Color(0xFF1E1B4B)], // purple/indigo
+          accentColor: Color(0xFFA855F7),
+        );
+      default:
+        return const ProjectBrandTheme(
+          gradientColors: [Color(0xFF171717), Color(0xFF262626)],
+          accentColor: Color(0xFFFF5C35),
+        );
+    }
+  }
+}
+
+class WebProjectCard extends StatefulWidget {
+  final int index;
+  final ProjectDetail project;
+  final VoidCallback onTap;
+
+  const WebProjectCard({
+    super.key,
+    required this.index,
+    required this.project,
+    required this.onTap,
+  });
+
+  @override
+  State<WebProjectCard> createState() => _WebProjectCardState();
+}
+
+class _WebProjectCardState extends State<WebProjectCard> {
+  bool _isHovered = false;
+  bool _isVisible = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Cascading entrance delay
+    Future.delayed(Duration(milliseconds: widget.index * 120), () {
+      if (mounted) {
+        setState(() => _isVisible = true);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ProjectBrandTheme.getTheme(widget.project.title);
+
+    return AnimatedOpacity(
+      opacity: _isVisible ? 1.0 : 0.0,
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeOutCubic,
+      child: AnimatedContainer(
+        transform: Matrix4.translationValues(0, _isVisible ? 0 : 50, 0),
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeOutCubic,
+        child: MouseRegion(
+          onEnter: (_) => setState(() => _isHovered = true),
+          onExit: (_) => setState(() => _isHovered = false),
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            onTap: widget.onTap,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isMobile = constraints.maxWidth < 500;
+                final double cardHeight = isMobile ? 300 : 340;
+                final double paddingVal = isMobile ? 20.0 : 28.0;
+                
+                // Font sizes
+                final double titleSize = isMobile ? 20.0 : 24.0;
+                final double subtitleSize = isMobile ? 12.0 : 13.0;
+                
+                // Phone dimensions
+                final double phoneWidth = isMobile ? 95 : 135;
+                final double phoneHeight = isMobile ? 190 : 270;
+
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 350),
+                  curve: Curves.easeOutCubic,
+                  height: cardHeight,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: theme.gradientColors,
+                      begin: _isHovered ? Alignment.topRight : Alignment.topLeft,
+                      end: _isHovered ? Alignment.bottomLeft : Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(
+                      color: _isHovered 
+                          ? theme.accentColor.withValues(alpha: 0.45) 
+                          : Colors.white.withValues(alpha: 0.05),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: _isHovered 
+                            ? theme.accentColor.withValues(alpha: 0.2) 
+                            : Colors.black.withValues(alpha: 0.2),
+                        blurRadius: _isHovered ? 35 : 15,
+                        offset: Offset(0, _isHovered ? 12 : 6),
+                      ),
+                    ],
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Stack(
+                    children: [
+                      // Subtle background glow circle behind phone mockup
+                      Positioned(
+                        right: isMobile ? -30 : -50,
+                        bottom: isMobile ? -30 : -50,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          width: _isHovered 
+                              ? (isMobile ? 200 : 280) 
+                              : (isMobile ? 140 : 200),
+                          height: _isHovered 
+                              ? (isMobile ? 200 : 280) 
+                              : (isMobile ? 140 : 200),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: RadialGradient(
+                              colors: [
+                                theme.accentColor.withValues(alpha: 0.28),
+                                theme.accentColor.withValues(alpha: 0.0),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Double overlapping phone mockup layout (Back Phone)
+                      AnimatedPositioned(
+                        duration: const Duration(milliseconds: 350),
+                        curve: Curves.easeOutBack,
+                        bottom: _isHovered 
+                            ? (isMobile ? -15 : -25) 
+                            : (isMobile ? -35 : -50),
+                        right: _isHovered 
+                            ? (isMobile ? 2 : 5) 
+                            : (isMobile ? -8 : -5),
+                        child: Transform.rotate(
+                          angle: _isHovered ? -0.11 : -0.14,
+                          child: AnimatedScale(
+                            scale: _isHovered ? 0.95 : 0.9,
+                            duration: const Duration(milliseconds: 350),
+                            child: Container(
+                              width: phoneWidth,
+                              height: phoneHeight,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(isMobile ? 16 : 22),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.35),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 6),
+                                  ),
+                                ],
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.08),
+                                  width: isMobile ? 2.5 : 3.5,
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(isMobile ? 13 : 18),
+                                child: widget.project.userImages.length > 1
+                                    ? Image.asset(
+                                        widget.project.userImages[1],
+                                        fit: BoxFit.cover,
+                                        alignment: Alignment.topCenter,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Container(color: Colors.grey[900]);
+                                        },
+                                      )
+                                    : Container(color: Colors.grey[900]),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Double overlapping phone mockup layout (Front Phone)
+                      AnimatedPositioned(
+                        duration: const Duration(milliseconds: 350),
+                        curve: Curves.easeOutBack,
+                        bottom: _isHovered 
+                            ? (isMobile ? -10 : -15) 
+                            : (isMobile ? -25 : -35),
+                        right: _isHovered 
+                            ? (isMobile ? 16 : 25) 
+                            : (isMobile ? 10 : 15),
+                        child: Transform.rotate(
+                          angle: _isHovered ? -0.03 : -0.07,
+                          child: AnimatedScale(
+                            scale: _isHovered ? 1.08 : 1.0,
+                            duration: const Duration(milliseconds: 350),
+                            child: Container(
+                              width: phoneWidth,
+                              height: phoneHeight,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(isMobile ? 16 : 22),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.45),
+                                    blurRadius: 15,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.12),
+                                  width: isMobile ? 2.5 : 3.5,
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(isMobile ? 13 : 18),
+                                child: widget.project.userImages.isNotEmpty
+                                    ? Image.asset(
+                                        widget.project.userImages[0],
+                                        fit: BoxFit.cover,
+                                        alignment: Alignment.topCenter,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Container(
+                                            color: Colors.grey[900],
+                                            child: Icon(
+                                              widget.project.icon,
+                                              color: theme.accentColor,
+                                              size: isMobile ? 24 : 32,
+                                            ),
+                                          );
+                                        },
+                                      )
+                                    : Container(
+                                        color: Colors.grey[900],
+                                        child: Icon(
+                                          widget.project.icon,
+                                          color: theme.accentColor,
+                                          size: isMobile ? 24 : 32,
+                                        ),
+                                      ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Content info layout on the left
+                      Positioned.fill(
+                        child: FractionallySizedBox(
+                          widthFactor: isMobile ? 0.65 : 0.58,
+                          alignment: Alignment.topLeft,
+                          child: Padding(
+                            padding: EdgeInsets.all(paddingVal),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Year Pill
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: theme.accentColor.withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: theme.accentColor.withValues(alpha: 0.25),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    widget.project.year,
+                                    style: GoogleFonts.outfit(
+                                      color: theme.accentColor,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 14),
+
+                                // Title
+                                Text(
+                                  widget.project.title,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.outfit(
+                                    color: Colors.white,
+                                    fontSize: titleSize,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: -0.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+
+                                // Subtitle
+                                Text(
+                                  widget.project.subtitle,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.75),
+                                    fontSize: subtitleSize,
+                                    fontWeight: FontWeight.w500,
+                                    height: 1.4,
+                                  ),
+                                ),
+                                const Spacer(),
+
+                                // Tech tags (displays up to 5 tags on desktop card, 3 on mobile)
+                                Wrap(
+                                  spacing: 6,
+                                  runSpacing: 6,
+                                  children: widget.project.techTags.take(isMobile ? 3 : 5).map((tag) {
+                                    final icon = TechIconHelper.getIcon(tag);
+                                    return Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withValues(alpha: 0.06),
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(
+                                          color: Colors.white.withValues(alpha: 0.05),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          if (icon != null) ...[
+                                            Icon(
+                                              icon,
+                                              color: TechIconHelper.getIconColor(icon),
+                                              size: 10,
+                                            ),
+                                            const SizedBox(width: 4),
+                                          ],
+                                          Text(
+                                            tag,
+                                            style: TextStyle(
+                                              color: Colors.white.withValues(alpha: 0.6),
+                                              fontSize: 10.5,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                                const SizedBox(height: 20),
+
+                                // Case Study action trigger
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      "View Case Study",
+                                      style: GoogleFonts.outfit(
+                                        color: theme.accentColor,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Icon(Icons.arrow_outward, color: theme.accentColor, size: 14),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class TimelineExperienceCard extends StatelessWidget {
   final String duration;
@@ -2371,6 +2800,31 @@ class TechIconHelper {
     if (lower.contains('xcode')) return SimpleIcons.xcode;
     if (lower.contains('android studio')) return SimpleIcons.androidstudio;
     if (lower.contains('swift')) return SimpleIcons.swift;
+    
+    // Add additional mappings with material icons
+    if (lower.contains('maps') || lower.contains('gps') || lower.contains('geolocator') || lower.contains('location'))
+      return Icons.map_rounded;
+    if (lower.contains('push') || lower.contains('fcm') || lower.contains('notification'))
+      return Icons.notifications_active_rounded;
+    if (lower.contains('razorpay') || lower.contains('payment') || lower.contains('transaction'))
+      return Icons.payment_rounded;
+    if (lower.contains('bloc') || lower.contains('cubit') || lower.contains('state') || lower.contains('riverpod') || lower.contains('provider'))
+      return Icons.alt_route_rounded;
+    if (lower.contains('database') || lower.contains('sqlite') || lower.contains('hive') || lower.contains('isar') || lower.contains('storage') || lower.contains('cache'))
+      return Icons.storage_rounded;
+    if (lower.contains('api') || lower.contains('rest') || lower.contains('network') || lower.contains('twilio') || lower.contains('cloud'))
+      return Icons.api_rounded;
+    if (lower.contains('security') || lower.contains('auth') || lower.contains('biometric'))
+      return Icons.security_rounded;
+    if (lower.contains('player') || lower.contains('video') || lower.contains('stream') || lower.contains('hls'))
+      return Icons.play_circle_outline_rounded;
+    if (lower.contains('qr') || lower.contains('ticket'))
+      return Icons.qr_code_rounded;
+    if (lower.contains('cron') || lower.contains('schedule'))
+      return Icons.schedule_rounded;
+    if (lower.contains('design') || lower.contains('ux') || lower.contains('ui'))
+      return Icons.gesture_rounded;
+      
     return null;
   }
 
@@ -2400,6 +2854,30 @@ class TechIconHelper {
       color = SimpleIconColors.python;
     else if (icon == SimpleIcons.react)
       color = SimpleIconColors.react;
+      
+    // New mappings
+    else if (icon == Icons.map_rounded)
+      color = const Color(0xFF4285F4); // Google Blue
+    else if (icon == Icons.notifications_active_rounded)
+      color = const Color(0xFFFFB300); // Amber/Orange
+    else if (icon == Icons.payment_rounded)
+      color = const Color(0xFF00E676); // Spring Green
+    else if (icon == Icons.alt_route_rounded)
+      color = const Color(0xFF00B0FF); // Light Blue
+    else if (icon == Icons.storage_rounded)
+      color = const Color(0xFFFFD600); // Yellow
+    else if (icon == Icons.api_rounded)
+      color = const Color(0xFFE040FB); // Neon Pink
+    else if (icon == Icons.security_rounded)
+      color = const Color(0xFF00E5FF); // Bright Cyan
+    else if (icon == Icons.play_circle_outline_rounded)
+      color = const Color(0xFFEA4335); // Google Red
+    else if (icon == Icons.qr_code_rounded)
+      color = const Color(0xFFB0BEC5); // Blue Grey
+    else if (icon == Icons.schedule_rounded)
+      color = const Color(0xFF81C784); // Soft Green
+    else if (icon == Icons.gesture_rounded)
+      color = const Color(0xFFBA68C8); // Soft Purple
 
     // Fallback to white for pure black/very dark colors to look good in dark mode
     if (color.computeLuminance() < 0.15) {
@@ -2496,6 +2974,10 @@ class ProjectDetail {
         "Firestore",
         "Cloud Functions",
         "Razorpay",
+        "Bloc State",
+        "Secure Storage",
+        "Biometric Auth",
+        "PDF Engine",
       ],
       icon: Icons.payment,
       userImages: [
@@ -2522,11 +3004,15 @@ class ProjectDetail {
       description:
           "Developed a location-aware, reactive mobile booking app with background GPS tracking, dynamic pricing calculators, and efficient driver routing algorithms. Optimized location fetch intervals to conserve battery while maintaining high tracking accuracy.",
       techTags: [
-        "Flutter & Dart",
+        "Flutter",
+        "Dart",
         "Google Maps API",
         "GPS Tracking",
         "Firestore",
         "Cloud Functions",
+        "Bloc State",
+        "Geolocator",
+        "Background GPS",
       ],
       icon: Icons.local_taxi,
       userImages: [
@@ -2558,6 +3044,9 @@ class ProjectDetail {
         "Firestore",
         "Push Notifications",
         "Razorpay",
+        "SQLite Cache",
+        "Bloc State",
+        "Local Auth",
       ],
       icon: Icons.shopping_bag_outlined,
       userImages: [
@@ -2589,6 +3078,9 @@ class ProjectDetail {
         "Firestore",
         "Google Maps API",
         "Push Notifications",
+        "Multiapp Setup",
+        "Real-time Queue",
+        "Figma UX",
       ],
       icon: Icons.agriculture_outlined,
       userImages: [
@@ -2620,6 +3112,9 @@ class ProjectDetail {
         "Firestore",
         "Razorpay",
         "Push Notifications",
+        "Twilio APIs",
+        "Weight Scales",
+        "Hive DB",
       ],
       icon: Icons.restaurant_menu_outlined,
       userImages: [
@@ -2650,6 +3145,9 @@ class ProjectDetail {
         "Firebase Auth",
         "Firestore",
         "Google Maps API",
+        "Discount Managers",
+        "Map Locator",
+        "Isar Database",
       ],
       icon: Icons.local_grocery_store_outlined,
       userImages: [
@@ -2681,6 +3179,9 @@ class ProjectDetail {
         "Firestore",
         "Push Notifications",
         "Razorpay",
+        "HLS Player",
+        "QR Code Ticket",
+        "Scheduled CRON",
       ],
       icon: Icons.church_outlined,
       userImages: [
