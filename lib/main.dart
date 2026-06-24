@@ -1413,23 +1413,23 @@ class LeftProfileCard extends StatelessWidget {
             runSpacing: 8,
             children: [
               SocialIconBtn(
-                icon: Icons.language,
+                icon: SimpleIcons.github,
                 onTap: () => _launchUrl("https://github.com/premmoparthi0829"),
                 tooltip: "GitHub",
               ),
               SocialIconBtn(
-                icon: Icons.work_history_outlined,
+                icon: SimpleIcons.linkedin,
                 onTap: () =>
                     _launchUrl("https://linkedin.com/in/moparthi-prem"),
                 tooltip: "LinkedIn",
               ),
               SocialIconBtn(
-                icon: Icons.chat_bubble_outline_outlined,
+                icon: Icons.phone_rounded,
                 onTap: () => _launchUrl("tel:+917780324745"),
                 tooltip: "Contact",
               ),
               SocialIconBtn(
-                icon: Icons.alternate_email_outlined,
+                icon: Icons.email_rounded,
                 onTap: () => _launchUrl("mailto:premmoparthi8@gmail.com"),
                 tooltip: "Email",
               ),
