@@ -1,6 +1,7 @@
 import 'dart:ui' show ImageFilter;
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:simple_icons/simple_icons.dart';
@@ -725,7 +726,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         skills: devOpsSkills,
                       ),
                       const SizedBox(height: 32),
-
                       Text(
                         "PROGRAMMING LANGUAGES",
                         style: GoogleFonts.outfit(
@@ -736,16 +736,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      const Wrap(
-                        spacing: 12,
-                        runSpacing: 10,
-                        children: [
-                          LangChip(name: "Dart", rating: 5),
-                          LangChip(name: "Kotlin", rating: 4),
-                          LangChip(name: "Python", rating: 4),
-                          LangChip(name: "Java", rating: 3),
-                          LangChip(name: "React.js", rating: 3),
-                        ],
+                      const Center(
+                        child: ProgrammingLanguagesGrid(),
                       ),
                     ],
                   ),
@@ -4973,3 +4965,186 @@ class _ImageGalleryDialogState extends State<ImageGalleryDialog> {
     );
   }
 }
+
+// --- Programming Languages Grid & Progress Circles ---
+
+class ProgrammingLanguagesGrid extends StatelessWidget {
+  const ProgrammingLanguagesGrid({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Map<String, dynamic>> languages = [
+      {"name": "Dart", "rating": 5},
+      {"name": "Kotlin", "rating": 5},
+      {"name": "Swift", "rating": 5},
+      {"name": "Python", "rating": 5},
+      {"name": "Java", "rating": 5},
+    ];
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double spacing = constraints.maxWidth > 500 ? 24.0 : 16.0;
+        
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: languages.map((lang) {
+            return LanguageProgressCircle(
+              name: lang["name"] as String,
+              rating: lang["rating"] as int,
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+}
+
+class LanguageProgressCircle extends StatefulWidget {
+  final String name;
+  final int rating;
+
+  const LanguageProgressCircle({
+    super.key,
+    required this.name,
+    required this.rating,
+  });
+
+  @override
+  State<LanguageProgressCircle> createState() => _LanguageProgressCircleState();
+}
+
+class _LanguageProgressCircleState extends State<LanguageProgressCircle> {
+  bool _isHovered = false;
+
+  String _getProficiencyText(String name) {
+    final lowerName = name.toLowerCase().trim();
+    if (lowerName == 'dart' || lowerName == 'python' || lowerName == 'java') {
+      return "Expert";
+    }
+    return "Proficient";
+  }
+
+  double _getProgressPercentage(int rating) {
+    return rating / 5.0;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final icon = TechIconHelper.getIcon(widget.name);
+    final iconColor = icon != null
+        ? TechIconHelper.getIconColor(icon)
+        : const Color(0xFFFF5C35);
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: AnimatedScale(
+        scale: _isHovered ? 1.05 : 1.0,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                // Hover glow aura
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: 90,
+                  height: 90,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: _isHovered
+                            ? iconColor.withOpacity(0.15)
+                            : Colors.black.withOpacity(0.15),
+                        blurRadius: _isHovered ? 20 : 10,
+                        spreadRadius: _isHovered ? 2 : 0,
+                      ),
+                    ],
+                  ),
+                ),
+                // Inner Track Ring
+                SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: CircularProgressIndicator(
+                    value: 1.0,
+                    strokeWidth: 4,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Colors.white.withOpacity(0.04),
+                    ),
+                  ),
+                ),
+                // Active Progress Ring
+                SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0.0, end: _getProgressPercentage(widget.rating)),
+                    duration: const Duration(milliseconds: 1000),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, value, child) {
+                      return CircularProgressIndicator(
+                        value: value,
+                        strokeWidth: 5,
+                        valueColor: AlwaysStoppedAnimation<Color>(iconColor),
+                        strokeCap: StrokeCap.round,
+                      );
+                    },
+                  ),
+                ),
+                // Center Circle containing the Icon
+                Container(
+                  width: 66,
+                  height: 66,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF131316),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: _isHovered
+                          ? iconColor.withOpacity(0.3)
+                          : Colors.white.withOpacity(0.05),
+                      width: 1,
+                    ),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      icon ?? Icons.code_rounded,
+                      color: iconColor,
+                      size: 26,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              widget.name,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.2,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              _getProficiencyText(widget.name),
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.4),
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
