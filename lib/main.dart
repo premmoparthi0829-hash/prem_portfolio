@@ -7,6 +7,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:simple_icons/simple_icons.dart';
 import 'services/resume_service.dart';
 import 'utils/download_helper.dart';
+import 'utils/admin_dialog.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 void main() {
   runApp(const MyApp());
@@ -206,45 +208,63 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               child: Stack(
                 children: [
                   SingleChildScrollView(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.only(
-                      left: 20,
-                      right: 20,
-                      top: 80,
-                      bottom: 60,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Left Profile Card acts as top header card on mobile
-                        const LeftProfileCard(),
-                        const SizedBox(height: 48),
+                      controller: _scrollController,
+                      padding: const EdgeInsets.only(
+                        left: 20,
+                        right: 20,
+                        top: 80,
+                        bottom: 60,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Left Profile Card acts as top header card on mobile
+                          FadeSlideIn(
+                            delay: const Duration(milliseconds: 100),
+                            child: const LeftProfileCard(),
+                          ),
+                          const SizedBox(height: 48),
 
-                        // Main Content sections
-                        Container(
-                          key: _homeKey,
-                          child: _buildHeroSection(isDesktop),
-                        ),
-                        const SizedBox(height: 64),
-                         Container(
-                           key: _projectsKey,
-                           child: _buildProjectsSection(isDesktop: false),
-                         ),
-                        const SizedBox(height: 64),
-                        Container(
-                          key: _experienceKey,
-                          child: _buildExperienceSection(),
-                        ),
-                        const SizedBox(height: 64),
-                        Container(
-                          key: _skillsKey,
-                          child: _buildSkillsSection(),
-                        ),
-                        const SizedBox(height: 64),
-                        Container(
-                          key: _contactKey,
-                          child: _buildContactSection(),
-                        ),
+                          // Main Content sections with staggered entrance animations
+                          FadeSlideIn(
+                            delay: const Duration(milliseconds: 300),
+                            child: Container(
+                              key: _homeKey,
+                              child: _buildHeroSection(isDesktop),
+                            ),
+                          ),
+                          const SizedBox(height: 64),
+                          FadeSlideIn(
+                            delay: const Duration(milliseconds: 500),
+                            child: Container(
+                              key: _projectsKey,
+                              child: _buildProjectsSection(isDesktop: false),
+                            ),
+                          ),
+                          const SizedBox(height: 64),
+                          FadeSlideIn(
+                            delay: const Duration(milliseconds: 700),
+                            child: Container(
+                              key: _experienceKey,
+                              child: _buildExperienceSection(),
+                            ),
+                          ),
+                          const SizedBox(height: 64),
+                          FadeSlideIn(
+                            delay: const Duration(milliseconds: 900),
+                            child: Container(
+                              key: _skillsKey,
+                              child: _buildSkillsSection(),
+                            ),
+                          ),
+                          const SizedBox(height: 64),
+                          FadeSlideIn(
+                            delay: const Duration(milliseconds: 1100),
+                            child: Container(
+                              key: _contactKey,
+                              child: _buildContactSection(),
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -307,7 +327,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Giant Heading Block — always 3 lines on mobile, 2 on desktop
+            // Giant Heading Block â€” always 3 lines on mobile, 2 on desktop
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -600,7 +620,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         TimelineExperienceCard(
           duration: "2026-Present",
           company: "All Hands Global Pvt. Ltd.",
-          location: "HYDERABAD · India",
+          location: "HYDERABAD Â· India",
           role: "Mobile Application Architect & Flutter Developer",
           description:
               "Lead the architecture and delivery of premium cross-platform mobile apps for iOS and Android. Spearheaded migrations to clean architecture, reducing codebase complexity and boosting feature delivery velocity. Integrated secure biometric auth, local caching (Hive/Isar), and optimized push notification delivery paths.",
@@ -609,7 +629,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         TimelineExperienceCard(
           duration: "2024-2025",
           company: "Space Age Infotech",
-          location: "BENGALURU · India",
+          location: "BENGALURU Â· India",
           role: "Software Development Engineer (Web & APIs)",
           description:
               "Developed performant, responsive web apps and robust REST APIs. Optimized API response times by implementing Redis caching and database indexing. Constructed smooth, interactive frontend dashboards using React, establishing solid fundamentals in UI state management and client-server synchronization.",
@@ -680,21 +700,74 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         ),
         const SizedBox(height: 32),
 
-        // Education and Skills Content blocks
+        // Education and Skills Content blocks — Row-based layout
+        // Row 1: Technical Expertise header + Education header
         LayoutBuilder(
           builder: (context, constraints) {
             final isDesktop = constraints.maxWidth > 700;
 
-            return Row(
+            if (!isDesktop) {
+              // Mobile: stacked layout
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "TECHNICAL EXPERTISE",
+                    style: GoogleFonts.outfit(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFFB2FF33),
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SkillCategoryCard(
+                    title: "Mobile & Frontend Development",
+                    icon: Icons.smartphone_rounded,
+                    accentColor: const Color(0xFFB2FF33),
+                    skills: mobileSkills,
+                  ),
+                  const SizedBox(height: 16),
+                  SkillCategoryCard(
+                    title: "Backend, Database & Security",
+                    icon: Icons.dns_rounded,
+                    accentColor: const Color(0xFFFF5C35),
+                    skills: backendSkills,
+                  ),
+                  const SizedBox(height: 16),
+                  SkillCategoryCard(
+                    title: "DevOps, Tools & Quality Assurance",
+                    icon: Icons.terminal_rounded,
+                    accentColor: const Color(0xFF29B6F6),
+                    skills: devOpsSkills,
+                  ),
+                  const SizedBox(height: 32),
+                  Text(
+                    "PROGRAMMING LANGUAGES",
+                    style: GoogleFonts.outfit(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFFFF5C35),
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Center(child: ProgrammingLanguagesGrid()),
+                ],
+              );
+            }
+
+            // Desktop: paired row layout
+            return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Column 1: Technical Skill chips
-                Expanded(
-                  flex: isDesktop ? 6 : 10,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
+                // Headers row
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 6,
+                      child: Text(
                         "TECHNICAL EXPERTISE",
                         style: GoogleFonts.outfit(
                           fontSize: 16,
@@ -703,86 +776,167 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           letterSpacing: 1.5,
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      
-                      SkillCategoryCard(
+                    ),
+                    const SizedBox(width: 32),
+                    Expanded(
+                      flex: 5,
+                      child: Text(
+                        "EDUCATION",
+                        style: GoogleFonts.outfit(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Row A: Mobile card | Education items
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 6,
+                      child: SkillCategoryCard(
                         title: "Mobile & Frontend Development",
                         icon: Icons.smartphone_rounded,
                         accentColor: const Color(0xFFB2FF33),
                         skills: mobileSkills,
                       ),
-                      const SizedBox(height: 16),
-                      SkillCategoryCard(
+                    ),
+                    const SizedBox(width: 32),
+                    Expanded(
+                      flex: 5,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const EducationTimelineItem(
+                            year: "2019-2023",
+                            degree: "B.Tech - Computer Science",
+                            school:
+                                "National Institute of Technology Sikkim, India",
+                          ),
+                          const SizedBox(height: 16),
+                          const EducationTimelineItem(
+                            year: "2017-2019",
+                            degree: "Intermediate (12th)",
+                            school: "Narayana Junior College, Andhra Pradesh",
+                          ),
+                          const SizedBox(height: 16),
+                          const EducationTimelineItem(
+                            year: "2016-2017",
+                            degree: "Secondary Education (10th)",
+                            school: "Kennedy School, Andhra Pradesh",
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Row B: Database card | Certificates section
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 6,
+                      child: SkillCategoryCard(
                         title: "Backend, Database & Security",
                         icon: Icons.dns_rounded,
                         accentColor: const Color(0xFFFF5C35),
                         skills: backendSkills,
                       ),
-                      const SizedBox(height: 16),
-                      SkillCategoryCard(
+                    ),
+                    const SizedBox(width: 32),
+                    Expanded(
+                      flex: 5,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "CERTIFICATES & COURSES",
+                            style: GoogleFonts.outfit(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          const CertificationItem(
+                            year: "2025",
+                            title: "Master Flutter Developer Certification",
+                            issuer: "Cursa",
+                          ),
+                          const SizedBox(height: 14),
+                          const CertificationItem(
+                            year: "2024",
+                            title:
+                                "Complete Flutter & Dart Development Course",
+                            issuer: "Udemy",
+                            tag:
+                                "Mobile Application Dev · Android / iOS / Web",
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Row C: DevOps card | Hobbies section
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 6,
+                      child: SkillCategoryCard(
                         title: "DevOps, Tools & Quality Assurance",
                         icon: Icons.terminal_rounded,
                         accentColor: const Color(0xFF29B6F6),
                         skills: devOpsSkills,
                       ),
-                      const SizedBox(height: 32),
-                      Text(
-                        "PROGRAMMING LANGUAGES",
-                        style: GoogleFonts.outfit(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                          color: const Color(0xFFFF5C35),
-                          letterSpacing: 1.5,
-                        ),
+                    ),
+                    const SizedBox(width: 32),
+                    Expanded(
+                      flex: 5,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "HOBBIES & INTERESTS",
+                            style: GoogleFonts.outfit(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          const HobbiesSection(),
+                        ],
                       ),
-                      const SizedBox(height: 16),
-                      const Center(
-                        child: ProgrammingLanguagesGrid(),
-                      ),
-                    ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 32),
+
+                // Programming Languages — full left column width
+                Text(
+                  "PROGRAMMING LANGUAGES",
+                  style: GoogleFonts.outfit(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFFFF5C35),
+                    letterSpacing: 1.5,
                   ),
                 ),
-
-                if (isDesktop) const SizedBox(width: 32),
-
-                // Column 2: Education Info
-                if (isDesktop)
-                  Expanded(
-                    flex: 5,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "EDUCATION",
-                          style: GoogleFonts.outfit(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                            letterSpacing: 1.5,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        const EducationTimelineItem(
-                          year: "2019-2023",
-                          degree: "B.Tech - Computer Science",
-                          school:
-                              "National Institute of Technology Sikkim, India",
-                        ),
-                        const SizedBox(height: 16),
-                        const EducationTimelineItem(
-                          year: "2017-2019",
-                          degree: "Intermediate (12th)",
-                          school: "Narayana Junior College, Andhra Pradesh",
-                        ),
-                        const SizedBox(height: 16),
-                        const EducationTimelineItem(
-                          year: "2016-2017",
-                          degree: "Secondary Education (10th)",
-                          school: "Kennedy School, Andhra Pradesh",
-                        ),
-                      ],
-                    ),
-                  ),
+                const SizedBox(height: 16),
+                const Center(child: ProgrammingLanguagesGrid()),
               ],
             );
           },
@@ -824,6 +978,41 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   degree: "Secondary Education (10th)",
                   school: "Kennedy School, Andhra Pradesh",
                 ),
+                const SizedBox(height: 28),
+                Text(
+                  "CERTIFICATES & COURSES",
+                  style: GoogleFonts.outfit(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const CertificationItem(
+                  year: "2025",
+                  title: "Master Flutter Developer Certification",
+                  issuer: "Cursa",
+                ),
+                const SizedBox(height: 14),
+                const CertificationItem(
+                  year: "2024",
+                  title: "Complete Flutter & Dart Development Course",
+                  issuer: "Udemy",
+                  tag: "Mobile Application Dev · Android / iOS / Web",
+                ),
+                const SizedBox(height: 28),
+                Text(
+                  "HOBBIES & INTERESTS",
+                  style: GoogleFonts.outfit(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                const HobbiesSection(),
               ],
             );
           },
@@ -834,6 +1023,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 
   Widget _buildContactSection() {
     final isDesktop = MediaQuery.of(context).size.width > 950;
+    final isMobile = MediaQuery.of(context).size.width < 600;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -864,6 +1054,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                     fontWeight: FontWeight.w900,
                   ),
                 ),
+
               ],
             );
           },
@@ -892,10 +1083,13 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               spacing: 16,
               runSpacing: 16,
               children: [
-                Interactive3DButton(
+                PremiumResumeButton(
                   label: "VIEW RESUME",
                   icon: Icons.visibility_outlined,
-                  color: const Color(0xFFFF5C35),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFFF5C35), Color(0xFFFF8B66)],
+                  ),
+                  textColor: Colors.white,
                   width: buttonWidth,
                   onTap: () async {
                     try {
@@ -930,44 +1124,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                     }
                   },
                 ),
-                Interactive3DButton(
-                  label: "DOWNLOAD RESUME",
-                  icon: Icons.file_download_outlined,
-                  color: const Color(0xFFB2FF33),
-                  width: buttonWidth,
-                  onTap: () async {
-                    try {
-                      final resume = await ResumeService.getActiveResume();
-                      if (resume.sourceType == ResumeSourceType.customUrl) {
-                        final Uri url = Uri.parse(resume.url!);
-                        if (await canLaunchUrl(url)) {
-                          await launchUrl(
-                            url,
-                            mode: LaunchMode.externalApplication,
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Could not open resume link'),
-                            ),
-                          );
-                        }
-                      } else if (resume.bytes != null) {
-                        downloadFile(resume.bytes!, resume.fileName);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('No resume content available'),
-                          ),
-                        );
-                      }
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error downloading resume: $e')),
-                      );
-                    }
-                  },
-                ),
               ],
             );
           },
@@ -975,80 +1131,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         const SizedBox(height: 32),
 
         // Contact block links
-        LayoutBuilder(
-          builder: (context, cc) {
-            return Wrap(
-              spacing: 16,
-              runSpacing: 16,
-              children: [
-                ContactTileCard(
-                  icon: SimpleIcons.gmail,
-                  title: "Email me",
-                  value: "premmoparthi8@gmail.com",
-                  url: "mailto:premmoparthi8@gmail.com",
-                  accentColor: const Color(0xFFEA4335),
-                ),
-                ContactTileCard(
-                  icon: SimpleIcons.whatsapp,
-                  title: "Call/WhatsApp",
-                  value: "",
-                  url: "",
-                  accentColor: const Color(0xFF25D366),
-                  subItems: const [
-                    {
-                      "label": "Primary",
-                      "value": "+91 7780324745",
-                      "url": "tel:+917780324745",
-                    },
-                    {
-                      "label": "Alternate",
-                      "value": "+91 7287928766",
-                      "url": "tel:+917287928766",
-                    },
-                  ],
-                ),
-                ContactTileCard(
-                  icon: SimpleIcons.googlemaps,
-                  title: "Based in",
-                  value: "Hyderabad, India",
-                  url: "https://maps.google.com/?q=Hyderabad,India",
-                  accentColor: const Color(0xFF4285F4),
-                ),
-                ContactTileCard(
-                  customIcon: Container(
-                    width: 20,
-                    height: 20,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0077B5),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: const Text(
-                      "in",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Arial',
-                      ),
-                    ),
-                  ),
-                  title: "LinkedIn",
-                  value: "moparthi-prem",
-                  url: "https://linkedin.com/in/moparthi-prem",
-                  accentColor: const Color(0xFF0077B5),
-                ),
-                ContactTileCard(
-                  icon: SimpleIcons.github,
-                  title: "GitHub",
-                  value: "premmoparthi0829",
-                  url: "https://github.com/premmoparthi0829",
-                  accentColor: const Color(0xFFB0BEC5),
-                ),
-              ],
-            );
-          },
-        ),
+        _buildContactIconsSection(isMobile),
         const SizedBox(height: 48),
 
         // Footer credits
@@ -1062,7 +1145,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "© 2026 Prem Moparthi. All rights reserved.",
+                    "Â© 2026 Prem Moparthi. All rights reserved.",
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.3),
                       fontSize: 13,
@@ -1082,7 +1165,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "© 2026 Prem Moparthi. All rights reserved.",
+                    "Â© 2026 Prem Moparthi. All rights reserved.",
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.3),
                       fontSize: 13,
@@ -1104,9 +1187,353 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       ],
     );
   }
+
+  Widget _buildContactIconsSection(bool isMobile) {
+    final double buttonSize = isMobile ? 54 : 72;
+    final double spacing = isMobile ? 20 : 32;
+
+    // Build each button with staggered FadeSlideIn on mobile
+    Widget wrapBtn(Widget btn, int index) {
+      if (!isMobile) return btn;
+      return FadeSlideIn(
+        delay: Duration(milliseconds: 200 + index * 120),
+        duration: const Duration(milliseconds: 500),
+        beginOffset: const Offset(0, 30),
+        child: _PulseContactBtn(delay: Duration(milliseconds: index * 200), child: btn),
+      );
+    }
+
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.only(top: 8.0, bottom: isMobile ? 16.0 : 32.0),
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          spacing: spacing,
+          runSpacing: spacing,
+          children: [
+            wrapBtn(ContactIconButton(
+              size: buttonSize,
+              icon: SimpleIcons.gmail,
+              accentColor: const Color(0xFFEA4335),
+              onTap: () => _launchContactUrl("mailto:premmoparthi8@gmail.com"),
+            ), 0),
+            wrapBtn(ContactIconButton(
+              size: buttonSize,
+              icon: SimpleIcons.whatsapp,
+              accentColor: const Color(0xFF25D366),
+              onTap: () => _showPhoneOptionsBottomSheet(context),
+            ), 1),
+            wrapBtn(ContactIconButton(
+              size: buttonSize,
+              icon: SimpleIcons.googlemaps,
+              accentColor: const Color(0xFF4285F4),
+              onTap: () => _launchContactUrl("https://maps.google.com/?q=Hyderabad,India"),
+            ), 2),
+            wrapBtn(ContactIconButton(
+              size: buttonSize,
+              customIcon: Text(
+                "in",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: isMobile ? 15 : 20,
+                  fontWeight: FontWeight.w900,
+                  fontFamily: 'Arial',
+                  letterSpacing: -0.5,
+                ),
+              ),
+              accentColor: const Color(0xFF0077B5),
+              onTap: () => _launchContactUrl("https://linkedin.com/in/moparthi-prem"),
+            ), 3),
+            wrapBtn(ContactIconButton(
+              size: buttonSize,
+              icon: SimpleIcons.github,
+              accentColor: Colors.white,
+              onTap: () => _launchContactUrl("https://github.com/premmoparthi0829"),
+            ), 4),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showPhoneOptionsBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 500),
+            decoration: const BoxDecoration(
+              color: Color(0xFF171717),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
+              ),
+              border: Border(
+                top: BorderSide(
+                  color: Colors.white10,
+                  width: 1,
+                ),
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            child: SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.white24,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    "GET IN TOUCH",
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildBottomSheetItem(
+                    icon: SimpleIcons.whatsapp,
+                    color: const Color(0xFF25D366),
+                    title: "WhatsApp Chat",
+                    subtitle: "+91 7780324745",
+                    onTap: () {
+                      Navigator.pop(context);
+                      _launchContactUrl("https://wa.me/917780324745");
+                    },
+                  ),
+                  const Divider(color: Colors.white10, height: 1),
+                  _buildBottomSheetItem(
+                    icon: Icons.phone_in_talk_rounded,
+                    color: const Color(0xFFFF5C35),
+                    title: "Call Primary",
+                    subtitle: "+91 7780324745",
+                    onTap: () {
+                      Navigator.pop(context);
+                      _launchContactUrl("tel:+917780324745");
+                    },
+                  ),
+                  const Divider(color: Colors.white10, height: 1),
+                  _buildBottomSheetItem(
+                    icon: Icons.phone_iphone_rounded,
+                    color: const Color(0xFFB2FF33),
+                    title: "Call Alternate",
+                    subtitle: "+91 7287928766",
+                    onTap: () {
+                      Navigator.pop(context);
+                      _launchContactUrl("tel:+917287928766");
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBottomSheetItem({
+    required IconData icon,
+    required Color color,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.5),
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: Colors.white.withOpacity(0.3),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _launchContactUrl(String urlStr) async {
+    final Uri parsedUrl = Uri.parse(urlStr);
+    final isNativeProtocol =
+        parsedUrl.scheme == 'mailto' ||
+        parsedUrl.scheme == 'tel' ||
+        parsedUrl.scheme == 'sms';
+    if (!await launchUrl(
+      parsedUrl,
+      mode: isNativeProtocol
+          ? LaunchMode.platformDefault
+          : LaunchMode.externalApplication,
+    )) {
+      throw Exception('Could not launch $parsedUrl');
+    }
+  }
 }
 
 // --- Custom Reusable Interactive Widgets ---
+
+// --- Fade + Slide Entrance Animation Widget (for mobile sections) ---
+
+class FadeSlideIn extends StatefulWidget {
+  final Widget child;
+  final Duration delay;
+  final Duration duration;
+  final Offset beginOffset;
+
+  const FadeSlideIn({
+    super.key,
+    required this.child,
+    this.delay = Duration.zero,
+    this.duration = const Duration(milliseconds: 600),
+    this.beginOffset = const Offset(0, 40),
+  });
+
+  @override
+  State<FadeSlideIn> createState() => _FadeSlideInState();
+}
+
+class _FadeSlideInState extends State<FadeSlideIn>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _opacity;
+  late Animation<Offset> _slide;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: widget.duration);
+
+    _opacity = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
+
+    _slide = Tween<Offset>(
+      begin: widget.beginOffset,
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+
+    Future.delayed(widget.delay, () {
+      if (mounted) _controller.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: _slide.value,
+          child: Opacity(opacity: _opacity.value, child: child),
+        );
+      },
+      child: widget.child,
+    );
+  }
+}
+
+// --- Pulse animation wrapper for contact buttons on mobile ---
+
+class _PulseContactBtn extends StatefulWidget {
+  final Widget child;
+  final Duration delay;
+
+  const _PulseContactBtn({required this.child, this.delay = Duration.zero});
+
+  @override
+  State<_PulseContactBtn> createState() => _PulseContactBtnState();
+}
+
+class _PulseContactBtnState extends State<_PulseContactBtn>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  late Animation<double> _scale;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1600),
+    );
+    _scale = Tween<double>(begin: 1.0, end: 1.06).animate(
+      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
+    );
+    // Start pulsing after a staggered delay
+    Future.delayed(widget.delay + const Duration(milliseconds: 800), () {
+      if (mounted) _ctrl.repeat(reverse: true);
+    });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _scale,
+      builder: (_, child) => Transform.scale(scale: _scale.value, child: child),
+      child: widget.child,
+    );
+  }
+}
 
 class HoverWidget extends StatefulWidget {
   final Widget child;
@@ -1216,131 +1643,87 @@ class _HoverWidgetState extends State<HoverWidget> {
 
 // --- Interactive 3D Action Button ---
 
-class Interactive3DButton extends StatefulWidget {
+class PremiumResumeButton extends StatefulWidget {
   final String label;
   final IconData icon;
-  final Color color;
+  final LinearGradient gradient;
+  final Color textColor;
   final VoidCallback onTap;
   final double width;
 
-  const Interactive3DButton({
+  const PremiumResumeButton({
     super.key,
     required this.label,
     required this.icon,
-    required this.color,
+    required this.gradient,
+    required this.textColor,
     required this.onTap,
     required this.width,
   });
 
   @override
-  State<Interactive3DButton> createState() => _Interactive3DButtonState();
+  State<PremiumResumeButton> createState() => _PremiumResumeButtonState();
 }
 
-class _Interactive3DButtonState extends State<Interactive3DButton> {
+class _PremiumResumeButtonState extends State<PremiumResumeButton> {
   bool _isHovered = false;
   bool _isPressed = false;
-  double _tiltX = 0.0;
-  double _tiltY = 0.0;
 
   @override
   Widget build(BuildContext context) {
-    final accent = widget.color;
-    final bgCol = _isHovered
-        ? accent.withOpacity(0.12)
-        : accent.withOpacity(0.04);
-    final borderCol = _isHovered
-        ? accent.withOpacity(0.75)
-        : accent.withOpacity(0.35);
-
-    double liftY = 0.0;
-    double extrusionDepth = 3.0;
-    if (_isPressed) {
-      liftY = 3.0;
-      extrusionDepth = 0.0;
-    } else if (_isHovered) {
-      liftY = -5.0;
-      extrusionDepth = 8.0;
-    }
-
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() {
         _isHovered = false;
         _isPressed = false;
-        _tiltX = 0.0;
-        _tiltY = 0.0;
       }),
-      onHover: (event) {
-        final size = context.size;
-        if (size != null) {
-          final dx = event.localPosition.dx - (size.width / 2);
-          final dy = event.localPosition.dy - (size.height / 2);
-          setState(() {
-            _tiltX = (dx / (size.width / 2)).clamp(-1.0, 1.0);
-            _tiltY = -(dy / (size.height / 2)).clamp(-1.0, 1.0);
-          });
-        }
-      },
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTapDown: (_) => setState(() => _isPressed = true),
         onTapUp: (_) => setState(() => _isPressed = false),
         onTapCancel: () => setState(() => _isPressed = false),
         onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 100),
+        child: AnimatedScale(
+          scale: _isPressed ? 0.96 : (_isHovered ? 1.04 : 1.0),
+          duration: const Duration(milliseconds: 150),
           curve: Curves.easeOutCubic,
-          transform: Matrix4.identity()
-            ..setEntry(3, 2, 0.0015)
-            ..rotateX(_tiltY * 0.08)
-            ..rotateY(_tiltX * 0.08)
-            ..translate(0.0, liftY, 0.0),
-          transformAlignment: Alignment.center,
-          width: widget.width,
-          height: 38,
-          decoration: BoxDecoration(
-            color: bgCol,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: borderCol, width: 1.5),
-            boxShadow: [
-              // 3D Extrusion base edge
-              BoxShadow(
-                color: accent.withOpacity(_isHovered ? 0.75 : 0.35),
-                offset: Offset(0, extrusionDepth),
-                blurRadius: 0,
-              ),
-              // Ambient shadow
-              BoxShadow(
-                color: Colors.black.withOpacity(_isHovered ? 0.5 : 0.3),
-                offset: Offset(0, _isHovered ? 12.0 : 6.0),
-                blurRadius: _isHovered ? 12.0 : 4.0,
-              ),
-            ],
-          ),
-          alignment: Alignment.center,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AnimatedScale(
-                scale: _isHovered ? 1.15 : 1.0,
-                duration: const Duration(milliseconds: 200),
-                child: Icon(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            width: widget.width,
+            height: 44,
+            decoration: BoxDecoration(
+              gradient: widget.gradient,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: widget.gradient.colors.first.withOpacity(_isHovered ? 0.35 : 0.15),
+                  blurRadius: _isHovered ? 16 : 8,
+                  offset: Offset(0, _isHovered ? 6 : 3),
+                  spreadRadius: _isHovered ? 1 : 0,
+                ),
+              ],
+            ),
+            alignment: Alignment.center,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
                   widget.icon,
-                  color: accent,
-                  size: 16,
+                  color: widget.textColor,
+                  size: 18,
                 ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                widget.label,
-                style: GoogleFonts.outfit(
-                  color: accent,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 11,
-                  letterSpacing: 0.8,
+                const SizedBox(width: 8),
+                Text(
+                  widget.label,
+                  style: GoogleFonts.outfit(
+                    color: widget.textColor,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 13,
+                    letterSpacing: 1.0,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -1420,8 +1803,37 @@ class FloatingNavbar extends StatelessWidget {
 
 // --- Left Sticky Profile Card ---
 
-class LeftProfileCard extends StatelessWidget {
+class LeftProfileCard extends StatefulWidget {
   const LeftProfileCard({super.key});
+
+  @override
+  State<LeftProfileCard> createState() => _LeftProfileCardState();
+}
+
+class _LeftProfileCardState extends State<LeftProfileCard> {
+  int _tapCount = 0;
+  DateTime? _lastTapTime;
+
+  void _handleProfileTap() {
+    if (!kIsWeb) return;
+    final now = DateTime.now();
+    if (_lastTapTime == null ||
+        now.difference(_lastTapTime!) > const Duration(milliseconds: 500)) {
+      _tapCount = 1;
+    } else {
+      _tapCount++;
+    }
+    _lastTapTime = now;
+
+    if (_tapCount >= 4) {
+      _tapCount = 0;
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) => const AdminLoginDialog(),
+      );
+    }
+  }
 
   Future<void> _launchUrl(String urlString) async {
     final Uri url = Uri.parse(urlString);
@@ -1469,9 +1881,11 @@ class LeftProfileCard extends StatelessWidget {
                 // Orange image frame
                 Align(
                   alignment: Alignment.center,
-                  child: Container(
-                    width: 175,
-                    height: 185,
+                  child: GestureDetector(
+                    onTap: _handleProfileTap,
+                    child: Container(
+                      width: 175,
+                      height: 185,
                     decoration: BoxDecoration(
                       color: const Color(0xFFFF5C35),
                       borderRadius: BorderRadius.circular(28),
@@ -1502,6 +1916,7 @@ class LeftProfileCard extends StatelessWidget {
                     ),
                   ),
                 ),
+              ),
               ],
             ),
           ),
@@ -1572,14 +1987,34 @@ class LeftProfileCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          const Text(
-            "Hi, I'm Prem! A passionate Mobile Architect focused on building fluid, high-performance user experiences. Specializing in secure clean architecture, state dynamics, and custom interactive animations that bring apps to life. Let's build together extraordinary mobile apps for Android & iOS!",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Color(0xFF666666),
-              fontSize: 12.5,
-              height: 1.55,
-            ),
+          Builder(
+            builder: (context) {
+              final isMobile = MediaQuery.of(context).size.width <= 950;
+              return Text.rich(
+                TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: "Hi, I'm Prem! A passionate Mobile Architect focused on building fluid, high-performance user experiences. Specializing in secure clean architecture, state dynamics, and custom interactive animations that bring apps to life. ",
+                    ),
+                    TextSpan(
+                      text: "Let's design and build next-generation mobile experiences for Android & iOS!",
+                      style: isMobile
+                          ? const TextStyle(
+                              color: Color(0xFFFF5C35),
+                              fontWeight: FontWeight.bold,
+                            )
+                          : null,
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFF666666),
+                  fontSize: 12.5,
+                  height: 1.55,
+                ),
+              );
+            },
           ),
           const SizedBox(height: 32),
 
@@ -2642,6 +3077,144 @@ class EducationTimelineItem extends StatelessWidget {
     );
   }
 }
+
+// --- Certification Item ---
+
+class CertificationItem extends StatelessWidget {
+  final String year;
+  final String title;
+  final String issuer;
+  final String? tag;
+
+  const CertificationItem({
+    super.key,
+    required this.year,
+    required this.title,
+    required this.issuer,
+    this.tag,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: const EdgeInsets.only(top: 4),
+          width: 8,
+          height: 8,
+          decoration: const BoxDecoration(
+            color: Color(0xFFFF5C35),
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                year,
+                style: GoogleFonts.outfit(
+                  color: const Color(0xFFFF5C35),
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                title,
+                style: GoogleFonts.outfit(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                issuer,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.5),
+                  fontSize: 12.5,
+                  height: 1.4,
+                ),
+              ),
+              if (tag != null) ...[  
+                const SizedBox(height: 5),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF5C35).withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                      color: const Color(0xFFFF5C35).withOpacity(0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Text(
+                    tag!,
+                    style: TextStyle(
+                      color: const Color(0xFFFF5C35).withOpacity(0.85),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// --- Hobbies Section ---
+
+class HobbiesSection extends StatelessWidget {
+  const HobbiesSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final hobbies = [
+      (icon: Icons.sports_esports_rounded, label: "Chess", color: const Color(0xFFB2FF33)),
+      (icon: Icons.music_note_rounded, label: "Music", color: const Color(0xFF29B6F6)),
+      (icon: Icons.code_rounded, label: "Coding", color: const Color(0xFFFF5C35)),
+      (icon: Icons.sports_cricket_rounded, label: "Cricket", color: const Color(0xFFFFC107)),
+    ];
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: hobbies.map((h) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          decoration: BoxDecoration(
+            color: h.color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: h.color.withOpacity(0.35),
+              width: 1.2,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(h.icon, color: h.color, size: 15),
+              const SizedBox(width: 6),
+              Text(
+                h.label,
+                style: GoogleFonts.outfit(
+                  color: h.color,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
 class SkillCategoryCard extends StatefulWidget {
   final String title;
   final IconData icon;
@@ -2916,18 +3489,87 @@ class LangChip extends StatelessWidget {
   }
 }
 
-// --- Contact Tile Card ---
+// --- Contact Star Card ---
 
-class ContactTileCard extends StatefulWidget {
+class ContactIconButton extends StatefulWidget {
+  final IconData? icon;
+  final Widget? customIcon;
+  final Color accentColor;
+  final VoidCallback onTap;
+  final double size;
+
+  const ContactIconButton({
+    super.key,
+    this.icon,
+    this.customIcon,
+    required this.accentColor,
+    required this.onTap,
+    required this.size,
+  });
+
+  @override
+  State<ContactIconButton> createState() => _ContactIconButtonState();
+}
+
+class _ContactIconButtonState extends State<ContactIconButton> {
+  bool _isHovered = false;
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = widget.size;
+    final accent = widget.accentColor;
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _isPressed = true),
+        onTapUp: (_) => setState(() => _isPressed = false),
+        onTapCancel: () => setState(() => _isPressed = false),
+        onTap: widget.onTap,
+        child: AnimatedScale(
+          scale: _isPressed ? 0.92 : (_isHovered ? 1.1 : 1.0),
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOutCubic,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: size,
+            height: size,
+            decoration: BoxDecoration(
+              color: _isHovered ? accent : accent.withOpacity(0.85),
+              borderRadius: BorderRadius.circular(size * 0.22),
+              boxShadow: [
+                BoxShadow(
+                  color: accent.withOpacity(_isHovered ? 0.45 : 0.18),
+                  blurRadius: _isHovered ? 22 : 8,
+                  spreadRadius: _isHovered ? 2 : 0,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            alignment: Alignment.center,
+            child: widget.customIcon ??
+                (widget.icon != null
+                    ? Icon(widget.icon, color: Colors.white, size: size * 0.46)
+                    : const SizedBox.shrink()),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ContactStarCard extends StatefulWidget {
   final IconData? icon;
   final Widget? customIcon;
   final String title;
   final String value;
   final String url;
   final List<Map<String, String>>? subItems;
-  final Color? accentColor;
+  final Color accentColor;
 
-  const ContactTileCard({
+  const ContactStarCard({
     super.key,
     this.icon,
     this.customIcon,
@@ -2935,20 +3577,18 @@ class ContactTileCard extends StatefulWidget {
     required this.value,
     required this.url,
     this.subItems,
-    this.accentColor,
+    required this.accentColor,
   });
 
   @override
-  State<ContactTileCard> createState() => _ContactTileCardState();
+  State<ContactStarCard> createState() => _ContactStarCardState();
 }
 
-class _ContactTileCardState extends State<ContactTileCard> {
+class _ContactStarCardState extends State<ContactStarCard> {
   bool _isHovered = false;
-  double _tiltX = 0.0;
-  double _tiltY = 0.0;
 
-  Future<void> _launchUrl() async {
-    final Uri parsedUrl = Uri.parse(widget.url);
+  Future<void> _launchUrl(String urlStr) async {
+    final Uri parsedUrl = Uri.parse(urlStr);
     final isNativeProtocol =
         parsedUrl.scheme == 'mailto' ||
         parsedUrl.scheme == 'tel' ||
@@ -2965,153 +3605,97 @@ class _ContactTileCardState extends State<ContactTileCard> {
 
   @override
   Widget build(BuildContext context) {
-    final isWide = MediaQuery.of(context).size.width > 600;
     final hasSubItems = widget.subItems != null && widget.subItems!.isNotEmpty;
-
-    final accent = widget.accentColor ?? Colors.white;
-
-    final bgCol = _isHovered
-        ? const Color(0xFF1E1E24)
-        : const Color(0xFF131316);
-    final borderCol = _isHovered
-        ? accent.withOpacity(0.55)
-        : Colors.white.withOpacity(0.06);
-    final iconCol = widget.accentColor ?? Colors.white.withOpacity(0.8);
-    final titleCol = widget.accentColor != null
-        ? widget.accentColor!.withOpacity(0.75)
-        : Colors.white.withOpacity(0.45);
-
-    Widget cardContent = Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AnimatedScale(
-          scale: _isHovered ? 1.15 : 1.0,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOutBack,
-          child: AnimatedRotation(
-            turns: _isHovered ? 0.04 : 0.0,
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeOutBack,
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: iconCol.withOpacity(0.12),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  if (_isHovered)
-                    BoxShadow(
-                      color: iconCol.withOpacity(0.2),
-                      blurRadius: 8,
-                      spreadRadius: 1,
-                    )
-                ],
-              ),
-              child: widget.customIcon ?? (widget.icon != null ? Icon(widget.icon, color: iconCol, size: 20) : const SizedBox.shrink()),
-            ),
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                widget.title.toUpperCase(),
-                style: TextStyle(
-                  color: titleCol,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.2,
-                ),
-              ),
-              const SizedBox(height: 4),
-              if (hasSubItems)
-                ...widget.subItems!.map((item) {
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
-                    child: HoverPhoneItem(
-                      value: item['value'] ?? '',
-                      label: item['label'] ?? '',
-                      url: item['url'] ?? '',
-                      hoverColor: iconCol,
-                    ),
-                  );
-                })
-              else
-                Text(
-                  widget.value,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.outfit(
-                    color: Colors.white,
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ],
-    );
+    final accent = widget.accentColor;
+    final iconCol = widget.accentColor;
+    final titleCol = widget.accentColor.withOpacity(0.75);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() {
-        _isHovered = false;
-        _tiltX = 0.0;
-        _tiltY = 0.0;
-      }),
-      onHover: (event) {
-        final size = context.size;
-        if (size != null) {
-          final dx = event.localPosition.dx - (size.width / 2);
-          final dy = event.localPosition.dy - (size.height / 2);
-          setState(() {
-            _tiltX = (dx / (size.width / 2)).clamp(-1.0, 1.0);
-            _tiltY = -(dy / (size.height / 2)).clamp(-1.0, 1.0);
-          });
-        }
-      },
+      onExit: (_) => setState(() => _isHovered = false),
       cursor: hasSubItems ? SystemMouseCursors.basic : SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: hasSubItems ? null : _launchUrl,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
+        onTap: hasSubItems ? null : () => _launchUrl(widget.url),
+        child: AnimatedScale(
+          scale: _isHovered ? 1.05 : 1.0,
+          duration: const Duration(milliseconds: 200),
           curve: Curves.easeOutCubic,
-          transform: Matrix4.identity()
-            ..setEntry(3, 2, 0.0015)
-            ..rotateX(_tiltY * 0.1)
-            ..rotateY(_tiltX * 0.1)
-            ..translate(0.0, _isHovered ? -8.0 : 0.0, 0.0),
-          transformAlignment: Alignment.center,
-          width: isWide ? 270 : double.infinity,
-          decoration: BoxDecoration(
-            color: bgCol,
-            borderRadius: BorderRadius.circular(32),
-            border: Border.all(color: borderCol, width: 1.5),
-            boxShadow: [
-              // 3D Extrusion base edge
-              BoxShadow(
-                color: _isHovered ? accent.withOpacity(0.7) : accent.withOpacity(0.2),
-                offset: Offset(0, _isHovered ? 12.0 : 4.0),
-                blurRadius: 0,
-              ),
-              // Ambient soft shadow
-              BoxShadow(
-                color: Colors.black.withOpacity(_isHovered ? 0.6 : 0.4),
-                offset: Offset(0, _isHovered ? 20.0 : 8.0),
-                blurRadius: _isHovered ? 24.0 : 8.0,
-              ),
-            ],
+          child: SizedBox(
+            width: 180,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: 86,
+                  height: 86,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color(0xFF1A1A1E),
+                    border: Border.all(
+                      color: accent.withOpacity(_isHovered ? 0.7 : 0.25),
+                      width: 2.0,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: accent.withOpacity(_isHovered ? 0.3 : 0.08),
+                        blurRadius: _isHovered ? 18 : 8,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                  alignment: Alignment.center,
+                  child: widget.customIcon ??
+                      (widget.icon != null
+                          ? Icon(widget.icon, color: iconCol, size: 28)
+                          : const SizedBox.shrink()),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  widget.title.toUpperCase(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: titleCol,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                if (hasSubItems)
+                  ...widget.subItems!.map((item) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 2.0),
+                      child: HoverPhoneItem(
+                        value: item['value'] ?? '',
+                        label: item['label'] ?? '',
+                        url: item['url'] ?? '',
+                        hoverColor: iconCol,
+                      ),
+                    );
+                  })
+                else
+                  Text(
+                    widget.value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.outfit(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+              ],
+            ),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          child: cardContent,
         ),
       ),
     );
   }
 }
+
 
 // --- Hoverable Phone Item for Combined Card ---
 
@@ -5147,4 +5731,113 @@ class _LanguageProgressCircleState extends State<LanguageProgressCircle> {
     );
   }
 }
+
+// --- Twinkling Star Particle Background widgets ---
+
+class TwinklingStarsBackground extends StatefulWidget {
+  final Widget child;
+
+  const TwinklingStarsBackground({super.key, required this.child});
+
+  @override
+  State<TwinklingStarsBackground> createState() => _TwinklingStarsBackgroundState();
+}
+
+class _TwinklingStarsBackgroundState extends State<TwinklingStarsBackground>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  final List<StarParticle> _stars = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 4),
+    )..repeat();
+
+    // Generate random stars
+    final random = math.Random();
+    for (int i = 0; i < 30; i++) {
+      _stars.add(
+        StarParticle(
+          x: random.nextDouble(),
+          y: random.nextDouble(),
+          size: random.nextDouble() * 2.5 + 1.0,
+          speed: random.nextDouble() * 0.05 + 0.02,
+          phase: random.nextDouble() * math.pi * 2,
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return CustomPaint(
+          painter: StarsPainter(stars: _stars, animationValue: _controller.value),
+          child: widget.child,
+        );
+      },
+    );
+  }
+}
+
+class StarParticle {
+  final double x;
+  final double y;
+  final double size;
+  final double speed;
+  final double phase;
+
+  StarParticle({
+    required this.x,
+    required this.y,
+    required this.size,
+    required this.speed,
+    required this.phase,
+  });
+}
+
+class StarsPainter extends CustomPainter {
+  final List<StarParticle> stars;
+  final double animationValue;
+
+  StarsPainter({required this.stars, required this.animationValue});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = Colors.white;
+    for (var star in stars) {
+      final double sinVal = math.sin(animationValue * math.pi * 2 + star.phase);
+      final double opacity = ((sinVal + 1.0) / 2.0).clamp(0.1, 1.0);
+      paint.color = Colors.white.withOpacity(opacity * 0.5);
+
+      final double px = star.x * size.width;
+      final double py = star.y * size.height;
+
+      canvas.drawCircle(Offset(px, py), star.size, paint);
+      
+      if (star.size > 2.2) {
+        final glowPaint = Paint()
+          ..color = const Color(0xFFFF5C35).withOpacity(opacity * 0.25)
+          ..strokeWidth = 0.8;
+        canvas.drawLine(Offset(px - 4, py), Offset(px + 4, py), glowPaint);
+        canvas.drawLine(Offset(px, py - 4), Offset(px, py + 4), glowPaint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant StarsPainter oldDelegate) => true;
+}
+
 
