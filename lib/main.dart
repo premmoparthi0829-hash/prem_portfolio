@@ -51,6 +51,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   final GlobalKey _contactKey = GlobalKey();
 
   int _activeSectionIndex = 0;
+  int _selectedSkillTab = 0;
 
   @override
   void initState() {
@@ -419,6 +420,11 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   label: "APPS ON STORES\n(PLAY & APP STORE)",
                   compact: !isDesktop,
                 ),
+                StatItem(
+                  value: "+1M",
+                  label: "ACTIVE APP\nDOWNLOADS",
+                  compact: !isDesktop,
+                ),
               ],
             ),
             SizedBox(height: sectionSpacing),
@@ -612,6 +618,31 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   }
 
   Widget _buildSkillsSection() {
+    final List<String> mobileSkills = [
+      "Flutter (Android / iOS / Web)",
+      "State Management (Bloc, Riverpod, Provider)",
+      "Clean Architecture & MVC",
+      "Swift & Kotlin",
+      "Xcode & Android Studio",
+      "Figma UI/UX design",
+    ];
+
+    final List<String> backendSkills = [
+      "Firebase (Auth, Firestore, Cloud Functions)",
+      "Database (Hive, SQLite, Isar)",
+      "REST APIs & Razorpay",
+      "Push Notifications (FCM, OneSignal)",
+      "Secure System Design",
+    ];
+
+    final List<String> devOpsSkills = [
+      "Play Store & App Store Deployments",
+      "CI/CD (GitHub Actions, Fastlane)",
+      "Git / GitHub",
+      "Unit & Integration Testing (Mockito)",
+      "Agile & Jira Coordination",
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -672,30 +703,26 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      const Wrap(
-                        spacing: 10,
-                        runSpacing: 10,
-                        children: [
-                          SkillChip(label: "Flutter (Android / iOS / Web)"),
-                          SkillChip(
-                            label:
-                                "Firebase (Auth, Firestore, Cloud Functions)",
-                          ),
-                          SkillChip(label: "Clean Architecture & MVC"),
-                          SkillChip(
-                            label:
-                                "State Management (Bloc, Riverpod, Provider)",
-                          ),
-                          SkillChip(label: "REST APIs & Razorpay"),
-                          SkillChip(label: "Swift & Kotlin"),
-                          SkillChip(
-                            label: "Play Store & App Store Deployments",
-                          ),
-                          SkillChip(label: "Git / GitHub"),
-                          SkillChip(label: "Secure System Design"),
-                          SkillChip(label: "Xcode & Android Studio"),
-                          SkillChip(label: "Figma UI/UX design"),
-                        ],
+                      
+                      SkillCategoryCard(
+                        title: "Mobile & Frontend Development",
+                        icon: Icons.smartphone_rounded,
+                        accentColor: const Color(0xFFB2FF33),
+                        skills: mobileSkills,
+                      ),
+                      const SizedBox(height: 16),
+                      SkillCategoryCard(
+                        title: "Backend, Database & Security",
+                        icon: Icons.dns_rounded,
+                        accentColor: const Color(0xFFFF5C35),
+                        skills: backendSkills,
+                      ),
+                      const SizedBox(height: 16),
+                      SkillCategoryCard(
+                        title: "DevOps, Tools & Quality Assurance",
+                        icon: Icons.terminal_rounded,
+                        accentColor: const Color(0xFF29B6F6),
+                        skills: devOpsSkills,
                       ),
                       const SizedBox(height: 32),
 
@@ -871,10 +898,13 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 : double.infinity;
             return Wrap(
               spacing: 16,
-              runSpacing: 12,
+              runSpacing: 16,
               children: [
-                HoverWidget(
-                  scale: 1.02,
+                Interactive3DButton(
+                  label: "VIEW RESUME",
+                  icon: Icons.visibility_outlined,
+                  color: const Color(0xFFFF5C35),
+                  width: buttonWidth,
                   onTap: () async {
                     try {
                       final resume = await ResumeService.getActiveResume();
@@ -907,42 +937,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                       );
                     }
                   },
-                  child: Container(
-                    width: buttonWidth,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFF5C35).withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: const Color(0xFFFF5C35).withOpacity(0.35),
-                        width: 1.0,
-                      ),
-                    ),
-                    alignment: Alignment.center,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.visibility_outlined,
-                          color: Color(0xFFFF5C35),
-                          size: 16,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          "VIEW RESUME",
-                          style: GoogleFonts.outfit(
-                            color: const Color(0xFFFF5C35),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 ),
-                HoverWidget(
-                  scale: 1.02,
+                Interactive3DButton(
+                  label: "DOWNLOAD RESUME",
+                  icon: Icons.file_download_outlined,
+                  color: const Color(0xFFB2FF33),
+                  width: buttonWidth,
                   onTap: () async {
                     try {
                       final resume = await ResumeService.getActiveResume();
@@ -975,39 +975,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                       );
                     }
                   },
-                  child: Container(
-                    width: buttonWidth,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFB2FF33).withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: const Color(0xFFB2FF33).withOpacity(0.35),
-                        width: 1.0,
-                      ),
-                    ),
-                    alignment: Alignment.center,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.file_download_outlined,
-                          color: Color(0xFFB2FF33),
-                          size: 16,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          "DOWNLOAD RESUME",
-                          style: GoogleFonts.outfit(
-                            color: const Color(0xFFB2FF33),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 ),
               ],
             );
@@ -1154,13 +1121,15 @@ class HoverWidget extends StatefulWidget {
   final double scale;
   final Duration duration;
   final Function()? onTap;
+  final bool enable3DTilt;
 
   const HoverWidget({
     super.key,
     required this.child,
-    this.scale = 1.025,
-    this.duration = const Duration(milliseconds: 200),
+    this.scale = 1.03,
+    this.duration = const Duration(milliseconds: 150),
     this.onTap,
+    this.enable3DTilt = true,
   });
 
   @override
@@ -1169,22 +1138,218 @@ class HoverWidget extends StatefulWidget {
 
 class _HoverWidgetState extends State<HoverWidget> {
   bool _isHovered = false;
+  double _tiltX = 0.0;
+  double _tiltY = 0.0;
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      cursor: widget.onTap != null
-          ? SystemMouseCursors.click
-          : SystemMouseCursors.basic,
-      child: GestureDetector(
-        onTap: widget.onTap,
+    // Standard scale-only animation fallback if 3D tilt is disabled
+    Widget currentChild = AnimatedScale(
+      scale: _isHovered ? widget.scale : 1.0,
+      duration: widget.duration,
+      curve: Curves.easeOutBack,
+      child: widget.child,
+    );
+
+    if (widget.enable3DTilt) {
+      currentChild = AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeOutCubic,
+        transform: Matrix4.identity()
+          ..setEntry(3, 2, 0.0012) // IMAX level depth perspective factor
+          ..rotateX(_tiltY * 0.12)  // Tilt on X-axis (forward/backward)
+          ..rotateY(_tiltX * 0.12), // Tilt on Y-axis (left/right)
+        transformAlignment: Alignment.center,
         child: AnimatedScale(
           scale: _isHovered ? widget.scale : 1.0,
           duration: widget.duration,
           curve: Curves.easeOutCubic,
-          child: widget.child,
+          child: Stack(
+            children: [
+              widget.child,
+              // IMAX Cinematic Lighting Glare Overlay that moves with the mouse
+              if (_isHovered)
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 100),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(24),
+                        gradient: RadialGradient(
+                          center: Alignment(_tiltX * 1.5, -_tiltY * 1.5),
+                          radius: 1.2,
+                          colors: [
+                            Colors.white.withValues(alpha: 0.08),
+                            Colors.white.withValues(alpha: 0.0),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() {
+        _isHovered = false;
+        _tiltX = 0.0;
+        _tiltY = 0.0;
+      }),
+      onHover: (event) {
+        if (!widget.enable3DTilt) return;
+        final size = context.size;
+        if (size != null) {
+          // Normalize mouse positions to a scale of [-1.0, 1.0] relative to center
+          final dx = event.localPosition.dx - (size.width / 2);
+          final dy = event.localPosition.dy - (size.height / 2);
+          setState(() {
+            _tiltX = (dx / (size.width / 2)).clamp(-1.0, 1.0);
+            _tiltY = -(dy / (size.height / 2)).clamp(-1.0, 1.0);
+          });
+        }
+      },
+      cursor: widget.onTap != null ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: currentChild,
+      ),
+    );
+  }
+}
+
+// --- Interactive 3D Action Button ---
+
+class Interactive3DButton extends StatefulWidget {
+  final String label;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+  final double width;
+
+  const Interactive3DButton({
+    super.key,
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+    required this.width,
+  });
+
+  @override
+  State<Interactive3DButton> createState() => _Interactive3DButtonState();
+}
+
+class _Interactive3DButtonState extends State<Interactive3DButton> {
+  bool _isHovered = false;
+  bool _isPressed = false;
+  double _tiltX = 0.0;
+  double _tiltY = 0.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = widget.color;
+    final bgCol = _isHovered
+        ? accent.withOpacity(0.12)
+        : accent.withOpacity(0.04);
+    final borderCol = _isHovered
+        ? accent.withOpacity(0.75)
+        : accent.withOpacity(0.35);
+
+    double liftY = 0.0;
+    double extrusionDepth = 3.0;
+    if (_isPressed) {
+      liftY = 3.0;
+      extrusionDepth = 0.0;
+    } else if (_isHovered) {
+      liftY = -5.0;
+      extrusionDepth = 8.0;
+    }
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() {
+        _isHovered = false;
+        _isPressed = false;
+        _tiltX = 0.0;
+        _tiltY = 0.0;
+      }),
+      onHover: (event) {
+        final size = context.size;
+        if (size != null) {
+          final dx = event.localPosition.dx - (size.width / 2);
+          final dy = event.localPosition.dy - (size.height / 2);
+          setState(() {
+            _tiltX = (dx / (size.width / 2)).clamp(-1.0, 1.0);
+            _tiltY = -(dy / (size.height / 2)).clamp(-1.0, 1.0);
+          });
+        }
+      },
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _isPressed = true),
+        onTapUp: (_) => setState(() => _isPressed = false),
+        onTapCancel: () => setState(() => _isPressed = false),
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.easeOutCubic,
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, 0.0015)
+            ..rotateX(_tiltY * 0.08)
+            ..rotateY(_tiltX * 0.08)
+            ..translate(0.0, liftY, 0.0),
+          transformAlignment: Alignment.center,
+          width: widget.width,
+          height: 38,
+          decoration: BoxDecoration(
+            color: bgCol,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: borderCol, width: 1.5),
+            boxShadow: [
+              // 3D Extrusion base edge
+              BoxShadow(
+                color: accent.withOpacity(_isHovered ? 0.75 : 0.35),
+                offset: Offset(0, extrusionDepth),
+                blurRadius: 0,
+              ),
+              // Ambient shadow
+              BoxShadow(
+                color: Colors.black.withOpacity(_isHovered ? 0.5 : 0.3),
+                offset: Offset(0, _isHovered ? 12.0 : 6.0),
+                blurRadius: _isHovered ? 12.0 : 4.0,
+              ),
+            ],
+          ),
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedScale(
+                scale: _isHovered ? 1.15 : 1.0,
+                duration: const Duration(milliseconds: 200),
+                child: Icon(
+                  widget.icon,
+                  color: accent,
+                  size: 16,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                widget.label,
+                style: GoogleFonts.outfit(
+                  color: accent,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                  letterSpacing: 0.8,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -2275,11 +2440,15 @@ class _WebProjectCardState extends State<WebProjectCard> {
                                             ),
                                             const SizedBox(width: 4),
                                           ],
-                                          Text(
-                                            tag,
-                                            style: TextStyle(
-                                              color: Colors.white.withValues(alpha: 0.6),
-                                              fontSize: 10.5,
+                                          Flexible(
+                                            child: Text(
+                                              tag,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                color: Colors.white.withValues(alpha: 0.6),
+                                                fontSize: 10.5,
+                                              ),
                                             ),
                                           ),
                                         ],
@@ -2290,20 +2459,24 @@ class _WebProjectCardState extends State<WebProjectCard> {
                                 const SizedBox(height: 20),
 
                                 // Case Study action trigger
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      "View Case Study",
-                                      style: GoogleFonts.outfit(
-                                        color: theme.accentColor,
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.bold,
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        isMobile ? "Case Study" : "View Case Study",
+                                        style: GoogleFonts.outfit(
+                                          color: theme.accentColor,
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Icon(Icons.arrow_outward, color: theme.accentColor, size: 14),
-                                  ],
+                                      const SizedBox(width: 8),
+                                      Icon(Icons.arrow_outward, color: theme.accentColor, size: 14),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -2477,6 +2650,186 @@ class EducationTimelineItem extends StatelessWidget {
     );
   }
 }
+class SkillCategoryCard extends StatefulWidget {
+  final String title;
+  final IconData icon;
+  final Color accentColor;
+  final List<String> skills;
+
+  const SkillCategoryCard({
+    super.key,
+    required this.title,
+    required this.icon,
+    required this.accentColor,
+    required this.skills,
+  });
+
+  @override
+  State<SkillCategoryCard> createState() => _SkillCategoryCardState();
+}
+
+class _SkillCategoryCardState extends State<SkillCategoryCard> {
+  bool _isHovered = false;
+  double _localX = 0.0;
+  double _localY = 0.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() {
+        _isHovered = false;
+        _localX = 0.0;
+        _localY = 0.0;
+      }),
+      onHover: (event) {
+        final size = context.size;
+        if (size != null) {
+          // Normalize mouse coordinates to [-1.0, 1.0] from center
+          final x = (event.localPosition.dx - (size.width / 2)) / (size.width / 2);
+          final y = (event.localPosition.dy - (size.height / 2)) / (size.height / 2);
+          setState(() {
+            _localX = x.clamp(-1.0, 1.0);
+            _localY = y.clamp(-1.0, 1.0);
+          });
+        }
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeOutCubic,
+        transform: Matrix4.identity()
+          ..setEntry(3, 2, 0.001) // 3D Perspective Depth
+          ..rotateX(-_localY * 0.1) // Tilt around X-axis
+          ..rotateY(_localX * 0.1)  // Tilt around Y-axis
+          ..scale(_isHovered ? 1.025 : 1.0),
+        transformAlignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            // Glowing neon shadow that shifts in the opposite direction of tilt
+            BoxShadow(
+              color: widget.accentColor.withValues(alpha: _isHovered ? 0.15 : 0.03),
+              blurRadius: _isHovered ? 25 : 12,
+              offset: Offset(-_localX * 12, -_localY * 12),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Stack(
+            children: [
+              // Background Glass Panel with a reactive spotlight
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 100),
+                width: double.infinity,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    center: Alignment(_localX * 1.5, _localY * 1.5),
+                    radius: 1.5,
+                    colors: [
+                      widget.accentColor.withValues(alpha: _isHovered ? 0.08 : 0.02),
+                      const Color(0xFF141414),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: _isHovered 
+                        ? widget.accentColor.withValues(alpha: 0.35) 
+                        : Colors.white.withValues(alpha: 0.05),
+                    width: 1.5,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Title Layer: shifts slightly (depth level 1)
+                    AnimatedSlide(
+                      offset: Offset(_localX * 0.03, _localY * 0.03),
+                      duration: const Duration(milliseconds: 100),
+                      curve: Curves.easeOutCubic,
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: widget.accentColor.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: _isHovered ? [
+                                BoxShadow(
+                                  color: widget.accentColor.withValues(alpha: 0.2),
+                                  blurRadius: 8,
+                                  spreadRadius: -2,
+                                )
+                              ] : [],
+                            ),
+                            child: Icon(
+                              widget.icon,
+                              color: widget.accentColor,
+                              size: 22,
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Text(
+                              widget.title.toUpperCase(),
+                              style: GoogleFonts.outfit(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.2,
+                                color: Colors.white,
+                                shadows: _isHovered ? [
+                                  Shadow(
+                                    color: widget.accentColor.withValues(alpha: 0.5),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 1),
+                                  )
+                                ] : [],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Chips Layer: shifts significantly (depth level 2 - true floating parallax)
+                    AnimatedSlide(
+                      offset: Offset(_localX * 0.08, _localY * 0.08),
+                      duration: const Duration(milliseconds: 100),
+                      curve: Curves.easeOutCubic,
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: widget.skills.map((skill) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: _isHovered ? [
+                                // Drop shadow projecting away from cursor under each chip
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.45),
+                                  blurRadius: 6,
+                                  offset: Offset(-_localX * 4, -_localY * 4),
+                                )
+                              ] : [],
+                            ),
+                            child: SkillChip(label: skill),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 // --- Skill Chip Helper ---
 
@@ -2599,6 +2952,8 @@ class ContactTileCard extends StatefulWidget {
 
 class _ContactTileCardState extends State<ContactTileCard> {
   bool _isHovered = false;
+  double _tiltX = 0.0;
+  double _tiltY = 0.0;
 
   Future<void> _launchUrl() async {
     final Uri parsedUrl = Uri.parse(widget.url);
@@ -2624,26 +2979,44 @@ class _ContactTileCardState extends State<ContactTileCard> {
     final accent = widget.accentColor ?? Colors.white;
 
     final bgCol = _isHovered
-        ? accent.withOpacity(0.06)
-        : const Color(0xFF171717);
+        ? const Color(0xFF1E1E24)
+        : const Color(0xFF131316);
     final borderCol = _isHovered
-        ? accent.withOpacity(0.3)
+        ? accent.withOpacity(0.55)
         : Colors.white.withOpacity(0.06);
     final iconCol = widget.accentColor ?? Colors.white.withOpacity(0.8);
     final titleCol = widget.accentColor != null
-        ? widget.accentColor!.withOpacity(0.6)
-        : Colors.white.withOpacity(0.4);
+        ? widget.accentColor!.withOpacity(0.75)
+        : Colors.white.withOpacity(0.45);
 
     Widget cardContent = Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: iconCol.withOpacity(0.12),
-            shape: BoxShape.circle,
+        AnimatedScale(
+          scale: _isHovered ? 1.15 : 1.0,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutBack,
+          child: AnimatedRotation(
+            turns: _isHovered ? 0.04 : 0.0,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOutBack,
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: iconCol.withOpacity(0.12),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  if (_isHovered)
+                    BoxShadow(
+                      color: iconCol.withOpacity(0.2),
+                      blurRadius: 8,
+                      spreadRadius: 1,
+                    )
+                ],
+              ),
+              child: widget.customIcon ?? (widget.icon != null ? Icon(widget.icon, color: iconCol, size: 20) : const SizedBox.shrink()),
+            ),
           ),
-          child: widget.customIcon ?? (widget.icon != null ? Icon(widget.icon, color: iconCol, size: 20) : const SizedBox.shrink()),
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -2652,14 +3025,15 @@ class _ContactTileCardState extends State<ContactTileCard> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                widget.title,
+                widget.title.toUpperCase(),
                 style: TextStyle(
                   color: titleCol,
-                  fontSize: 11,
+                  fontSize: 10,
                   fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
                 ),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 4),
               if (hasSubItems)
                 ...widget.subItems!.map((item) {
                   return Padding(
@@ -2679,7 +3053,7 @@ class _ContactTileCardState extends State<ContactTileCard> {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.outfit(
                     color: Colors.white,
-                    fontSize: 13,
+                    fontSize: 13.5,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -2691,22 +3065,55 @@ class _ContactTileCardState extends State<ContactTileCard> {
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
+      onExit: (_) => setState(() {
+        _isHovered = false;
+        _tiltX = 0.0;
+        _tiltY = 0.0;
+      }),
+      onHover: (event) {
+        final size = context.size;
+        if (size != null) {
+          final dx = event.localPosition.dx - (size.width / 2);
+          final dy = event.localPosition.dy - (size.height / 2);
+          setState(() {
+            _tiltX = (dx / (size.width / 2)).clamp(-1.0, 1.0);
+            _tiltY = -(dy / (size.height / 2)).clamp(-1.0, 1.0);
+          });
+        }
+      },
       cursor: hasSubItems ? SystemMouseCursors.basic : SystemMouseCursors.click,
       child: GestureDetector(
         onTap: hasSubItems ? null : _launchUrl,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 150),
           curve: Curves.easeOutCubic,
-          transform: Matrix4.identity()..scale(_isHovered ? 1.02 : 1.0),
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, 0.0015)
+            ..rotateX(_tiltY * 0.1)
+            ..rotateY(_tiltX * 0.1)
+            ..translate(0.0, _isHovered ? -8.0 : 0.0, 0.0),
           transformAlignment: Alignment.center,
           width: isWide ? 270 : double.infinity,
           decoration: BoxDecoration(
             color: bgCol,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: borderCol, width: 1),
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(color: borderCol, width: 1.5),
+            boxShadow: [
+              // 3D Extrusion base edge
+              BoxShadow(
+                color: _isHovered ? accent.withOpacity(0.7) : accent.withOpacity(0.2),
+                offset: Offset(0, _isHovered ? 12.0 : 4.0),
+                blurRadius: 0,
+              ),
+              // Ambient soft shadow
+              BoxShadow(
+                color: Colors.black.withOpacity(_isHovered ? 0.6 : 0.4),
+                offset: Offset(0, _isHovered ? 20.0 : 8.0),
+                blurRadius: _isHovered ? 24.0 : 8.0,
+              ),
+            ],
           ),
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           child: cardContent,
         ),
       ),
@@ -2814,7 +3221,7 @@ class TechIconHelper {
       return Icons.storage_rounded;
     if (lower.contains('api') || lower.contains('rest') || lower.contains('network') || lower.contains('twilio') || lower.contains('cloud'))
       return Icons.api_rounded;
-    if (lower.contains('security') || lower.contains('auth') || lower.contains('biometric'))
+    if (lower.contains('security') || lower.contains('auth') || lower.contains('secure') || lower.contains('biometric'))
       return Icons.security_rounded;
     if (lower.contains('player') || lower.contains('video') || lower.contains('stream') || lower.contains('hls'))
       return Icons.play_circle_outline_rounded;
@@ -2824,6 +3231,16 @@ class TechIconHelper {
       return Icons.schedule_rounded;
     if (lower.contains('design') || lower.contains('ux') || lower.contains('ui'))
       return Icons.gesture_rounded;
+    if (lower.contains('testing') || lower.contains('mockito') || lower.contains('unit') || lower.contains('integration'))
+      return Icons.fact_check_rounded;
+    if (lower.contains('jira') || lower.contains('agile') || lower.contains('scrum') || lower.contains('coordination'))
+      return Icons.assignment_turned_in_rounded;
+    if (lower.contains('cicd') || lower.contains('actions') || lower.contains('fastlane') || lower.contains('pipeline'))
+      return Icons.build_circle_rounded;
+    if (lower.contains('architecture') || lower.contains('mvc'))
+      return Icons.account_tree_rounded;
+    if (lower.contains('deployment') || lower.contains('store') || lower.contains('publish'))
+      return Icons.cloud_upload_rounded;
       
     return null;
   }
@@ -2878,6 +3295,16 @@ class TechIconHelper {
       color = const Color(0xFF81C784); // Soft Green
     else if (icon == Icons.gesture_rounded)
       color = const Color(0xFFBA68C8); // Soft Purple
+    else if (icon == Icons.fact_check_rounded)
+      color = const Color(0xFF00E676); // Neon Green
+    else if (icon == Icons.assignment_turned_in_rounded)
+      color = const Color(0xFF29B6F6); // Blue
+    else if (icon == Icons.build_circle_rounded)
+      color = const Color(0xFFFFB74D); // Light Orange
+    else if (icon == Icons.account_tree_rounded)
+      color = const Color(0xFFCE93D8); // Lilac
+    else if (icon == Icons.cloud_upload_rounded)
+      color = const Color(0xFF80DEEA); // Turquoise
 
     // Fallback to white for pure black/very dark colors to look good in dark mode
     if (color.computeLuminance() < 0.15) {
@@ -2903,6 +3330,17 @@ class TechIconHelper {
     if (lower.contains('java') && !lower.contains('script'))
       icons.add(SimpleIcons.openjdk);
     if (lower.contains('react')) icons.add(SimpleIcons.react);
+
+    // Fallbacks to guarantee that every single label gets an icon
+    if (icons.isEmpty) {
+      final matchedIcon = getIcon(label);
+      if (matchedIcon != null) {
+        icons.add(matchedIcon);
+      } else {
+        // Absolute fallback for unknown labels
+        icons.add(Icons.star_rounded);
+      }
+    }
     return icons;
   }
 }
