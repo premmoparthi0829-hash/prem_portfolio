@@ -1,4 +1,4 @@
-import 'dart:ui' show ImageFilter;
+import 'dart:ui' show ImageFilter, PointMode;
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
@@ -235,7 +235,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           ),
                           const SizedBox(height: 64),
                           FadeSlideIn(
-                            delay: const Duration(milliseconds: 500),
+                            delay: const Duration(milliseconds: 400),
                             child: Container(
                               key: _projectsKey,
                               child: _buildProjectsSection(isDesktop: false),
@@ -243,7 +243,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           ),
                           const SizedBox(height: 64),
                           FadeSlideIn(
-                            delay: const Duration(milliseconds: 700),
+                            delay: const Duration(milliseconds: 500),
                             child: Container(
                               key: _experienceKey,
                               child: _buildExperienceSection(),
@@ -251,7 +251,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           ),
                           const SizedBox(height: 64),
                           FadeSlideIn(
-                            delay: const Duration(milliseconds: 900),
+                            delay: const Duration(milliseconds: 600),
                             child: Container(
                               key: _skillsKey,
                               child: _buildSkillsSection(),
@@ -259,7 +259,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           ),
                           const SizedBox(height: 64),
                           FadeSlideIn(
-                            delay: const Duration(milliseconds: 1100),
+                            delay: const Duration(milliseconds: 700),
                             child: Container(
                               key: _contactKey,
                               child: _buildContactSection(),
@@ -497,6 +497,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       },
     );
   }
+
+
 
   Widget _buildProjectsSection({bool isDesktop = false}) {
     return Column(
@@ -1073,59 +1075,44 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         ),
         const SizedBox(height: 32),
 
-        // Resume View & Download Row
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final buttonWidth = constraints.maxWidth > 600
-                ? 180.0
-                : double.infinity;
-            return Wrap(
-              spacing: 16,
-              runSpacing: 16,
-              children: [
-                PremiumResumeButton(
-                  label: "VIEW RESUME",
-                  icon: Icons.visibility_outlined,
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFFF5C35), Color(0xFFFF8B66)],
+        // Resume View & Download Button
+        NykaaButton(
+          label: "VIEW RESUME",
+          icon: Icons.visibility_outlined,
+          isPrimary: true,
+          width: 150.0,
+          height: 42.0,
+          onTap: () async {
+            try {
+              final resume = await ResumeService.getActiveResume();
+              if (resume.sourceType == ResumeSourceType.customUrl) {
+                final Uri url = Uri.parse(resume.url!);
+                if (await canLaunchUrl(url)) {
+                  await launchUrl(
+                    url,
+                    mode: LaunchMode.externalApplication,
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Could not open resume link'),
+                    ),
+                  );
+                }
+              } else if (resume.bytes != null) {
+                viewFile(resume.bytes!, resume.fileName);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('No resume content available'),
                   ),
-                  textColor: Colors.white,
-                  width: buttonWidth,
-                  onTap: () async {
-                    try {
-                      final resume = await ResumeService.getActiveResume();
-                      if (resume.sourceType == ResumeSourceType.customUrl) {
-                        final Uri url = Uri.parse(resume.url!);
-                        if (await canLaunchUrl(url)) {
-                          await launchUrl(
-                            url,
-                            mode: LaunchMode.externalApplication,
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Could not open resume link'),
-                            ),
-                          );
-                        }
-                      } else if (resume.bytes != null) {
-                        viewFile(resume.bytes!, resume.fileName);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('No resume content available'),
-                          ),
-                        );
-                      }
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error viewing resume: $e')),
-                      );
-                    }
-                  },
-                ),
-              ],
-            );
+                );
+              }
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Error viewing resume: $e')),
+              );
+            }
           },
         ),
         const SizedBox(height: 32),
@@ -1643,91 +1630,244 @@ class _HoverWidgetState extends State<HoverWidget> {
 
 // --- Interactive 3D Action Button ---
 
-class PremiumResumeButton extends StatefulWidget {
+class NykaaButton extends StatefulWidget {
   final String label;
-  final IconData icon;
-  final LinearGradient gradient;
-  final Color textColor;
+  final IconData? icon;
   final VoidCallback onTap;
   final double width;
+  final double height;
+  final bool isPrimary;
 
-  const PremiumResumeButton({
+  const NykaaButton({
     super.key,
     required this.label,
-    required this.icon,
-    required this.gradient,
-    required this.textColor,
+    this.icon,
     required this.onTap,
     required this.width,
+    this.height = 48.0,
+    this.isPrimary = true,
   });
 
   @override
-  State<PremiumResumeButton> createState() => _PremiumResumeButtonState();
+  State<NykaaButton> createState() => _NykaaButtonState();
 }
 
-class _PremiumResumeButtonState extends State<PremiumResumeButton> {
-  bool _isHovered = false;
+class _NykaaButtonState extends State<NykaaButton> with SingleTickerProviderStateMixin {
+  late AnimationController _hoverController;
   bool _isPressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _hoverController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+    );
+  }
+
+  @override
+  void dispose() {
+    _hoverController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() {
-        _isHovered = false;
-        _isPressed = false;
-      }),
+      onEnter: (_) => _hoverController.forward(),
+      onExit: (_) => _hoverController.reverse(),
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTapDown: (_) => setState(() => _isPressed = true),
         onTapUp: (_) => setState(() => _isPressed = false),
         onTapCancel: () => setState(() => _isPressed = false),
         onTap: widget.onTap,
-        child: AnimatedScale(
-          scale: _isPressed ? 0.96 : (_isHovered ? 1.04 : 1.0),
-          duration: const Duration(milliseconds: 150),
-          curve: Curves.easeOutCubic,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 150),
-            width: widget.width,
-            height: 44,
-            decoration: BoxDecoration(
-              gradient: widget.gradient,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: widget.gradient.colors.first.withOpacity(_isHovered ? 0.35 : 0.15),
-                  blurRadius: _isHovered ? 16 : 8,
-                  offset: Offset(0, _isHovered ? 6 : 3),
-                  spreadRadius: _isHovered ? 1 : 0,
+        child: AnimatedBuilder(
+          animation: _hoverController,
+          builder: (context, child) {
+            final double hoverVal = _hoverController.value;
+            final double scale = 1.0 + (hoverVal * 0.04) - (_isPressed ? 0.04 : 0.0);
+            
+            // Interpolate colors and borders
+            final borderColor = widget.isPrimary
+                ? Colors.white.withOpacity(0.25 + hoverVal * 0.15)
+                : Color.lerp(Colors.white.withOpacity(0.12), const Color(0xFFFF1774).withOpacity(0.5), hoverVal)!;
+                
+            final shadowColor = const Color(0xFFFF1774).withOpacity(
+              widget.isPrimary
+                  ? (0.15 + hoverVal * 0.20)
+                  : (hoverVal * 0.18),
+            );
+
+            return Transform.scale(
+              scale: scale,
+              child: Container(
+                width: widget.width,
+                height: widget.height,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: shadowColor,
+                      blurRadius: widget.isPrimary ? (8 + hoverVal * 12) : (4 + hoverVal * 12),
+                      offset: Offset(0, widget.isPrimary ? (3 + hoverVal * 3) : (2 + hoverVal * 3)),
+                      spreadRadius: widget.isPrimary ? (hoverVal * 1) : 0,
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            alignment: Alignment.center,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  widget.icon,
-                  color: widget.textColor,
-                  size: 18,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  widget.label,
-                  style: GoogleFonts.outfit(
-                    color: widget.textColor,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 13,
-                    letterSpacing: 1.0,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: Stack(
+                    children: [
+                      // 1. Smoky mesh gradient/ink background
+                      Positioned.fill(
+                        child: CustomPaint(
+                          painter: NykaaButtonPainter(
+                            isPrimary: widget.isPrimary,
+                            hoverProgress: hoverVal,
+                          ),
+                        ),
+                      ),
+                      // 2. Glass blur overlay
+                      Positioned.fill(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: borderColor,
+                                width: 1.2,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      // 3. Grain/noise overlay
+                      Positioned.fill(
+                        child: CustomPaint(
+                          painter: NoisePainter(opacity: widget.isPrimary ? 0.045 : 0.025),
+                        ),
+                      ),
+                      // 4. Content (Text & Icon)
+                      Positioned.fill(
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (widget.icon != null) ...[
+                                Icon(
+                                  widget.icon,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                              ],
+                              Text(
+                                widget.label,
+                                style: GoogleFonts.inter(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 13,
+                                  letterSpacing: -0.2,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
+  }
+}
+
+class NykaaButtonPainter extends CustomPainter {
+  final bool isPrimary;
+  final double hoverProgress;
+
+  NykaaButtonPainter({
+    required this.isPrimary,
+    required this.hoverProgress,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(14));
+
+    if (isPrimary) {
+      // Primary: smoky magenta base
+      final basePaint = Paint()
+        ..shader = const LinearGradient(
+          colors: [Color(0xFFFF1774), Color(0xFF8F003F)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ).createShader(rect);
+      
+      canvas.drawRRect(rrect, basePaint);
+
+      // Top-left white highlight bloom (animated)
+      final bloomCenterX = -0.8 + (0.2 * hoverProgress);
+      final bloomCenterY = -0.8 + (0.2 * hoverProgress);
+      final bloomRadius = 0.5 + (0.25 * hoverProgress);
+      
+      final bloomPaint = Paint()
+        ..shader = RadialGradient(
+          colors: [
+            Colors.white.withOpacity(0.7),
+            Colors.white.withOpacity(0.2),
+            Colors.white.withOpacity(0.0),
+          ],
+          center: Alignment(bloomCenterX, bloomCenterY),
+          radius: bloomRadius,
+        ).createShader(rect);
+      canvas.drawRRect(rrect, bloomPaint);
+
+      // Organic smoky ink cloud in the middle (animated)
+      final smokePaint = Paint()
+        ..shader = RadialGradient(
+          colors: [
+            const Color(0xFFFF1774).withOpacity(0.4),
+            const Color(0xFFFF1774).withOpacity(0.0),
+          ],
+          center: Alignment(0.2 * hoverProgress, -0.2 * hoverProgress),
+          radius: 0.6 + (0.4 * hoverProgress),
+        ).createShader(rect);
+      canvas.drawRRect(rrect, smokePaint);
+    } else {
+      // Secondary: transparent base + magenta ink bleed on hover
+      // Draw standard dark frosted background first
+      final basePaint = Paint()..color = Colors.white.withOpacity(0.04);
+      canvas.drawRRect(rrect, basePaint);
+
+      if (hoverProgress > 0) {
+        // Bleeding ink circle blooming from center outwards
+        final bleedPaint = Paint()
+          ..shader = RadialGradient(
+            colors: [
+              const Color(0xFFFF1774).withOpacity(0.45 * hoverProgress),
+              const Color(0xFFFF1774).withOpacity(0.15 * hoverProgress),
+              const Color(0xFFFF1774).withOpacity(0.0),
+            ],
+            center: Alignment.center,
+            radius: 0.1 + (1.2 * hoverProgress),
+          ).createShader(rect);
+        canvas.drawRRect(rrect, bleedPaint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant NykaaButtonPainter oldDelegate) {
+    return oldDelegate.isPrimary != isPrimary || oldDelegate.hoverProgress != hoverProgress;
   }
 }
 
@@ -3593,58 +3733,191 @@ class ContactIconButton extends StatefulWidget {
   State<ContactIconButton> createState() => _ContactIconButtonState();
 }
 
-class _ContactIconButtonState extends State<ContactIconButton> {
-  bool _isHovered = false;
+class _ContactIconButtonState extends State<ContactIconButton> with SingleTickerProviderStateMixin {
+  late AnimationController _hoverController;
   bool _isPressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _hoverController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+    );
+  }
+
+  @override
+  void dispose() {
+    _hoverController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final size = widget.size;
     final accent = widget.accentColor;
+    
     return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
+      onEnter: (_) => _hoverController.forward(),
+      onExit: (_) => _hoverController.reverse(),
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTapDown: (_) => setState(() => _isPressed = true),
         onTapUp: (_) => setState(() => _isPressed = false),
         onTapCancel: () => setState(() => _isPressed = false),
         onTap: widget.onTap,
-        child: AnimatedScale(
-          scale: _isPressed ? 0.92 : (_isHovered ? 1.1 : 1.0),
-          duration: const Duration(milliseconds: 150),
-          curve: Curves.easeOutCubic,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-              color: _isHovered ? accent : accent.withOpacity(0.85),
-              borderRadius: BorderRadius.circular(size * 0.22),
-              boxShadow: [
-                BoxShadow(
-                  color: accent.withOpacity(_isHovered ? 0.45 : 0.18),
-                  blurRadius: _isHovered ? 22 : 8,
-                  spreadRadius: _isHovered ? 2 : 0,
-                  offset: const Offset(0, 4),
+        child: AnimatedBuilder(
+          animation: _hoverController,
+          builder: (context, child) {
+            final double hoverVal = _hoverController.value;
+            final double scale = _isPressed ? 0.92 : (1.0 + hoverVal * 0.08);
+
+            // Use brand accent color directly for the border, starting from a subtle opacity to vibrant on hover
+            final borderColor = Color.lerp(
+              accent.withOpacity(0.3),
+              accent.withOpacity(0.85),
+              hoverVal,
+            )!;
+
+            // Use brand accent color directly for the shadow/glow, starting from a subtle opacity to vibrant on hover
+            final shadowColor = Color.lerp(
+              accent.withOpacity(0.18),
+              accent.withOpacity(0.55),
+              hoverVal,
+            )!;
+
+            return Transform.scale(
+              scale: scale,
+              child: Container(
+                width: size,
+                height: size,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(size * 0.28),
+                  boxShadow: [
+                    BoxShadow(
+                      color: shadowColor,
+                      blurRadius: 8 + hoverVal * 14,
+                      spreadRadius: 0.5 + hoverVal * 1.5,
+                      offset: Offset(0, 3 + hoverVal * 3),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            alignment: Alignment.center,
-            child: widget.customIcon ??
-                (widget.icon != null
-                    ? Icon(
-                        widget.icon,
-                        color: accent.computeLuminance() > 0.6
-                            ? const Color(0xFF24292E)
-                            : Colors.white,
-                        size: size * 0.46,
-                      )
-                    : const SizedBox.shrink()),
-          ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(size * 0.28),
+                  child: Stack(
+                    children: [
+                      // 1. Watery/Ink background
+                      Positioned.fill(
+                        child: CustomPaint(
+                          painter: ContactIconInkPainter(
+                            accentColor: accent,
+                            hoverProgress: hoverVal,
+                          ),
+                        ),
+                      ),
+                      // 2. Glass blur & border
+                      Positioned.fill(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(size * 0.28),
+                              border: Border.all(
+                                color: borderColor,
+                                width: 1.2,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      // 3. Noise grain overlay
+                      Positioned.fill(
+                        child: CustomPaint(
+                          painter: NoisePainter(opacity: 0.02 + hoverVal * 0.025),
+                        ),
+                      ),
+                      // 4. Icon
+                      Positioned.fill(
+                        child: Center(
+                          child: widget.customIcon ??
+                              (widget.icon != null
+                                  ? Icon(
+                                      widget.icon,
+                                      color: Color.lerp(
+                                        Colors.white.withOpacity(0.75),
+                                        Colors.white,
+                                        hoverVal,
+                                      ),
+                                      size: size * 0.42,
+                                    )
+                                  : const SizedBox.shrink()),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
+  }
+}
+
+class ContactIconInkPainter extends CustomPainter {
+  final Color accentColor;
+  final double hoverProgress;
+
+  ContactIconInkPainter({
+    required this.accentColor,
+    required this.hoverProgress,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final rrect = RRect.fromRectAndRadius(rect, Radius.circular(size.width * 0.28));
+
+    // Dark frosted base
+    final basePaint = Paint()..color = Colors.white.withOpacity(0.02);
+    canvas.drawRRect(rrect, basePaint);
+
+    // Continuous soft brand background color that gets brighter on hover
+    final double activeProgress = 0.16 + (hoverProgress * 0.44); // 0.16 when idle, 0.60 when hovered
+    final double radius = 0.55 + (hoverProgress * 0.65);         // 0.55 when idle, 1.20 when hovered
+
+    final bloomPaint = Paint()
+      ..shader = RadialGradient(
+        colors: [
+          accentColor.withOpacity(activeProgress),
+          accentColor.withOpacity(activeProgress * 0.45),
+          accentColor.withOpacity(0.0),
+        ],
+        stops: const [0.0, 0.65, 1.0],
+        center: Alignment.center,
+        radius: radius,
+      ).createShader(rect);
+
+    canvas.drawRRect(rrect, bloomPaint);
+
+    // Dynamic glassy highlight
+    final highlightPaint = Paint()
+      ..shader = RadialGradient(
+        colors: [
+          Colors.white.withOpacity(0.12 + 0.28 * hoverProgress),
+          Colors.white.withOpacity(0.0),
+        ],
+        center: const Alignment(-0.5, -0.5),
+        radius: 0.45,
+      ).createShader(rect);
+    canvas.drawRRect(rrect, highlightPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant ContactIconInkPainter oldDelegate) {
+    return oldDelegate.accentColor != accentColor || oldDelegate.hoverProgress != hoverProgress;
   }
 }
 
@@ -5927,5 +6200,31 @@ class StarsPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant StarsPainter oldDelegate) => true;
 }
+
+class NoisePainter extends CustomPainter {
+  final double opacity;
+  NoisePainter({this.opacity = 0.035});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(opacity)
+      ..strokeWidth = 1.0;
+
+    final random = math.Random(42);
+    final int dotCount = (size.width * size.height * 0.08).toInt();
+    for (int i = 0; i < dotCount; i++) {
+      final double x = random.nextDouble() * size.width;
+      final double y = random.nextDouble() * size.height;
+      canvas.drawPoints(PointMode.points, [Offset(x, y)], paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant NoisePainter oldDelegate) => false;
+}
+
+
+
 
 
