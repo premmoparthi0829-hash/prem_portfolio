@@ -3169,48 +3169,130 @@ class CertificationItem extends StatelessWidget {
 
 // --- Hobbies Section ---
 
+class HobbyCard extends StatefulWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  const HobbyCard({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  State<HobbyCard> createState() => _HobbyCardState();
+}
+
+class _HobbyCardState extends State<HobbyCard> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        width: 82,
+        height: 82,
+        transform: Matrix4.identity()..translate(0.0, _isHovered ? -3.0 : 0.0),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: _isHovered
+                ? [const Color(0xFF2E2E2E), const Color(0xFF1E1E1E)]
+                : [const Color(0xFF1A1A1A), const Color(0xFF121212)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(
+            color: _isHovered
+                ? widget.color.withOpacity(0.5)
+                : Colors.white.withOpacity(0.06),
+            width: 1.2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: _isHovered
+                  ? widget.color.withOpacity(0.18)
+                  : Colors.black.withOpacity(0.3),
+              blurRadius: _isHovered ? 12 : 6,
+              offset: Offset(0, _isHovered ? 4 : 2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              widget.icon,
+              color: widget.color,
+              size: 24,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              widget.label,
+              style: GoogleFonts.outfit(
+                color: Colors.white.withOpacity(0.9),
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class HobbiesSection extends StatelessWidget {
   const HobbiesSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final hobbies = [
+    final row1 = [
       (icon: Icons.sports_esports_rounded, label: "Chess", color: const Color(0xFFB2FF33)),
       (icon: Icons.music_note_rounded, label: "Music", color: const Color(0xFF29B6F6)),
       (icon: Icons.code_rounded, label: "Coding", color: const Color(0xFFFF5C35)),
       (icon: Icons.sports_cricket_rounded, label: "Cricket", color: const Color(0xFFFFC107)),
     ];
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      children: hobbies.map((h) {
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-          decoration: BoxDecoration(
-            color: h.color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: h.color.withOpacity(0.35),
-              width: 1.2,
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(h.icon, color: h.color, size: 15),
-              const SizedBox(width: 6),
-              Text(
-                h.label,
-                style: GoogleFonts.outfit(
-                  color: h.color,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
+    final row2 = [
+      (icon: Icons.fastfood_rounded, label: "Food", color: const Color(0xFFE91E63)),
+      (icon: Icons.local_movies_rounded, label: "Cinemas", color: const Color(0xFF9C27B0)),
+      (icon: Icons.directions_car_rounded, label: "Driving", color: const Color(0xFF4CAF50)),
+      (icon: Icons.palette_rounded, label: "Design", color: const Color(0xFF00BCD4)),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: row1.map((h) {
+            return HobbyCard(
+              icon: h.icon,
+              label: h.label,
+              color: h.color,
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: row2.map((h) {
+            return HobbyCard(
+              icon: h.icon,
+              label: h.label,
+              color: h.color,
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 }
@@ -3551,7 +3633,13 @@ class _ContactIconButtonState extends State<ContactIconButton> {
             alignment: Alignment.center,
             child: widget.customIcon ??
                 (widget.icon != null
-                    ? Icon(widget.icon, color: Colors.white, size: size * 0.46)
+                    ? Icon(
+                        widget.icon,
+                        color: accent.computeLuminance() > 0.6
+                            ? const Color(0xFF24292E)
+                            : Colors.white,
+                        size: size * 0.46,
+                      )
                     : const SizedBox.shrink()),
           ),
         ),
