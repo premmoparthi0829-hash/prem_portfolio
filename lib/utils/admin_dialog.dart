@@ -97,31 +97,36 @@ class _AdminLoginDialogState extends State<AdminLoginDialog> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFF5C35).withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(10),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFF5C35).withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(
+                                  Icons.lock_outline_rounded,
+                                  color: Color(0xFFFF5C35),
+                                  size: 24,
+                                ),
                               ),
-                              child: const Icon(
-                                Icons.lock_outline_rounded,
-                                color: Color(0xFFFF5C35),
-                                size: 24,
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Text(
+                                  'ADMIN LOGIN',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.outfit(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 14),
-                            Text(
-                              'ADMIN LOGIN',
-                              style: GoogleFonts.outfit(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         IconButton(
                           onPressed: () => Navigator.of(context).pop(),
@@ -508,31 +513,36 @@ class _AdminDialogState extends State<AdminDialog> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFF5C35).withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(10),
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFF5C35).withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(
+                                  Icons.admin_panel_settings_rounded,
+                                  color: Color(0xFFFF5C35),
+                                  size: 24,
+                                ),
                               ),
-                              child: const Icon(
-                                Icons.admin_panel_settings_rounded,
-                                color: Color(0xFFFF5C35),
-                                size: 24,
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Text(
+                                  'PORTFOLIO ADMIN',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.outfit(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 14),
-                            Text(
-                              'PORTFOLIO ADMIN',
-                              style: GoogleFonts.outfit(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         IconButton(
                           onPressed: () => Navigator.of(context).pop(),
@@ -604,44 +614,90 @@ class _AdminDialogState extends State<AdminDialog> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: _isLoading ? null : _pickFile,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white.withOpacity(0.08),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                side: BorderSide(
-                                  color: Colors.white.withOpacity(0.05),
+                    LayoutBuilder(
+                      builder: (context, rowConstraints) {
+                        final useVertical = rowConstraints.maxWidth < 340;
+                        if (useVertical) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              ElevatedButton.icon(
+                                onPressed: _isLoading ? null : _pickFile,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white.withOpacity(0.08),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    side: BorderSide(
+                                      color: Colors.white.withOpacity(0.05),
+                                    ),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                icon: const Icon(Icons.attach_file_rounded, size: 18),
+                                label: const Text('CHOOSE PDF FILE'),
+                              ),
+                              if (_selectedFile != null) ...[
+                                const SizedBox(height: 12),
+                                ElevatedButton(
+                                  onPressed: _isLoading ? null : _saveFile,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFFF5C35),
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(vertical: 14),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    elevation: 0,
+                                  ),
+                                  child: const Text('SAVE FILE'),
+                                ),
+                              ],
+                            ],
+                          );
+                        } else {
+                          return Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: _isLoading ? null : _pickFile,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white.withOpacity(0.08),
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(vertical: 14),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      side: BorderSide(
+                                        color: Colors.white.withOpacity(0.05),
+                                      ),
+                                    ),
+                                    elevation: 0,
+                                  ),
+                                  icon: const Icon(Icons.attach_file_rounded, size: 18),
+                                  label: const Text('CHOOSE PDF FILE'),
                                 ),
                               ),
-                              elevation: 0,
-                            ),
-                            icon: const Icon(Icons.attach_file_rounded, size: 18),
-                            label: const Text('CHOOSE PDF FILE'),
-                          ),
-                        ),
-                        if (_selectedFile != null) ...[
-                          const SizedBox(width: 12),
-                          ElevatedButton(
-                            onPressed: _isLoading ? null : _saveFile,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFFF5C35),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              elevation: 0,
-                            ),
-                            child: const Text('SAVE FILE'),
-                          ),
-                        ],
-                      ],
+                              if (_selectedFile != null) ...[
+                                const SizedBox(width: 12),
+                                ElevatedButton(
+                                  onPressed: _isLoading ? null : _saveFile,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFFF5C35),
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    elevation: 0,
+                                  ),
+                                  child: const Text('SAVE FILE'),
+                                ),
+                              ],
+                            ],
+                          );
+                        }
+                      },
                     ),
                     const SizedBox(height: 28),
 
@@ -656,53 +712,108 @@ class _AdminDialogState extends State<AdminDialog> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _urlController,
-                            style: const TextStyle(color: Colors.white, fontSize: 14),
-                            cursorColor: const Color(0xFFFF5C35),
-                            decoration: InputDecoration(
-                              hintText: 'https://example.com/my_resume.pdf',
-                              hintStyle: const TextStyle(color: Colors.white30, fontSize: 14),
-                              filled: true,
-                              fillColor: Colors.white.withOpacity(0.04),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 14,
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Colors.white.withOpacity(0.08),
+                    LayoutBuilder(
+                      builder: (context, rowConstraints) {
+                        final useVertical = rowConstraints.maxWidth < 340;
+                        if (useVertical) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              TextField(
+                                controller: _urlController,
+                                style: const TextStyle(color: Colors.white, fontSize: 14),
+                                cursorColor: const Color(0xFFFF5C35),
+                                decoration: InputDecoration(
+                                  hintText: 'https://example.com/my_resume.pdf',
+                                  hintStyle: const TextStyle(color: Colors.white30, fontSize: 14),
+                                  filled: true,
+                                  fillColor: Colors.white.withOpacity(0.04),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 14,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.white.withOpacity(0.08),
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                      color: Color(0xFFFF5C35),
+                                      width: 1.5,
+                                    ),
+                                  ),
                                 ),
                               ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFFF5C35),
-                                  width: 1.5,
+                              const SizedBox(height: 12),
+                              ElevatedButton(
+                                onPressed: _isLoading ? null : _saveUrl,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFFF5C35),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: const Text('SAVE URL'),
+                              ),
+                            ],
+                          );
+                        } else {
+                          return Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: _urlController,
+                                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                                  cursorColor: const Color(0xFFFF5C35),
+                                  decoration: InputDecoration(
+                                    hintText: 'https://example.com/my_resume.pdf',
+                                    hintStyle: const TextStyle(color: Colors.white30, fontSize: 14),
+                                    filled: true,
+                                    fillColor: Colors.white.withOpacity(0.04),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 14,
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                        color: Colors.white.withOpacity(0.08),
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFFFF5C35),
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        ElevatedButton(
-                          onPressed: _isLoading ? null : _saveUrl,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFF5C35),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: const Text('SAVE URL'),
-                        ),
-                      ],
+                              const SizedBox(width: 12),
+                              ElevatedButton(
+                                onPressed: _isLoading ? null : _saveUrl,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFFF5C35),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: const Text('SAVE URL'),
+                              ),
+                            ],
+                          );
+                        }
+                      },
                     ),
                     const SizedBox(height: 28),
 

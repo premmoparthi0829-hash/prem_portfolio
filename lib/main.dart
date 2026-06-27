@@ -537,46 +537,55 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         ),
         const SizedBox(height: 32),
 
-        if (isDesktop)
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: ProjectDetail.projects.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 24,
-              mainAxisSpacing: 24,
-              mainAxisExtent: 340,
-            ),
-            itemBuilder: (context, index) {
-              final project = ProjectDetail.projects[index];
-              return WebProjectCard(
-                index: index,
-                project: project,
-                onTap: () {
-                  Navigator.of(context).push(ProjectDetailRoute(project: project));
-                },
-              );
-            },
-          )
-        else
-          // Dynamically generated project items mapping from static dataset (mobile view)
-          ...ProjectDetail.projects.asMap().entries.map((entry) {
-            final index = entry.key;
-            final project = entry.value;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 24.0),
-              child: WebProjectCard(
-                index: index,
-                project: project,
-                onTap: () {
-                  Navigator.of(context).push(
-                    ProjectDetailRoute(project: project),
+        LayoutBuilder(
+          builder: (context, gridConstraints) {
+            final double availableWidth = gridConstraints.maxWidth;
+            final int crossAxisCount = availableWidth > 600 ? 2 : 1;
+
+            if (crossAxisCount > 1) {
+              return GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: ProjectDetail.projects.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: 24,
+                  mainAxisSpacing: 24,
+                  mainAxisExtent: availableWidth > 900 ? 340 : 280,
+                ),
+                itemBuilder: (context, index) {
+                  final project = ProjectDetail.projects[index];
+                  return WebProjectCard(
+                    index: index,
+                    project: project,
+                    onTap: () {
+                      Navigator.of(context).push(ProjectDetailRoute(project: project));
+                    },
                   );
                 },
-              ),
-            );
-          }).toList(),
+              );
+            } else {
+              return Column(
+                children: ProjectDetail.projects.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final project = entry.value;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 24.0),
+                    child: WebProjectCard(
+                      index: index,
+                      project: project,
+                      onTap: () {
+                        Navigator.of(context).push(
+                          ProjectDetailRoute(project: project),
+                        );
+                      },
+                    ),
+                  );
+                }).toList(),
+              );
+            }
+          },
+        ),
       ],
     );
   }
@@ -2044,33 +2053,42 @@ class _LeftProfileCardState extends State<LeftProfileCard> {
                   alignment: Alignment.center,
                   child: GestureDetector(
                     onTap: _handleProfileTap,
-                    child: Container(
-                      width: 175,
-                      height: 185,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFF5C35),
-                      borderRadius: BorderRadius.circular(28),
-                      border: Border.all(color: Colors.white, width: 6),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
-                          blurRadius: 15,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: Image.asset(
-                      'assets/profile.png',
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        // Safe fallback if image is not loaded
+                    child: LayoutBuilder(
+                      builder: (context, avatarConstraints) {
+                        final double avatarWidth = (avatarConstraints.maxWidth * 0.65).clamp(120.0, 175.0);
+                        final double avatarHeight = avatarWidth * (185.0 / 175.0);
                         return Container(
-                          color: const Color(0xFFFF5C35),
-                          child: const Icon(
-                            Icons.person,
-                            size: 80,
-                            color: Colors.white,
+                          width: avatarWidth,
+                          height: avatarHeight,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFF5C35),
+                            borderRadius: BorderRadius.circular(avatarWidth * 0.16),
+                            border: Border.all(
+                              color: Colors.white,
+                              width: (avatarWidth * 6.0 / 175.0).clamp(4.0, 6.0),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.15),
+                                blurRadius: 15,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: Image.asset(
+                            'assets/profile.png',
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                color: const Color(0xFFFF5C35),
+                                child: Icon(
+                                  Icons.person,
+                                  size: avatarWidth * 0.45,
+                                  color: Colors.white,
+                                ),
+                              );
+                            },
                           ),
                         );
                       },
@@ -2346,8 +2364,12 @@ class DashedCirclesPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.2;
 
-    _drawDashedCircle(canvas, center, 105, paint, 6, 6);
-    _drawDashedCircle(canvas, center, 125, paint, 8, 8);
+    final double maxRadius = math.min(size.width, size.height) / 2;
+    final double r1 = maxRadius * 0.84;
+    final double r2 = maxRadius;
+
+    _drawDashedCircle(canvas, center, r1, paint, 6, 6);
+    _drawDashedCircle(canvas, center, r2, paint, 8, 8);
   }
 
   void _drawDashedCircle(
@@ -3433,13 +3455,11 @@ class HobbiesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final row1 = [
+    final hobbies = [
       (icon: Icons.sports_esports_rounded, label: "Chess", color: const Color(0xFFB2FF33)),
       (icon: Icons.music_note_rounded, label: "Music", color: const Color(0xFF29B6F6)),
       (icon: Icons.code_rounded, label: "Coding", color: const Color(0xFFFF5C35)),
       (icon: Icons.sports_cricket_rounded, label: "Cricket", color: const Color(0xFFFFC107)),
-    ];
-    final row2 = [
       (icon: Icons.fastfood_rounded, label: "Food", color: const Color(0xFFE91E63)),
       (icon: Icons.local_movies_rounded, label: "Cinemas", color: const Color(0xFF9C27B0)),
       (icon: Icons.directions_car_rounded, label: "Driving", color: const Color(0xFF4CAF50)),
@@ -3448,51 +3468,22 @@ class HobbiesSection extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isMobile = constraints.maxWidth < 600;
+        final double availableWidth = constraints.maxWidth;
+        // On very small screens, make card size slightly smaller to fit more items
+        final double cardSize = availableWidth < 350 ? 68 : 82;
+        final double gap = availableWidth < 350 ? 8 : 12;
 
-        if (isMobile) {
-          // 4 cards per row — card fills (width - 3 gaps) / 4
-          final double gap = 8;
-          final double cardSize = (constraints.maxWidth - gap * 3) / 4;
-
-          Widget buildRow(List items) => Row(
-            children: items.asMap().entries.map((e) {
-              final h = e.value;
-              return Row(
-                children: [
-                  HobbyCard(icon: h.icon, label: h.label, color: h.color, size: cardSize),
-                  if (e.key < items.length - 1) SizedBox(width: gap),
-                ],
-              );
-            }).toList(),
-          );
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              buildRow(row1),
-              SizedBox(height: gap),
-              buildRow(row2),
-            ],
-          );
-        }
-
-        // Desktop: original Wrap layout
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: row1.map((h) => HobbyCard(icon: h.icon, label: h.label, color: h.color)).toList(),
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: row2.map((h) => HobbyCard(icon: h.icon, label: h.label, color: h.color)).toList(),
-            ),
-          ],
+        return Wrap(
+          spacing: gap,
+          runSpacing: gap,
+          children: hobbies.map((h) {
+            return HobbyCard(
+              icon: h.icon,
+              label: h.label,
+              color: h.color,
+              size: cardSize,
+            );
+          }).toList(),
         );
       },
     );
@@ -5341,20 +5332,26 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
                           key: ValueKey("mobile_$activeImage"),
                           child: Image.asset(activeImage, fit: BoxFit.cover),
                         )
-                      : Container(
-                          height: 260,
-                          width: 390,
-                          alignment: Alignment.center,
-                          child: BrowserDeviceFrame(
-                            key: ValueKey("browser_$activeImage"),
-                            projectTitle: widget.project.title,
-                            child: Image.asset(
-                              activeImage,
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: double.infinity,
-                            ),
-                          ),
+                      : LayoutBuilder(
+                          builder: (context, frameConstraints) {
+                            final double maxWidth = frameConstraints.maxWidth;
+                            final double frameWidth = 390.0.clamp(0.0, maxWidth);
+                            final double frameHeight = frameWidth * (260.0 / 390.0);
+                            return SizedBox(
+                              width: frameWidth,
+                              height: frameHeight,
+                              child: BrowserDeviceFrame(
+                                key: ValueKey("browser_$activeImage"),
+                                projectTitle: widget.project.title,
+                                child: Image.asset(
+                                  activeImage,
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                ),
+                              ),
+                            );
+                          },
                         ),
                 ),
               ),
