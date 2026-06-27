@@ -880,8 +880,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                             title:
                                 "Complete Flutter & Dart Development Course",
                             issuer: "Udemy",
-                            tag:
-                                "Mobile Application Dev · Android / iOS / Web",
                           ),
                         ],
                       ),
@@ -1001,7 +999,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   year: "2024",
                   title: "Complete Flutter & Dart Development Course",
                   issuer: "Udemy",
-                  tag: "Mobile Application Dev · Android / iOS / Web",
                 ),
                 const SizedBox(height: 28),
                 Text(
@@ -2758,16 +2755,16 @@ class _WebProjectCardState extends State<WebProjectCard> {
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final isMobile = constraints.maxWidth < 500;
-                final double cardHeight = isMobile ? 300 : 340;
-                final double paddingVal = isMobile ? 20.0 : 28.0;
+                final double cardHeight = isMobile ? 260 : 340;
+                final double paddingVal = isMobile ? 16.0 : 28.0;
                 
                 // Font sizes
-                final double titleSize = isMobile ? 20.0 : 24.0;
-                final double subtitleSize = isMobile ? 12.0 : 13.0;
+                final double titleSize = isMobile ? 17.0 : 24.0;
+                final double subtitleSize = isMobile ? 11.0 : 13.0;
                 
                 // Phone dimensions
-                final double phoneWidth = isMobile ? 95 : 135;
-                final double phoneHeight = isMobile ? 190 : 270;
+                final double phoneWidth = isMobile ? 78 : 135;
+                final double phoneHeight = isMobile ? 158 : 270;
 
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 350),
@@ -3337,12 +3334,14 @@ class HobbyCard extends StatefulWidget {
   final IconData icon;
   final String label;
   final Color color;
+  final double size;
 
   const HobbyCard({
     super.key,
     required this.icon,
     required this.label,
     required this.color,
+    this.size = 82,
   });
 
   @override
@@ -3354,13 +3353,16 @@ class _HobbyCardState extends State<HobbyCard> {
 
   @override
   Widget build(BuildContext context) {
+    final double iconSize = widget.size < 70 ? 18 : 24;
+    final double fontSize = widget.size < 70 ? 9.5 : 11;
+    final double gap = widget.size < 70 ? 5 : 8;
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        width: 82,
-        height: 82,
+        width: widget.size,
+        height: widget.size,
         transform: Matrix4.identity()..translate(0.0, _isHovered ? -3.0 : 0.0),
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -3370,7 +3372,7 @@ class _HobbyCardState extends State<HobbyCard> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(widget.size < 70 ? 16 : 22),
           border: Border.all(
             color: _isHovered
                 ? widget.color.withOpacity(0.5)
@@ -3393,14 +3395,14 @@ class _HobbyCardState extends State<HobbyCard> {
             Icon(
               widget.icon,
               color: widget.color,
-              size: 24,
+              size: iconSize,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: gap),
             Text(
               widget.label,
               style: GoogleFonts.outfit(
                 color: Colors.white.withOpacity(0.9),
-                fontSize: 11,
+                fontSize: fontSize,
                 fontWeight: FontWeight.w600,
               ),
               textAlign: TextAlign.center,
@@ -3430,33 +3432,55 @@ class HobbiesSection extends StatelessWidget {
       (icon: Icons.palette_rounded, label: "Design", color: const Color(0xFF00BCD4)),
     ];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: row1.map((h) {
-            return HobbyCard(
-              icon: h.icon,
-              label: h.label,
-              color: h.color,
-            );
-          }).toList(),
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: row2.map((h) {
-            return HobbyCard(
-              icon: h.icon,
-              label: h.label,
-              color: h.color,
-            );
-          }).toList(),
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 600;
+
+        if (isMobile) {
+          // 4 cards per row — card fills (width - 3 gaps) / 4
+          final double gap = 8;
+          final double cardSize = (constraints.maxWidth - gap * 3) / 4;
+
+          Widget buildRow(List items) => Row(
+            children: items.asMap().entries.map((e) {
+              final h = e.value;
+              return Row(
+                children: [
+                  HobbyCard(icon: h.icon, label: h.label, color: h.color, size: cardSize),
+                  if (e.key < items.length - 1) SizedBox(width: gap),
+                ],
+              );
+            }).toList(),
+          );
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              buildRow(row1),
+              SizedBox(height: gap),
+              buildRow(row2),
+            ],
+          );
+        }
+
+        // Desktop: original Wrap layout
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: row1.map((h) => HobbyCard(icon: h.icon, label: h.label, color: h.color)).toList(),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: row2.map((h) => HobbyCard(icon: h.icon, label: h.label, color: h.color)).toList(),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -3533,7 +3557,9 @@ class _SkillCategoryCardState extends State<SkillCategoryCard> {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 100),
                 width: double.infinity,
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(
+                  MediaQuery.of(context).size.width < 700 ? 14 : 24,
+                ),
                 decoration: BoxDecoration(
                   gradient: RadialGradient(
                     center: Alignment(_localX * 1.5, _localY * 1.5),
@@ -3578,7 +3604,7 @@ class _SkillCategoryCardState extends State<SkillCategoryCard> {
                             child: Icon(
                               widget.icon,
                               color: widget.accentColor,
-                              size: 22,
+                              size: MediaQuery.of(context).size.width < 700 ? 18 : 22,
                             ),
                           ),
                           const SizedBox(width: 14),
@@ -3653,7 +3679,10 @@ class SkillChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final icons = TechIconHelper.getIconsForLabel(label);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      padding: EdgeInsets.symmetric(
+        horizontal: MediaQuery.of(context).size.width < 700 ? 10 : 14,
+        vertical: MediaQuery.of(context).size.width < 700 ? 6 : 8,
+      ),
       decoration: BoxDecoration(
         color: const Color(0xFF1E1E1E),
         borderRadius: BorderRadius.circular(16),
@@ -3671,9 +3700,9 @@ class SkillChip extends StatelessWidget {
           ],
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
-              fontSize: 13,
+              fontSize: MediaQuery.of(context).size.width < 700 ? 11.5 : 13,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -4168,6 +4197,7 @@ class TechIconHelper {
     if (lower.contains('xcode')) return SimpleIcons.xcode;
     if (lower.contains('android studio')) return SimpleIcons.androidstudio;
     if (lower.contains('swift')) return SimpleIcons.swift;
+    if (lower == 'html' || lower.contains('html5')) return SimpleIcons.html5;
     
     // Add additional mappings with material icons
     if (lower.contains('maps') || lower.contains('gps') || lower.contains('geolocator') || lower.contains('location'))
@@ -4232,6 +4262,8 @@ class TechIconHelper {
       color = SimpleIconColors.python;
     else if (icon == SimpleIcons.react)
       color = SimpleIconColors.react;
+    else if (icon == SimpleIcons.html5)
+      color = SimpleIconColors.html5;
       
     // New mappings
     else if (icon == Icons.map_rounded)
@@ -5948,6 +5980,7 @@ class ProgrammingLanguagesGrid extends StatelessWidget {
       {"name": "Swift", "rating": 5},
       {"name": "Python", "rating": 5},
       {"name": "Java", "rating": 5},
+      {"name": "HTML", "rating": 5},
     ];
 
     return LayoutBuilder(
@@ -5988,7 +6021,7 @@ class _LanguageProgressCircleState extends State<LanguageProgressCircle> {
 
   String _getProficiencyText(String name) {
     final lowerName = name.toLowerCase().trim();
-    if (lowerName == 'dart' || lowerName == 'python' || lowerName == 'java') {
+    if (lowerName == 'dart' || lowerName == 'python' || lowerName == 'java' || lowerName == 'html') {
       return "Expert";
     }
     return "Proficient";
