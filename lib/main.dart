@@ -672,7 +672,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         // Title
         LayoutBuilder(
           builder: (context, c) {
-            final double fs = c.maxWidth > 600 ? 36 : 26;
+            final double fs = c.maxWidth > 600 ? 36 : 28;
             return Wrap(
               spacing: 8,
               runSpacing: 4,
@@ -729,14 +729,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                     accentColor: const Color(0xFFB2FF33),
                     skills: mobileSkills,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   SkillCategoryCard(
                     title: "Backend, Database & Security",
                     icon: Icons.dns_rounded,
                     accentColor: const Color(0xFFFF5C35),
                     skills: backendSkills,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   SkillCategoryCard(
                     title: "DevOps, Tools & Quality Assurance",
                     icon: Icons.terminal_rounded,
@@ -1250,7 +1250,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 ),
               ),
               accentColor: const Color(0xFF0077B5),
-              onTap: () => _launchContactUrl("https://linkedin.com/in/moparthi-prem"),
+              onTap: () => _launchContactUrl("https://www.linkedin.com/in/prem-moparthi-4b8342418"),
             ), 3),
             wrapBtn(ContactIconButton(
               size: buttonSize,
@@ -2193,7 +2193,7 @@ class _LeftProfileCardState extends State<LeftProfileCard> {
               SocialIconBtn(
                 assetPath: 'assets/linkedin_3d.png',
                 onTap: () =>
-                    _launchUrl("https://linkedin.com/in/moparthi-prem"),
+                    _launchUrl("https://www.linkedin.com/in/prem-moparthi-4b8342418"),
                 tooltip: "LinkedIn",
               ),
               SocialIconBtn(
@@ -3101,75 +3101,89 @@ class TimelineExperienceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HoverWidget(
-      scale: 1.015,
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFF171717),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.white.withOpacity(0.04), width: 1),
-        ),
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: double.infinity,
-              child: Wrap(
-                alignment: WrapAlignment.spaceBetween,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: 16,
-                runSpacing: 4,
-                children: [
-                  Text(
-                    duration,
-                    style: GoogleFonts.outfit(
-                      color: const Color(0xFFB2FF33),
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                    ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 500;
+        final double padding     = isMobile ? 16 : 28;
+        final double companySize = isMobile ? 17 : 22;
+        final double roleSize    = isMobile ? 12 : 14;
+        final double descSize    = isMobile ? 12 : 14;
+        final double durSize     = isMobile ? 12 : 14;
+        final double locSize     = isMobile ? 10 : 12;
+        final double innerGap    = isMobile ? 10 : 16;
+        final double descGap     = isMobile ?  8 : 12;
+
+        return HoverWidget(
+          scale: 1.015,
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF171717),
+              borderRadius: BorderRadius.circular(isMobile ? 18 : 24),
+              border: Border.all(color: Colors.white.withOpacity(0.04), width: 1),
+            ),
+            padding: EdgeInsets.all(padding),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 16,
+                    runSpacing: 4,
+                    children: [
+                      Text(
+                        duration,
+                        style: GoogleFonts.outfit(
+                          color: const Color(0xFFB2FF33),
+                          fontSize: durSize,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      Text(
+                        location,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.4),
+                          fontSize: locSize,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    location,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.4),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
+                ),
+                SizedBox(height: innerGap),
+                Text(
+                  company,
+                  style: GoogleFonts.outfit(
+                    color: Colors.white,
+                    fontSize: companySize,
+                    fontWeight: FontWeight.w800,
                   ),
-                ],
-              ),
+                ),
+                Text(
+                  role,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.5),
+                    fontSize: roleSize,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: descGap),
+                Text(
+                  description,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.6),
+                    fontSize: descSize,
+                    height: 1.6,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            Text(
-              company,
-              style: GoogleFonts.outfit(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            Text(
-              role,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.5),
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              description,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.6),
-                fontSize: 14,
-                height: 1.6,
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
@@ -3510,6 +3524,8 @@ class _SkillCategoryCardState extends State<SkillCategoryCard> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobile = MediaQuery.of(context).size.width < 700;
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() {
@@ -3539,7 +3555,7 @@ class _SkillCategoryCardState extends State<SkillCategoryCard> {
           ..scale(_isHovered ? 1.025 : 1.0),
         transformAlignment: Alignment.center,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(isMobile ? 18 : 24),
           boxShadow: [
             // Glowing neon shadow that shifts in the opposite direction of tilt
             BoxShadow(
@@ -3550,7 +3566,7 @@ class _SkillCategoryCardState extends State<SkillCategoryCard> {
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(isMobile ? 18 : 24),
           child: Stack(
             children: [
               // Background Glass Panel with a reactive spotlight
@@ -3558,7 +3574,7 @@ class _SkillCategoryCardState extends State<SkillCategoryCard> {
                 duration: const Duration(milliseconds: 100),
                 width: double.infinity,
                 padding: EdgeInsets.all(
-                  MediaQuery.of(context).size.width < 700 ? 14 : 24,
+                  isMobile ? 16 : 24,
                 ),
                 decoration: BoxDecoration(
                   gradient: RadialGradient(
@@ -3569,7 +3585,7 @@ class _SkillCategoryCardState extends State<SkillCategoryCard> {
                       const Color(0xFF141414),
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(isMobile ? 18 : 24),
                   border: Border.all(
                     color: _isHovered 
                         ? widget.accentColor.withValues(alpha: 0.35) 
@@ -3604,7 +3620,7 @@ class _SkillCategoryCardState extends State<SkillCategoryCard> {
                             child: Icon(
                               widget.icon,
                               color: widget.accentColor,
-                              size: MediaQuery.of(context).size.width < 700 ? 18 : 22,
+                              size: isMobile ? 18 : 22,
                             ),
                           ),
                           const SizedBox(width: 14),
@@ -3612,7 +3628,7 @@ class _SkillCategoryCardState extends State<SkillCategoryCard> {
                             child: Text(
                               widget.title.toUpperCase(),
                               style: GoogleFonts.outfit(
-                                fontSize: 13,
+                                fontSize: isMobile ? 17 : 20,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 1.2,
                                 color: Colors.white,
