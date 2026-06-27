@@ -1,0 +1,8 @@
+{{flutter_js}}
+{{flutter_build_config}}
+
+_flutter.loader.load({
+  config: {
+    canvasKitBaseUrl: "https://www.gstatic.com/flutter-canvaskit/425cfb54d01a9472b3e81d9e76fd63a4a44cfbcb/",
+  },
+});

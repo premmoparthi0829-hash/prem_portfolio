@@ -2095,7 +2095,6 @@ class _LeftProfileCardState extends State<LeftProfileCard> {
                     ),
                   ),
                 ),
-              ),
               ],
             ),
           ),

@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "prem-portfolio-dd2fb"
+  },
+  "targets": {
+    "prem-portfolio-dd2fb": {
+      "hosting": {
+        "prem-moparthi": [
+          "prem-moparthi"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
