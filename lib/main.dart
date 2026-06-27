@@ -622,7 +622,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         TimelineExperienceCard(
           duration: "2026-Present",
           company: "All Hands Global Pvt. Ltd.",
-          location: "HYDERABAD Â· India",
+          location: "HYDERABAD · India",
           role: "Mobile Application Architect & Flutter Developer",
           description:
               "Lead the architecture and delivery of premium cross-platform mobile apps for iOS and Android. Spearheaded migrations to clean architecture, reducing codebase complexity and boosting feature delivery velocity. Integrated secure biometric auth, local caching (Hive/Isar), and optimized push notification delivery paths.",
@@ -631,7 +631,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         TimelineExperienceCard(
           duration: "2024-2025",
           company: "Space Age Infotech",
-          location: "BENGALURU Â· India",
+          location: "BENGALURU · India",
           role: "Software Development Engineer (Web & APIs)",
           description:
               "Developed performant, responsive web apps and robust REST APIs. Optimized API response times by implementing Redis caching and database indexing. Constructed smooth, interactive frontend dashboards using React, establishing solid fundamentals in UI state management and client-server synchronization.",
@@ -1132,18 +1132,30 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Â© 2026 Prem Moparthi. All rights reserved.",
+                    "© 2026 Prem Moparthi. All rights reserved.",
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.3),
                       fontSize: 13,
                     ),
                   ),
-                  Text(
-                    "Prem Moparthi Portfolio",
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.3),
-                      fontSize: 13,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        "Prem Moparthi Portfolio",
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.3),
+                          fontSize: 13,
+                        ),
+                      ),
+                      Text(
+                        "  ·  Made in Flutter",
+                        style: TextStyle(
+                          color: Colors.lightBlueAccent.withOpacity(0.5),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               );
@@ -1152,19 +1164,31 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Â© 2026 Prem Moparthi. All rights reserved.",
+                    "© 2026 Prem Moparthi. All rights reserved.",
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.3),
                       fontSize: 13,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    "Prem Moparthi Portfolio",
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.3),
-                      fontSize: 13,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        "Prem Moparthi Portfolio",
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.3),
+                          fontSize: 13,
+                        ),
+                      ),
+                      Text(
+                        "  ·  Made in Flutter",
+                        style: TextStyle(
+                          color: Colors.lightBlueAccent.withOpacity(0.5),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               );
