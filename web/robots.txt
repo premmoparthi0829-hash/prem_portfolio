@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://prem-moparthi.web.app/sitemap.xml

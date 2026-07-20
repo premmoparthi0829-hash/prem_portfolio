@@ -1083,11 +1083,11 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 
         // Resume View & Download Button
         NykaaButton(
-          label: "VIEW RESUME",
+          label: "RESUME",
           icon: Icons.visibility_outlined,
           isPrimary: true,
-          width: 150.0,
-          height: 42.0,
+          width: 120.0,
+          height: 38.0,
           onTap: () async {
             try {
               final resume = await ResumeService.getActiveResume();
@@ -3465,24 +3465,49 @@ class HobbiesSection extends StatelessWidget {
       (icon: Icons.palette_rounded, label: "Design", color: const Color(0xFF00BCD4)),
     ];
 
+    final firstRow = hobbies.sublist(0, 4);
+    final secondRow = hobbies.sublist(4, 8);
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final double availableWidth = constraints.maxWidth;
-        // On very small screens, make card size slightly smaller to fit more items
-        final double cardSize = availableWidth < 350 ? 68 : 82;
         final double gap = availableWidth < 350 ? 8 : 12;
+        const double maxCardSize = 82;
+        final double cardSize = ((availableWidth - 3 * gap) / 4).clamp(10.0, maxCardSize);
 
-        return Wrap(
-          spacing: gap,
-          runSpacing: gap,
-          children: hobbies.map((h) {
-            return HobbyCard(
-              icon: h.icon,
-              label: h.label,
-              color: h.color,
-              size: cardSize,
-            );
-          }).toList(),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                for (int i = 0; i < firstRow.length; i++) ...[
+                  if (i > 0) SizedBox(width: gap),
+                  HobbyCard(
+                    icon: firstRow[i].icon,
+                    label: firstRow[i].label,
+                    color: firstRow[i].color,
+                    size: cardSize,
+                  ),
+                ],
+              ],
+            ),
+            SizedBox(height: gap),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                for (int i = 0; i < secondRow.length; i++) ...[
+                  if (i > 0) SizedBox(width: gap),
+                  HobbyCard(
+                    icon: secondRow[i].icon,
+                    label: secondRow[i].label,
+                    color: secondRow[i].color,
+                    size: cardSize,
+                  ),
+                ],
+              ],
+            ),
+          ],
         );
       },
     );
