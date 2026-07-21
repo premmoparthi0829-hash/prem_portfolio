@@ -144,7 +144,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                               const SizedBox(height: 80),
                               Container(
                                 key: _projectsKey,
-                                child: _buildProjectsSection(isDesktop: true),
+                                child: const ProjectsSection(isDesktop: true),
                               ),
                               const SizedBox(height: 80),
                               Container(
@@ -238,7 +238,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                             delay: const Duration(milliseconds: 400),
                             child: Container(
                               key: _projectsKey,
-                              child: _buildProjectsSection(isDesktop: false),
+                              child: const ProjectsSection(isDesktop: false),
                             ),
                           ),
                           const SizedBox(height: 64),
@@ -327,12 +327,12 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Giant Heading Block â€” always 3 lines on mobile, 2 on desktop
+            // Giant Heading Block — 3 lines on mobile, 2 on desktop
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 GradientText(
-                  "FULL STACK",
+                  isDesktop ? "FULL STACK WEB &" : "FULL STACK",
                   gradient: const LinearGradient(
                     colors: [Color(0xFFFF5C35), Color(0xFFB2FF33)],
                   ),
@@ -358,7 +358,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   )
                 else ...[
                   GradientText(
-                    "FLUTTER",
+                    "WEB & FLUTTER",
                     gradient: LinearGradient(
                       colors: [Colors.white, Colors.white.withOpacity(0.4)],
                     ),
@@ -395,10 +395,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 children: isDesktop
                     ? [
                         const TextSpan(
-                          text: "As a Mobile Application Architect & Lead Flutter Developer (CS graduate from NIT Sikkim), I engineer premium cross-platform ecosystems. Over the last 2+ years, I have successfully delivered 12+ premium projects and launched 5+ apps to production. Combining clean architecture with pixel-perfect design, I build secure, scalable, and polished mobile solutions. ",
+                          text: "As a Full Stack Web Developer & Mobile Application Architect (CS graduate from NIT Sikkim), I engineer responsive web applications and premium cross-platform ecosystems. Over the last 2+ years, I have successfully delivered 12+ projects and launched 5+ apps to production. Combining modern web technologies and clean architecture with pixel-perfect design, I build secure, scalable, and polished web & mobile solutions. ",
                         ),
                         const TextSpan(
-                          text: "Let's build together extraordinary mobile apps for Android & iOS!",
+                          text: "Let's build together extraordinary web & mobile applications!",
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
@@ -407,10 +407,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                       ]
                     : [
                         const TextSpan(
-                          text: "CS graduate from NIT Sikkim and Mobile Architect specializing in engineering high-performance cross-platform applications. With 2+ years of experience, I have delivered 12+ projects and launched 5+ apps to production, leveraging clean architecture, reactive state, and pixel-perfect design. ",
+                          text: "CS graduate from NIT Sikkim and Full Stack Web & Mobile Architect specializing in engineering high-performance web applications and cross-platform mobile apps. With 2+ years of experience, I have delivered 12+ projects and launched 5+ apps to production, leveraging clean architecture and pixel-perfect design. ",
                         ),
                         const TextSpan(
-                          text: "Let's build together extraordinary mobile apps for Android & iOS!",
+                          text: "Let's build together extraordinary web & mobile applications!",
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
@@ -498,98 +498,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     );
   }
 
-
-
-  Widget _buildProjectsSection({bool isDesktop = false}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Title
-        LayoutBuilder(
-          builder: (context, c) {
-            final double fs = c.maxWidth > 600 ? 36 : 28;
-            return Wrap(
-              spacing: 8,
-              runSpacing: 4,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                Text(
-                  "RECENT ",
-                  style: GoogleFonts.outfit(
-                    fontSize: fs,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
-                  ),
-                ),
-                GradientText(
-                  "WORKS",
-                  gradient: LinearGradient(
-                    colors: [Colors.white, Colors.white.withValues(alpha: 0.4)],
-                  ),
-                  style: GoogleFonts.outfit(
-                    fontSize: fs,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-        const SizedBox(height: 32),
-
-        LayoutBuilder(
-          builder: (context, gridConstraints) {
-            final double availableWidth = gridConstraints.maxWidth;
-            final int crossAxisCount = availableWidth > 600 ? 2 : 1;
-
-            if (crossAxisCount > 1) {
-              return GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: ProjectDetail.projects.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: 24,
-                  mainAxisSpacing: 24,
-                  mainAxisExtent: availableWidth > 900 ? 340 : 280,
-                ),
-                itemBuilder: (context, index) {
-                  final project = ProjectDetail.projects[index];
-                  return WebProjectCard(
-                    index: index,
-                    project: project,
-                    onTap: () {
-                      Navigator.of(context).push(ProjectDetailRoute(project: project));
-                    },
-                  );
-                },
-              );
-            } else {
-              return Column(
-                children: ProjectDetail.projects.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final project = entry.value;
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 24.0),
-                    child: WebProjectCard(
-                      index: index,
-                      project: project,
-                      onTap: () {
-                        Navigator.of(context).push(
-                          ProjectDetailRoute(project: project),
-                        );
-                      },
-                    ),
-                  );
-                }).toList(),
-              );
-            }
-          },
-        ),
-      ],
-    );
-  }
-
   Widget _buildExperienceSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -632,7 +540,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           duration: "2026-Present",
           company: "All Hands Global Pvt. Ltd.",
           location: "HYDERABAD · India",
-          role: "Mobile Application Architect & Flutter Developer",
+          role: "Mobile & Web Application Architect / Flutter Developer",
           description:
               "Lead the architecture and delivery of premium cross-platform mobile apps for iOS and Android. Spearheaded migrations to clean architecture, reducing codebase complexity and boosting feature delivery velocity. Integrated secure biometric auth, local caching (Hive/Isar), and optimized push notification delivery paths.",
         ),
@@ -652,6 +560,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   Widget _buildSkillsSection() {
     final List<String> mobileSkills = [
       "Flutter (Android / iOS / Web)",
+      "Web Development (React, HTML5, CSS3, JS/TS)",
+      "Flutter Web & Responsive Design",
       "State Management (Bloc, Riverpod, Provider)",
       "Clean Architecture & MVC",
       "Swift & Kotlin",
@@ -733,7 +643,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   ),
                   const SizedBox(height: 16),
                   SkillCategoryCard(
-                    title: "Mobile & Frontend Development",
+                    title: "Mobile & Web Development",
                     icon: Icons.smartphone_rounded,
                     accentColor: const Color(0xFFB2FF33),
                     skills: mobileSkills,
@@ -812,7 +722,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                     Expanded(
                       flex: 6,
                       child: SkillCategoryCard(
-                        title: "Mobile & Frontend Development",
+                        title: "Mobile & Web Development",
                         icon: Icons.smartphone_rounded,
                         accentColor: const Color(0xFFB2FF33),
                         skills: mobileSkills,
@@ -1071,8 +981,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 
         Text(
           isDesktop
-              ? "Let's get in touch! I'm always open to discussing new opportunities, codebase architecture, or consulting on scalable Flutter projects. Whether you want to collaborate, hire a dedicated Mobile Architect, or simply brainstorm high-performance systems, drop me a line directly!"
-              : "Let's get in touch! I am deeply passionate about engineering high-performance mobile applications and always open to discussing full-time roles, codebase architecture, or collaborations. Drop me a line directly!",
+              ? "Let's get in touch! I'm always open to discussing new opportunities, web & mobile codebase architecture, or consulting on scalable web & Flutter projects. Whether you want to collaborate, hire a dedicated Web & Mobile Architect, or simply brainstorm high-performance systems, drop me a line directly!"
+              : "Let's get in touch! I am deeply passionate about engineering high-performance web & mobile applications and always open to discussing full-time roles, codebase architecture, or collaborations. Drop me a line directly!",
           style: TextStyle(
             fontSize: 16,
             color: Colors.white.withOpacity(0.85),
@@ -1438,6 +1348,486 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 }
 
 // --- Custom Reusable Interactive Widgets ---
+
+class ProjectsSection extends StatefulWidget {
+  final bool isDesktop;
+  const ProjectsSection({super.key, this.isDesktop = false});
+
+  @override
+  State<ProjectsSection> createState() => _ProjectsSectionState();
+}
+
+class _ProjectsSectionState extends State<ProjectsSection> {
+  // -1 = nothing selected (default, show no cards)
+  // 0  = Website Projects
+  // 1  = App Projects
+  // 2  = UI/UX Design
+  int _selected = -1;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<ProjectDetail> webProjects = ProjectDetail.projects
+        .where((p) => p.category.contains("Web"))
+        .toList();
+    final List<ProjectDetail> mobileProjects = ProjectDetail.projects
+        .where((p) => p.category.contains("Mobile"))
+        .toList();
+    final List<ProjectDetail> uiUxProjects = ProjectDetail.projects
+        .where((p) => p.category.contains("UI/UX") || p.techTags.any((t) => t.toLowerCase().contains("figma")))
+        .toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // ── Main Title ──────────────────────────────────────────
+        LayoutBuilder(builder: (context, c) {
+          final double fs = c.maxWidth > 600 ? 36 : 28;
+          return Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Text("RECENT ",
+                  style: GoogleFonts.outfit(
+                      fontSize: fs,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white)),
+              GradientText(
+                "WORKS",
+                gradient: LinearGradient(
+                    colors: [Colors.white, Colors.white.withValues(alpha: 0.4)]),
+                style: GoogleFonts.outfit(
+                    fontSize: fs, fontWeight: FontWeight.w900),
+              ),
+            ],
+          );
+        }),
+        const SizedBox(height: 32),
+
+        // ── Three Polaroid Category Cards (Web, Mobile, UI UX) ────
+        Center(
+          child: Wrap(
+            spacing: 24,
+            runSpacing: 24,
+            alignment: WrapAlignment.center,
+            children: [
+              _CategoryPolaroidCard(
+                index: 0,
+                title: "WEBSITE PROJECTS",
+                count: webProjects.length,
+                icon: Icons.language_rounded,
+                accentColor: const Color(0xFF00E5FF),
+                gradientColors: const [Color(0xFF00E5FF), Color(0xFF006064)],
+                isSelected: _selected == 0,
+                onTap: () => setState(() => _selected = _selected == 0 ? -1 : 0),
+              ),
+              _CategoryPolaroidCard(
+                index: 1,
+                title: "MOBILE APPS",
+                count: mobileProjects.length,
+                icon: Icons.smartphone_rounded,
+                accentColor: const Color(0xFFFF5C35),
+                gradientColors: const [Color(0xFFFF5C35), Color(0xFFBF360C)],
+                isSelected: _selected == 1,
+                onTap: () => setState(() => _selected = _selected == 1 ? -1 : 1),
+              ),
+              _CategoryPolaroidCard(
+                index: 2,
+                title: "UI/UX DESIGN",
+                count: uiUxProjects.length,
+                icon: Icons.gesture_rounded,
+                accentColor: const Color(0xFFBA68C8),
+                gradientColors: const [Color(0xFFBA68C8), Color(0xFF4A148C)],
+                isSelected: _selected == 2,
+                onTap: () => setState(() => _selected = _selected == 2 ? -1 : 2),
+              ),
+            ],
+          ),
+        ),
+
+        // ── Project Cards (appear only when a category is active) ─────
+        SizedBox(
+          width: double.infinity,
+          child: AnimatedSize(
+            duration: const Duration(milliseconds: 350),
+            curve: Curves.easeInOut,
+            child: _selected == -1
+                ? const SizedBox(width: double.infinity, height: 0)
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 40),
+                      // Thin accent divider
+                      Container(
+                        height: 1.5,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(colors: [
+                            (_selected == 0
+                                    ? const Color(0xFF00E5FF)
+                                    : (_selected == 1
+                                        ? const Color(0xFFFF5C35)
+                                        : const Color(0xFFBA68C8)))
+                                .withValues(alpha: 0.6),
+                            Colors.transparent,
+                          ]),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      AnimatedSwitcher(
+                        key: ValueKey(_selected),
+                        duration: const Duration(milliseconds: 300),
+                        child: _ProjectGrid(
+                          projects: _selected == 0
+                              ? webProjects
+                              : (_selected == 1 ? mobileProjects : uiUxProjects),
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Polaroid Category Card Widget ───────────────────────────────────────────
+class _CategoryPolaroidCard extends StatefulWidget {
+  final int index;
+  final String title;
+  final int count;
+  final IconData icon;
+  final Color accentColor;
+  final List<Color> gradientColors;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _CategoryPolaroidCard({
+    required this.index,
+    required this.title,
+    required this.count,
+    required this.icon,
+    required this.accentColor,
+    required this.gradientColors,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  State<_CategoryPolaroidCard> createState() => _CategoryPolaroidCardState();
+}
+
+class _CategoryPolaroidCardState extends State<_CategoryPolaroidCard> {
+  bool _hover = false;
+
+  double get _tiltTurns {
+    const tilts = [-0.006, 0.007, -0.004];
+    return tilts[widget.index % tilts.length];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final active = widget.isSelected || _hover;
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hover = true),
+      onExit: (_) => setState(() => _hover = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedRotation(
+          turns: active ? 0.0 : _tiltTurns,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutCubic,
+          child: AnimatedScale(
+            scale: active ? 1.06 : 1.0,
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOutCubic,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOutCubic,
+              width: 195,
+              height: 245,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFDFCF9), // Warm polaroid cream-white
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(
+                  color: widget.isSelected
+                      ? widget.accentColor
+                      : Colors.black.withValues(alpha: 0.07),
+                  width: widget.isSelected ? 2.0 : 1.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: widget.isSelected
+                        ? widget.accentColor.withValues(alpha: 0.25)
+                        : Colors.black.withValues(alpha: _hover ? 0.2 : 0.12),
+                    blurRadius: active ? 22 : 12,
+                    offset: Offset(active ? 4 : 2, active ? 12 : 5),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 1. Stylized Category Image (Abstract design)
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E1E1E),
+                          border: Border.all(
+                            color: Colors.black.withValues(alpha: 0.08),
+                            width: 1,
+                          ),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            // Glowing category gradient background
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: widget.gradientColors,
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                              ),
+                            ),
+                            // Micro abstract grid wireframe
+                            Opacity(
+                              opacity: 0.15,
+                              child: GridPaper(
+                                color: Colors.white,
+                                interval: 24,
+                                subdivisions: 1,
+                              ),
+                            ),
+                            // Large category icon
+                            Center(
+                              child: Icon(
+                                widget.icon,
+                                size: 58,
+                                color: Colors.white.withValues(alpha: 0.85),
+                              ),
+                            ),
+                            // Glossy overlay shine
+                            Positioned.fill(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      Colors.white.withValues(alpha: 0.05),
+                                      Colors.transparent,
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // 2. Caption area
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                widget.title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.architectsDaughter(
+                                  color: const Color(0xFF1D1D1D),
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: -0.1,
+                                ),
+                              ),
+                            ),
+                            if (widget.isSelected)
+                              Icon(
+                                Icons.check_circle_outline_rounded,
+                                size: 13,
+                                color: widget.accentColor,
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          "${widget.count} showcases",
+                          style: GoogleFonts.architectsDaughter(
+                            color: Colors.black54,
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+// ── Shared sub-section header ─────────────────────────────────────────────────
+class _SectionHeader extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final int count;
+  final Color accentColor;
+
+  const _SectionHeader({
+    required this.icon,
+    required this.label,
+    required this.count,
+    required this.accentColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: accentColor.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(color: accentColor.withValues(alpha: 0.4), width: 1.2),
+            boxShadow: [
+              BoxShadow(
+                color: accentColor.withValues(alpha: 0.18),
+                blurRadius: 14,
+                spreadRadius: 0,
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 15, color: accentColor),
+              const SizedBox(width: 7),
+              Text(
+                label,
+                style: GoogleFonts.outfit(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: accentColor,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const SizedBox(width: 7),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                decoration: BoxDecoration(
+                  color: accentColor.withValues(alpha: 0.22),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  "$count",
+                  style: GoogleFonts.outfit(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w900,
+                    color: accentColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Container(
+            height: 1,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  accentColor.withValues(alpha: 0.35),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Shared project grid ────────────────────────────────────────────────────────
+class _ProjectGrid extends StatelessWidget {
+  final List<ProjectDetail> projects;
+
+  const _ProjectGrid({super.key, required this.projects});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final int crossAxisCount = constraints.maxWidth > 600 ? 2 : 1;
+        if (crossAxisCount > 1) {
+          return GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: projects.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 24,
+              mainAxisSpacing: 24,
+              mainAxisExtent: 330,
+            ),
+            itemBuilder: (context, index) {
+              final project = projects[index];
+              return WebProjectCard(
+                key: ValueKey(project.title),
+                index: index,
+                project: project,
+                onTap: () {
+                  Navigator.of(context).push(ProjectDetailRoute(project: project));
+                },
+              );
+            },
+          );
+        } else {
+          return Column(
+            children: projects.asMap().entries.map((entry) {
+              final project = entry.value;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 24.0),
+                child: WebProjectCard(
+                  key: ValueKey(project.title),
+                  index: entry.key,
+                  project: project,
+                  onTap: () {
+                    Navigator.of(context).push(ProjectDetailRoute(project: project));
+                  },
+                ),
+              );
+            }).toList(),
+          );
+        }
+      },
+    );
+  }
+}
+
+
 
 // --- Fade + Slide Entrance Animation Widget (for mobile sections) ---
 
@@ -2113,7 +2503,7 @@ class _LeftProfileCardState extends State<LeftProfileCard> {
           ),
           const SizedBox(height: 6),
           Text(
-            "Mobile Application Architect &\nLead Flutter Developer",
+            "Mobile & Web Application Architect\nFull Stack Web & Mobile Developer",
             textAlign: TextAlign.center,
             style: TextStyle(
               color: const Color(0xFF555555),
@@ -2124,10 +2514,27 @@ class _LeftProfileCardState extends State<LeftProfileCard> {
           ),
           const SizedBox(height: 20),
 
-          // Android & iOS icons
+          // Web, Android & iOS icons
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF29B6F6).withOpacity(0.1),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: const Color(0xFF29B6F6).withOpacity(0.2),
+                    width: 1.5,
+                  ),
+                ),
+                child: const Icon(
+                  Icons.language,
+                  color: Color(0xFF29B6F6),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
@@ -2172,10 +2579,10 @@ class _LeftProfileCardState extends State<LeftProfileCard> {
                 TextSpan(
                   children: [
                     const TextSpan(
-                      text: "Hi, I'm Prem! A passionate Mobile Architect focused on building fluid, high-performance user experiences. Specializing in secure clean architecture, state dynamics, and custom interactive animations that bring apps to life. ",
+                      text: "Hi, I'm Prem! A passionate Full Stack Web & Mobile Architect focused on building fluid, high-performance web applications and cross-platform mobile experiences. Specializing in modern web development, clean architecture, and custom interactive web & mobile interfaces. ",
                     ),
                     TextSpan(
-                      text: "Let's design and build next-generation mobile experiences for Android & iOS!",
+                      text: "Let's design and build next-generation web & mobile solutions!",
                       style: isMobile
                           ? const TextStyle(
                               color: Color(0xFFFF5C35),
@@ -2509,166 +2916,6 @@ class GridAccentCard extends StatelessWidget {
   }
 }
 
-// --- Recent Project Card ---
-
-class ProjectCard extends StatelessWidget {
-  final String year;
-  final String title;
-  final String subtitle;
-  final String description;
-  final List<String> techTags;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const ProjectCard({
-    super.key,
-    required this.year,
-    required this.title,
-    required this.subtitle,
-    required this.description,
-    required this.techTags,
-    required this.icon,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return HoverWidget(
-      onTap: onTap,
-      scale: 1.015,
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFF171717),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.white.withOpacity(0.04), width: 1),
-        ),
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.06),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    year,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.6),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                Icon(
-                  Icons.arrow_outward,
-                  color: Colors.white.withOpacity(0.4),
-                  size: 20,
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFF5C35).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Icon(icon, color: const Color(0xFFFF5C35), size: 24),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: GoogleFonts.outfit(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        subtitle,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.4),
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              description,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.6),
-                fontSize: 14,
-                height: 1.6,
-              ),
-            ),
-            const SizedBox(height: 20),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: techTags.map((tag) {
-                final icon = TechIconHelper.getIcon(tag);
-                return Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.04),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.05),
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (icon != null) ...[
-                        Icon(
-                          icon,
-                          color: TechIconHelper.getIconColor(icon),
-                          size: 12,
-                        ),
-                        const SizedBox(width: 6),
-                      ],
-                      Text(
-                        tag,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.5),
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class ProjectBrandTheme {
   final List<Color> gradientColors;
   final Color accentColor;
@@ -2684,6 +2931,26 @@ class ProjectBrandTheme {
         return const ProjectBrandTheme(
           gradientColors: [Color(0xFF0F172A), Color(0xFF1E3A8A)], // deep blue
           accentColor: Color(0xFF38BDF8),
+        );
+      case "OmniHub ERP & Web Dashboard":
+        return const ProjectBrandTheme(
+          gradientColors: [Color(0xFF0F2027), Color(0xFF203A43)], // cyan dark gradient
+          accentColor: Color(0xFF00E5FF),
+        );
+      case "NexStore Web Marketplace":
+        return const ProjectBrandTheme(
+          gradientColors: [Color(0xFF2D0B5A), Color(0xFF16032E)], // deep violet
+          accentColor: Color(0xFFD8B4FE),
+        );
+      case "SaaS CloudOps Platform":
+        return const ProjectBrandTheme(
+          gradientColors: [Color(0xFF0F172A), Color(0xFF0284C7)], // sky cloud blue
+          accentColor: Color(0xFF38BDF8),
+        );
+      case "Apex Agency Website":
+        return const ProjectBrandTheme(
+          gradientColors: [Color(0xFF311B92), Color(0xFF4A148C)], // deep violet indigo
+          accentColor: Color(0xFFE040FB),
         );
       case "Ride 4 you":
         return const ProjectBrandTheme(
@@ -2747,25 +3014,30 @@ class _WebProjectCardState extends State<WebProjectCard> {
   @override
   void initState() {
     super.initState();
-    // Cascading entrance delay
-    Future.delayed(Duration(milliseconds: widget.index * 120), () {
+    Future.delayed(Duration(milliseconds: widget.index * 80), () {
       if (mounted) {
         setState(() => _isVisible = true);
       }
     });
   }
 
+  double get _tiltTurns {
+    // Alternate slight rotations for that organic scattered Polaroid look
+    const tilts = [-0.005, 0.006, -0.002, 0.004, -0.006, 0.005];
+    return tilts[widget.index % tilts.length];
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = ProjectBrandTheme.getTheme(widget.project.title);
+    final bool isWeb = widget.project.category.contains("Web");
 
     return AnimatedOpacity(
       opacity: _isVisible ? 1.0 : 0.0,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 500),
       curve: Curves.easeOutCubic,
       child: AnimatedContainer(
-        transform: Matrix4.translationValues(0, _isVisible ? 0 : 50, 0),
-        duration: const Duration(milliseconds: 600),
+        transform: Matrix4.translationValues(0, _isVisible ? 0 : 30, 0),
+        duration: const Duration(milliseconds: 500),
         curve: Curves.easeOutCubic,
         child: MouseRegion(
           onEnter: (_) => setState(() => _isHovered = true),
@@ -2773,318 +3045,118 @@ class _WebProjectCardState extends State<WebProjectCard> {
           cursor: SystemMouseCursors.click,
           child: GestureDetector(
             onTap: widget.onTap,
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final isMobile = constraints.maxWidth < 500;
-                final double cardHeight = isMobile ? 260 : 340;
-                final double paddingVal = isMobile ? 16.0 : 28.0;
-                
-                // Font sizes
-                final double titleSize = isMobile ? 17.0 : 24.0;
-                final double subtitleSize = isMobile ? 11.0 : 13.0;
-                
-                // Phone dimensions
-                final double phoneWidth = isMobile ? 78 : 135;
-                final double phoneHeight = isMobile ? 158 : 270;
-
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 350),
+            child: AnimatedRotation(
+              turns: _isHovered ? 0.0 : _tiltTurns,
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOutCubic,
+              child: AnimatedScale(
+                scale: _isHovered ? 1.04 : 1.0,
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutCubic,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
                   curve: Curves.easeOutCubic,
-                  height: cardHeight,
+                  width: double.infinity,
+                  height: 330,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: theme.gradientColors,
-                      begin: _isHovered ? Alignment.topRight : Alignment.topLeft,
-                      end: _isHovered ? Alignment.bottomLeft : Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(28),
+                    color: const Color(0xFFFDFCF9), // Classic Polaroid paper off-white
+                    borderRadius: BorderRadius.circular(4),
                     border: Border.all(
-                      color: _isHovered 
-                          ? theme.accentColor.withValues(alpha: 0.45) 
-                          : Colors.white.withValues(alpha: 0.05),
+                      color: Colors.black.withValues(alpha: 0.06),
                       width: 1.5,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: _isHovered 
-                            ? theme.accentColor.withValues(alpha: 0.2) 
-                            : Colors.black.withValues(alpha: 0.2),
-                        blurRadius: _isHovered ? 35 : 15,
-                        offset: Offset(0, _isHovered ? 12 : 6),
+                        color: Colors.black.withValues(alpha: _isHovered ? 0.22 : 0.12),
+                        blurRadius: _isHovered ? 20 : 10,
+                        offset: Offset(_isHovered ? 4 : 2, _isHovered ? 12 : 5),
                       ),
                     ],
                   ),
-                  clipBehavior: Clip.antiAlias,
-                  child: Stack(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Subtle background glow circle behind phone mockup
-                      Positioned(
-                        right: isMobile ? -30 : -50,
-                        bottom: isMobile ? -30 : -50,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          width: _isHovered 
-                              ? (isMobile ? 200 : 280) 
-                              : (isMobile ? 140 : 200),
-                          height: _isHovered 
-                              ? (isMobile ? 200 : 280) 
-                              : (isMobile ? 140 : 200),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: RadialGradient(
-                              colors: [
-                                theme.accentColor.withValues(alpha: 0.28),
-                                theme.accentColor.withValues(alpha: 0.0),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // Double overlapping phone mockup layout (Back Phone)
-                      AnimatedPositioned(
-                        duration: const Duration(milliseconds: 350),
-                        curve: Curves.easeOutBack,
-                        bottom: _isHovered 
-                            ? (isMobile ? -15 : -25) 
-                            : (isMobile ? -35 : -50),
-                        right: _isHovered 
-                            ? (isMobile ? 2 : 5) 
-                            : (isMobile ? -8 : -5),
-                        child: Transform.rotate(
-                          angle: _isHovered ? -0.11 : -0.14,
-                          child: AnimatedScale(
-                            scale: _isHovered ? 0.95 : 0.9,
-                            duration: const Duration(milliseconds: 350),
-                            child: Container(
-                              width: phoneWidth,
-                              height: phoneHeight,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(isMobile ? 16 : 22),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.35),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 6),
-                                  ),
-                                ],
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.08),
-                                  width: isMobile ? 2.5 : 3.5,
-                                ),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(isMobile ? 13 : 18),
-                                child: widget.project.userImages.length > 1
-                                    ? Image.asset(
-                                        widget.project.userImages[1],
-                                        fit: BoxFit.cover,
-                                        alignment: Alignment.topCenter,
-                                        errorBuilder: (context, error, stackTrace) {
-                                          return Container(color: Colors.grey[900]);
-                                        },
-                                      )
-                                    : Container(color: Colors.grey[900]),
+                      // 1. Image area
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF1E1E1E),
+                              border: Border.all(
+                                color: Colors.black.withValues(alpha: 0.08),
+                                width: 1,
                               ),
                             ),
-                          ),
-                        ),
-                      ),
-
-                      // Double overlapping phone mockup layout (Front Phone)
-                      AnimatedPositioned(
-                        duration: const Duration(milliseconds: 350),
-                        curve: Curves.easeOutBack,
-                        bottom: _isHovered 
-                            ? (isMobile ? -10 : -15) 
-                            : (isMobile ? -25 : -35),
-                        right: _isHovered 
-                            ? (isMobile ? 16 : 25) 
-                            : (isMobile ? 10 : 15),
-                        child: Transform.rotate(
-                          angle: _isHovered ? -0.03 : -0.07,
-                          child: AnimatedScale(
-                            scale: _isHovered ? 1.08 : 1.0,
-                            duration: const Duration(milliseconds: 350),
-                            child: Container(
-                              width: phoneWidth,
-                              height: phoneHeight,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(isMobile ? 16 : 22),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.45),
-                                    blurRadius: 15,
-                                    offset: const Offset(0, 8),
-                                  ),
-                                ],
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.12),
-                                  width: isMobile ? 2.5 : 3.5,
-                                ),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(isMobile ? 13 : 18),
-                                child: widget.project.userImages.isNotEmpty
-                                    ? Image.asset(
-                                        widget.project.userImages[0],
-                                        fit: BoxFit.cover,
-                                        alignment: Alignment.topCenter,
-                                        errorBuilder: (context, error, stackTrace) {
-                                          return Container(
-                                            color: Colors.grey[900],
-                                            child: Icon(
-                                              widget.project.icon,
-                                              color: theme.accentColor,
-                                              size: isMobile ? 24 : 32,
-                                            ),
-                                          );
-                                        },
-                                      )
-                                    : Container(
-                                        color: Colors.grey[900],
-                                        child: Icon(
-                                          widget.project.icon,
-                                          color: theme.accentColor,
-                                          size: isMobile ? 24 : 32,
-                                        ),
-                                      ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // Content info layout on the left
-                      Positioned.fill(
-                        child: FractionallySizedBox(
-                          widthFactor: isMobile ? 0.65 : 0.58,
-                          alignment: Alignment.topLeft,
-                          child: Padding(
-                            padding: EdgeInsets.all(paddingVal),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            clipBehavior: Clip.antiAlias,
+                            child: Stack(
+                              fit: StackFit.expand,
                               children: [
-                                // Year Pill
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 5,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: theme.accentColor.withValues(alpha: 0.12),
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: theme.accentColor.withValues(alpha: 0.25),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    widget.project.year,
-                                    style: GoogleFonts.outfit(
-                                      color: theme.accentColor,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 14),
-
-                                // Title
-                                Text(
-                                  widget.project.title,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: GoogleFonts.outfit(
-                                    color: Colors.white,
-                                    fontSize: titleSize,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: -0.5,
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-
-                                // Subtitle
-                                Text(
-                                  widget.project.subtitle,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.75),
-                                    fontSize: subtitleSize,
-                                    fontWeight: FontWeight.w500,
-                                    height: 1.4,
-                                  ),
-                                ),
-                                const Spacer(),
-
-                                // Tech tags (displays up to 5 tags on desktop card, 3 on mobile)
-                                Wrap(
-                                  spacing: 6,
-                                  runSpacing: 6,
-                                  children: widget.project.techTags.take(isMobile ? 3 : 5).map((tag) {
-                                    final icon = TechIconHelper.getIcon(tag);
-                                    return Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withValues(alpha: 0.06),
-                                        borderRadius: BorderRadius.circular(6),
-                                        border: Border.all(
-                                          color: Colors.white.withValues(alpha: 0.05),
-                                          width: 1,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          if (icon != null) ...[
-                                            Icon(
-                                              icon,
-                                              color: TechIconHelper.getIconColor(icon),
-                                              size: 10,
-                                            ),
-                                            const SizedBox(width: 4),
-                                          ],
-                                          Flexible(
-                                            child: Text(
-                                              tag,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                color: Colors.white.withValues(alpha: 0.6),
-                                                fontSize: 10.5,
+                                widget.project.adminImages.isNotEmpty
+                                    ? Image.asset(
+                                        widget.project.adminImages[0],
+                                        fit: BoxFit.cover,
+                                        alignment: Alignment.topCenter,
+                                      )
+                                    : (widget.project.userImages.isNotEmpty
+                                        ? Image.asset(
+                                            widget.project.userImages[0],
+                                            fit: BoxFit.cover,
+                                            alignment: Alignment.topCenter,
+                                          )
+                                        : Container(
+                                            color: const Color(0xFFDEDBD2),
+                                            child: Center(
+                                              child: Icon(
+                                                widget.project.icon,
+                                                size: 52,
+                                                color: Colors.black38,
                                               ),
                                             ),
-                                          ),
+                                          )),
+                                // Paper surface reflection gradient
+                                Positioned.fill(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          Colors.white.withValues(alpha: 0.05),
+                                          Colors.black.withValues(alpha: 0.02),
                                         ],
                                       ),
-                                    );
-                                  }).toList(),
+                                    ),
+                                  ),
                                 ),
-                                const SizedBox(height: 20),
-
-                                // Case Study action trigger
-                                FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  alignment: Alignment.centerLeft,
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        isMobile ? "Case Study" : "View Case Study",
-                                        style: GoogleFonts.outfit(
-                                          color: theme.accentColor,
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
+                                // Category Sticker Badge
+                                Positioned(
+                                  top: 8,
+                                  right: 8,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: isWeb
+                                          ? const Color(0xFF00E5FF).withValues(alpha: 0.95)
+                                          : const Color(0xFFFF5C35).withValues(alpha: 0.95),
+                                      borderRadius: BorderRadius.circular(4),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(alpha: 0.15),
+                                          blurRadius: 4,
+                                          offset: const Offset(1, 2),
                                         ),
+                                      ],
+                                    ),
+                                    child: Text(
+                                      isWeb ? "WEB" : "APP",
+                                      style: GoogleFonts.outfit(
+                                        color: Colors.black,
+                                        fontSize: 8.5,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 0.5,
                                       ),
-                                      const SizedBox(width: 8),
-                                      Icon(Icons.arrow_outward, color: theme.accentColor, size: 14),
-                                    ],
+                                    ),
                                   ),
                                 ),
                               ],
@@ -3092,15 +3164,94 @@ class _WebProjectCardState extends State<WebProjectCard> {
                           ),
                         ),
                       ),
+
+                      // 2. Polaroid bottom caption
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    widget.project.title.toUpperCase(),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.architectsDaughter(
+                                      color: const Color(0xFF222222),
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: -0.2,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  _formatYear(widget.project.year),
+                                  style: GoogleFonts.architectsDaughter(
+                                    color: Colors.black54,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    widget.project.techTags.take(3).join(" • "),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.architectsDaughter(
+                                      color: Colors.black45,
+                                      fontSize: 9.5,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                AnimatedDefaultTextStyle(
+                                  duration: const Duration(milliseconds: 150),
+                                  style: GoogleFonts.architectsDaughter(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: _isHovered
+                                        ? (isWeb ? const Color(0xFF00B0FF) : const Color(0xFFFF3D00))
+                                        : Colors.black38,
+                                  ),
+                                  child: const Text("View study →"),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
-                );
-              },
+                ),
+              ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  String _formatYear(String year) {
+    final parts = year.split('-');
+    final formattedParts = parts.map((part) {
+      final trimmed = part.trim();
+      if (trimmed.length >= 4) {
+        return "'${trimmed.substring(trimmed.length - 2)}";
+      }
+      return trimmed;
+    });
+    return formattedParts.join('-');
   }
 }
 
@@ -4228,7 +4379,10 @@ class TechIconHelper {
     if (lower.contains('xcode')) return SimpleIcons.xcode;
     if (lower.contains('android studio')) return SimpleIcons.androidstudio;
     if (lower.contains('swift')) return SimpleIcons.swift;
-    if (lower == 'html' || lower.contains('html5')) return SimpleIcons.html5;
+    if (lower.contains('javascript') || lower == 'js') return SimpleIcons.javascript;
+    if (lower.contains('typescript') || lower == 'ts') return SimpleIcons.typescript;
+    if (lower.contains('css')) return Icons.css_rounded;
+    if (lower == 'html' || lower.contains('html5') || lower.contains('html / css')) return SimpleIcons.html5;
     
     // Add additional mappings with material icons
     if (lower.contains('maps') || lower.contains('gps') || lower.contains('geolocator') || lower.contains('location'))
@@ -4295,6 +4449,8 @@ class TechIconHelper {
       color = SimpleIconColors.react;
     else if (icon == SimpleIcons.html5)
       color = SimpleIconColors.html5;
+    else if (icon == Icons.css_rounded)
+      color = const Color(0xFF264DE4);
       
     // New mappings
     else if (icon == Icons.map_rounded)
@@ -4408,6 +4564,7 @@ class ProjectDetail {
   final List<String> adminImages;
   final List<String> highlights;
   final String githubUrl;
+  final String category;
 
   const ProjectDetail({
     required this.year,
@@ -4420,6 +4577,7 @@ class ProjectDetail {
     required this.adminImages,
     required this.highlights,
     this.githubUrl = "https://github.com/premmoparthi0829",
+    this.category = "Mobile Application",
   });
 
   static const List<ProjectDetail> projects = [
@@ -4457,6 +4615,146 @@ class ProjectDetail {
         "Built live ledger updates and transaction statement exports using PDF generator libraries.",
         "Implemented Firebase Authentication with secure storage for sessions and biometric lock toggle.",
         "Architected client state using Bloc/Cubit pattern to separate presentation from transaction logic.",
+      ],
+    ),
+    ProjectDetail(
+      year: "2024-2025",
+      title: "OmniHub ERP & Web Dashboard",
+      subtitle: "Enterprise React & TypeScript Web Application",
+      category: "Web Application & Website",
+      description:
+          "Architected and developed a real-time enterprise web dashboard. Built high-performance interactive data tables, dynamic chart visualization dashboards, and role-based access control (RBAC) layers. Optimized web bundle load times and state management using React Query and Redux Toolkit.",
+      techTags: [
+        "React",
+        "TypeScript",
+        "HTML5",
+        "CSS3",
+        "JavaScript",
+        "REST APIs",
+        "Node.js",
+        "Redux Toolkit",
+        "Redis Cache",
+        "Chart.js",
+      ],
+      icon: Icons.dashboard_customize_outlined,
+      userImages: [
+        "assets/project_omnihub_erp_user1.png",
+        "assets/project_omnihub_erp_user2.png",
+        "assets/project_omnihub_erp_user3.png",
+      ],
+      adminImages: [
+        "assets/project_omnihub_erp_admin1.png",
+        "assets/project_omnihub_erp_admin2.png",
+      ],
+      highlights: [
+        "Built responsive, high-performance web dashboard using React 18 and TypeScript.",
+        "Engineered client-side caching and state management using React Query, reducing API latency by 40%.",
+        "Implemented Redis-backed server caching and indexed SQL queries for sub-100ms response times.",
+        "Constructed role-based authentication (RBAC) and audit log tracking for enterprise security compliance.",
+      ],
+    ),
+    ProjectDetail(
+      year: "2024-2025",
+      title: "NexStore Web Marketplace",
+      subtitle: "Modern Full-Stack Web Application (React & Node.js)",
+      category: "Web Application & Website",
+      description:
+          "Built a modern e-commerce web platform featuring server-side rendering, instant product search with debounce algorithms, interactive shopping carts, and dynamic invoice generation. Focused on web vitals, accessibility (a11y), and responsive UI layouts.",
+      techTags: [
+        "React",
+        "JavaScript",
+        "HTML5",
+        "CSS3",
+        "Node.js",
+        "Express",
+        "MongoDB",
+        "Tailwind CSS",
+        "REST APIs",
+        "Stripe API",
+      ],
+      icon: Icons.storefront_outlined,
+      userImages: [
+        "assets/project_nexstore_web_user1.png",
+        "assets/project_nexstore_web_user2.png",
+        "assets/project_nexstore_web_user3.png",
+      ],
+      adminImages: [
+        "assets/project_nexstore_web_admin1.png",
+        "assets/project_nexstore_web_admin2.png",
+      ],
+      highlights: [
+        "Designed pixel-perfect responsive web UI using custom CSS3 and React component architecture.",
+        "Optimized Core Web Vitals (LCP, CLS, FID) to achieve 95+ Google Lighthouse performance score.",
+        "Integrated Stripe web payment checkout flow with automated webhook event handlers.",
+        "Implemented custom debounced search filter system for ultra-fast product lookup across 5,000+ items.",
+      ],
+    ),
+    ProjectDetail(
+      year: "2024-2025",
+      title: "SaaS CloudOps Platform",
+      subtitle: "High-Performance Cloud Analytics & Automation Website",
+      category: "Web Application & Website",
+      description:
+          "Architected a full-stack SaaS marketing website & real-time telemetry dashboard. Implemented dynamic dark-mode landing pages, automated lead capture funnels, webhooks, and live server health monitors built with React, TypeScript, and HTML5/CSS3.",
+      techTags: [
+        "React",
+        "TypeScript",
+        "HTML5",
+        "CSS3",
+        "JavaScript",
+        "Node.js",
+        "Express",
+        "REST APIs",
+        "Tailwind CSS",
+      ],
+      icon: Icons.cloud_queue_rounded,
+      userImages: [
+        "assets/project_cloudops_web_user1.png",
+        "assets/project_cloudops_web_user2.png",
+        "assets/project_cloudops_web_user3.png",
+      ],
+      adminImages: [
+        "assets/project_cloudops_web_admin1.png",
+        "assets/project_cloudops_web_admin2.png",
+      ],
+      highlights: [
+        "Built responsive, high-converting SaaS website landing page with glassmorphism CSS aesthetics.",
+        "Engineered live server metric charts and webhook notification integration.",
+        "Optimized SEO meta hierarchy, OpenGraph social cards, and speed index.",
+        "Implemented interactive pricing toggles and automated email subscription workflows.",
+      ],
+    ),
+    ProjectDetail(
+      year: "2024",
+      title: "Apex Agency Website",
+      subtitle: "Interactive 3D Agency Portal & CMS Showcase",
+      category: "Web Application & Website",
+      description:
+          "Designed and developed an interactive agency showcase website featuring smooth micro-animations, custom cursor interactions, case study CMS integration, and responsive layout scaling across desktop, tablet, and mobile screens.",
+      techTags: [
+        "React",
+        "JavaScript",
+        "HTML5",
+        "CSS3",
+        "Node.js",
+        "REST APIs",
+        "Figma UX",
+      ],
+      icon: Icons.language_rounded,
+      userImages: [
+        "assets/project_apex_agency_user1.png",
+        "assets/project_apex_agency_user2.png",
+        "assets/project_apex_agency_user3.png",
+      ],
+      adminImages: [
+        "assets/project_apex_agency_admin1.png",
+        "assets/project_apex_agency_admin2.png",
+      ],
+      highlights: [
+        "Integrated interactive 3D hero canvas elements with smooth scroll animations.",
+        "Constructed custom headless CMS backend for easy case study publishing and team blogs.",
+        "Achieved 98+ Google Lighthouse score across Performance, Accessibility, and SEO.",
+        "Built modular, reusable HTML5/CSS3 components with strict BEM naming conventions.",
       ],
     ),
     ProjectDetail(
@@ -4662,6 +4960,55 @@ class ProjectDetail {
         "Designed daily verses notifications delivered via FCM scheduled CRON triggers.",
       ],
     ),
+    ProjectDetail(
+      year: "2025",
+      title: "Apex Fintech Design System",
+      subtitle: "Comprehensive Design Language & Component Library",
+      category: "UI/UX Design",
+      description:
+          "Crafted a complete, modern design system for a global fintech platform. Designed 150+ reusable Figma components, typography scale, accessibility-compliant color tokens, and interactive micro-animations. Conducted usability validation tests on high-fidelity prototypes.",
+      techTags: [
+        "Figma UX",
+        "Design System",
+        "Wireframing",
+        "Prototyping",
+        "UI Design",
+        "Design Tokens",
+      ],
+      icon: Icons.palette_outlined,
+      userImages: [],
+      adminImages: [],
+      highlights: [
+        "Created 150+ variants of UI components with dynamic auto-layout constraints in Figma.",
+        "Designed accessibility-compliant dark/light mode color tokens (WCAG AA standard).",
+        "Built interactive high-fidelity user flows for mobile onboarding and stock transfers.",
+        "Collaborated with developers to export Figma design tokens directly into Flutter theme classes.",
+      ],
+    ),
+    ProjectDetail(
+      year: "2024",
+      title: "Fresh Cart UX Research",
+      subtitle: "User Journey, Cart Optimization & Checkout Flows",
+      category: "UI/UX Design",
+      description:
+          "Led user research, information architecture design, and UX design for a local grocery delivery mobile app. Designed low-to-high fidelity wireframes, user journey maps, and optimized shopping cart checkout flow pages, reducing drop-off rates.",
+      techTags: [
+        "Figma UX",
+        "User Research",
+        "Wireframing",
+        "Information Architecture",
+        "Interaction Design",
+      ],
+      icon: Icons.gesture_rounded,
+      userImages: [],
+      adminImages: [],
+      highlights: [
+        "Conducted 12 user interviews and constructed detailed user personas and empathy maps.",
+        "Redesigned checkout flow to reduce required purchase clicks from 7 to 3 steps.",
+        "Tested interactive click-through prototyping in Figma for quick layout validation.",
+        "Optimized user search and item navigation layout based on quantitative A/B test results.",
+      ],
+    ),
   ];
 }
 
@@ -4697,12 +5044,12 @@ class MobileDeviceFrame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 250,
+      width: 140,
       height: 420,
       decoration: BoxDecoration(
         color: const Color(0xFF0F0F0F),
-        borderRadius: BorderRadius.circular(36),
-        border: Border.all(color: Colors.white.withOpacity(0.12), width: 6),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.12), width: 3),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.5),
@@ -4930,9 +5277,10 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
     final isDesktop = MediaQuery.of(context).size.width > 900;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    final currentImages = _selectedTab == 0
-        ? widget.project.userImages
-        : widget.project.adminImages;
+    final bool isWebProject = widget.project.category.contains("Web");
+    final currentImages = isWebProject
+        ? (_selectedTab == 0 ? widget.project.adminImages : widget.project.userImages)
+        : (_selectedTab == 0 ? widget.project.userImages : widget.project.adminImages);
 
     // Boundary sanity check
     if (_currentImageIndex >= currentImages.length) {
@@ -5240,6 +5588,25 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
 
   Widget _buildImageCard(BuildContext context, List<String> currentImages) {
     final activeImage = currentImages[_currentImageIndex];
+    final bool isWebProject = widget.project.category.contains("Web");
+    final bool isBrowserFrame = isWebProject ? (_selectedTab == 0) : (_selectedTab == 1);
+
+    final String tab0Text = isWebProject
+        ? "DESKTOP WEB (${widget.project.adminImages.length})"
+        : "USER APP (${widget.project.userImages.length})";
+    final String tab1Text = isWebProject
+        ? "MOBILE VIEW (${widget.project.userImages.length})"
+        : "ADMIN PANEL (${widget.project.adminImages.length})";
+
+    final Color tab0ActiveColor = isWebProject ? const Color(0xFF00E5FF) : const Color(0xFFFF5C35);
+    final Color tab1ActiveColor = isWebProject ? const Color(0xFFFF5C35) : const Color(0xFFB2FF33);
+    final Color tab0TextColor = _selectedTab == 0
+        ? (isWebProject ? const Color(0xFF0F0F0F) : Colors.white)
+        : Colors.white.withOpacity(0.6);
+    final Color tab1TextColor = _selectedTab == 1
+        ? (isWebProject ? Colors.white : const Color(0xFF0F0F0F))
+        : Colors.white.withOpacity(0.6);
+
     return Column(
       children: [
         // Tab buttons (Mobile User vs Admin Web)
@@ -5261,20 +5628,16 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
-                      color: _selectedTab == 0
-                          ? const Color(0xFFFF5C35)
-                          : Colors.transparent,
+                      color: _selectedTab == 0 ? tab0ActiveColor : Colors.transparent,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     alignment: Alignment.center,
                     child: Text(
-                      "USER APP (3)",
+                      tab0Text,
                       style: GoogleFonts.outfit(
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
-                        color: _selectedTab == 0
-                            ? Colors.white
-                            : Colors.white.withOpacity(0.6),
+                        color: tab0TextColor,
                       ),
                     ),
                   ),
@@ -5289,20 +5652,16 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
-                      color: _selectedTab == 1
-                          ? const Color(0xFFB2FF33)
-                          : Colors.transparent,
+                      color: _selectedTab == 1 ? tab1ActiveColor : Colors.transparent,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     alignment: Alignment.center,
                     child: Text(
-                      "ADMIN PANEL (2)",
+                      tab1Text,
                       style: GoogleFonts.outfit(
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
-                        color: _selectedTab == 1
-                            ? const Color(0xFF0F0F0F)
-                            : Colors.white.withOpacity(0.6),
+                        color: tab1TextColor,
                       ),
                     ),
                   ),
@@ -5351,12 +5710,9 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
                   duration: const Duration(milliseconds: 250),
                   transitionBuilder: (child, animation) =>
                       FadeTransition(opacity: animation, child: child),
-                  child: _selectedTab == 0
-                      ? MobileDeviceFrame(
-                          key: ValueKey("mobile_$activeImage"),
-                          child: Image.asset(activeImage, fit: BoxFit.cover),
-                        )
-                      : LayoutBuilder(
+                  child: isBrowserFrame
+                      ? LayoutBuilder(
+                          key: ValueKey("browser_$activeImage"),
                           builder: (context, frameConstraints) {
                             final double maxWidth = frameConstraints.maxWidth;
                             final double frameWidth = 390.0.clamp(0.0, maxWidth);
@@ -5365,17 +5721,25 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen>
                               width: frameWidth,
                               height: frameHeight,
                               child: BrowserDeviceFrame(
-                                key: ValueKey("browser_$activeImage"),
                                 projectTitle: widget.project.title,
                                 child: Image.asset(
                                   activeImage,
-                                  fit: BoxFit.cover,
+                                  fit: BoxFit.fill,
+                                  alignment: Alignment.topCenter,
                                   width: double.infinity,
                                   height: double.infinity,
                                 ),
                               ),
                             );
                           },
+                        )
+                      : MobileDeviceFrame(
+                          key: ValueKey("mobile_$activeImage"),
+                          child: Image.asset(
+                            activeImage,
+                            fit: BoxFit.fill,
+                            alignment: Alignment.topCenter,
+                          ),
                         ),
                 ),
               ),
@@ -6013,11 +6377,14 @@ class ProgrammingLanguagesGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> languages = [
       {"name": "Dart", "rating": 5},
+      {"name": "JavaScript", "rating": 5},
+      {"name": "TypeScript", "rating": 5},
+      {"name": "HTML", "rating": 5},
+      {"name": "CSS", "rating": 5},
       {"name": "Kotlin", "rating": 5},
       {"name": "Swift", "rating": 5},
       {"name": "Python", "rating": 5},
       {"name": "Java", "rating": 5},
-      {"name": "HTML", "rating": 5},
     ];
 
     return LayoutBuilder(
@@ -6058,7 +6425,7 @@ class _LanguageProgressCircleState extends State<LanguageProgressCircle> {
 
   String _getProficiencyText(String name) {
     final lowerName = name.toLowerCase().trim();
-    if (lowerName == 'dart' || lowerName == 'python' || lowerName == 'java' || lowerName == 'html') {
+    if (lowerName == 'dart' || lowerName == 'javascript' || lowerName == 'typescript' || lowerName == 'html' || lowerName == 'css' || lowerName == 'python' || lowerName == 'java') {
       return "Expert";
     }
     return "Proficient";
